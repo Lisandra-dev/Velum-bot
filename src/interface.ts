@@ -34,3 +34,37 @@ export const Seuil = {
 	epique : 16,
 	impossible : 20
 };
+
+export const SEUIL_KEYS = Object.keys(Seuil).map(value => value.toString());
+
+export const STATISTIQUES = [
+	"force",
+	"constitution",
+	"agilite",
+	"intelligence",
+	"psychologie",
+	"perception"];
+
+export const PREFIX = "!";
+
+export interface Parameters {
+	seuil?: number;
+	cc?: boolean;
+	statistiques: number;
+	statistiqueName: string;
+	modificateur: number;
+	commentaire?: string;
+	personnage?: string;
+	user: string;
+	fiche?: boolean;
+}
+
+export const PARAMS = {
+	"seuil" : /^[><]/,
+	"statistiques" : STATISTIQUES,
+	"modificateur" : /^[+-]/,
+	"commentaire" : /^#/,
+	"personnage" : /^&/,
+	"user" : /^@/,
+	"cc" : /cc/i
+};

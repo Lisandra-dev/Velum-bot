@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 import process from "process";
 import { commands } from "../commands";
 import { logInDev } from "../utils";
-import { VERSION } from "../index";
+import {DESTROY, VERSION} from "../index";
+import {destroyDB, loadGuild} from "../maps";
 
 dotenv.config();
 
@@ -33,7 +34,11 @@ export default (client: Client): void => {
 				{ body: serializeCmds }
 			);
 			logInDev(`Load in ${guild.name} done`);
-			//remove("189390243676422144", guild.id);
+			logInDev(`Exporting maps for ${guild.name}`);
+			if (DESTROY) destroyDB();
+			loadGuild(guild.id);
+			//const exported = exportMaps();
+			//logInDev(exported);
 		}
 	});
 };

@@ -11,6 +11,8 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "checkJs": false,
         "resolveJsonModule": true,
         "forceConsistentCasingInFileNames": true,
         "removeComments": true,

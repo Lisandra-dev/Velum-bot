@@ -1,8 +1,23 @@
 import Enmap from "enmap";
-import { logInDev } from "./utils";
-import { Characters, Statistiques } from "./interface";
+import {latinize, logInDev} from "./utils";
+import {Statistiques } from "./interface";
 
-const characters = new Enmap({name: "Characters"});
+/**
+ * Create a new Enmap "Characters"
+ * @type {Enmap}
+ * @name Characters
+ * @description Store all characters of all users
+ * guildID:
+ *  userID1: @type {Statistiques[]}
+ *  userID2: @type {Statistiques[]}
+ */
+
+
+const characters = new Enmap({name: "Characters",
+	fetchAll: false,
+	autoFetch: true,
+	cloneLevel: "deep"});
+
 
 /**
  * Set a value in Emaps 
@@ -13,8 +28,7 @@ export function set(
 	guildID: string,
 	value: Statistiques
 ) {
-	const key = `${user}-${guildID}`; // ensure that the key is unique
-	const userCharacters = characters.get(key) as Statistiques[];
+	const userCharacters = characters.get(guildID, user) as Statistiques[];
 	if (userCharacters) {
 		const charName = value.characterName ?? "main";
 		const charStats = userCharacters.find((s: Statistiques) => s.characterName === charName);
@@ -22,44 +36,53 @@ export function set(
 			//replace
 			const index = userCharacters.indexOf(charStats);
 			userCharacters[index] = value;
-			characters.set(key, userCharacters);
+			characters.set(guildID, userCharacters, user);
 			logInDev(`Updated ${user}'s ${charName} stats:`, value);
 		} else {
 			//add
 			userCharacters.push(value);
-			characters.set(key, userCharacters);
+			characters.set(guildID, userCharacters, user);
 			logInDev(`Added ${user}'s ${charName} stats:`, value);
 		}
 	} else {
-		characters.set(key, [value]);
+		/**
+		 * Create a new user in the map
+		 * guildID: {
+		 *   idUser: @type {Statistiques[]}
+		 * }
+		 */
+		const newUser = {[user]: [value]};
+		characters.set(guildID, newUser);
+		logInDev(characters.get(guildID, user));
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
 }
 
 
 export function get(user: string, guildID: string): Statistiques[] {
-	const key = `${user}-${guildID}`; // ensure that the key is unique
-	return characters.get(key) ?? [] as Statistiques[] ;
+	return characters.get(guildID, user) ?? [] as Statistiques[] ;
 }
 
 export function getCharacters(user: string, guildID: string, characterName?: string): Statistiques | undefined{
-	const key = `${user}-${guildID}`; // ensure that the key is unique
-	const userCharacters = characters.get(key) as Statistiques[];
+	const userCharacters = characters.get(guildID, user) as Statistiques[];
 	logInDev(userCharacters);
+	logInDev(characters.get(guildID));
 	logInDev(`getCharacters: ${user}'s characters:`, userCharacters);
 	if (userCharacters) {
-		return userCharacters.find((s: Statistiques) => s.characterName === characterName);
+		return userCharacters.find((s: Statistiques) => {
+			s.characterName ??= "main";
+			if (!characterName) return;
+			return latinize(s.characterName).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
+		});
 	}
 	return undefined;
 }
 
-export function removeAll(user: string, guildID: string) {
-	const key = `${user}-${guildID}`; // ensure that the key is unique
-	characters.delete(key);
+export function removeUser(user: string, guildID: string) {
+	characters.delete(guildID, user);
 }
 export function removeCharacter(user: string, guildID: string, chara?: string) {
-	const key = `${user}-${guildID}`; // ensure that the key is unique
-	const userCharacters = characters.get(key) as Statistiques[];
+	const userCharacters = characters.get(guildID, user) as Statistiques[];
 	if (userCharacters) {
 		const charName = chara ?? "main";
 		const charStats = userCharacters.find((s: Statistiques) => s.characterName === charName);
@@ -67,14 +90,34 @@ export function removeCharacter(user: string, guildID: string, chara?: string) {
 			//replace
 			const index = userCharacters.indexOf(charStats);
 			userCharacters.splice(index, 1);
-			characters.set(key, userCharacters);
+			characters.set(guildID, userCharacters, user);
 			logInDev(`Removed ${user}'s ${charName} stats:`, charStats);
 			// delete if empty
 			if (userCharacters.length === 0) {
-				removeAll(user, guildID);
+				removeUser(user, guildID);
 			}
 		}
 	} else {
 		logInDev(`No characters found for ${user}`);
 	} 
+}
+
+export function removeGuild(guildID: string, guildName: string) {
+	//search all keys for guildID
+	characters.delete(guildID);
+	logInDev(`Removed ${guildName} (${guildID}) from characters`);
+}
+
+export function exportMaps() {
+	return characters.export();
+}
+
+export function loadGuild(guildID: string) {
+	characters.ensure(guildID, {});
+	
+}
+
+export function destroyDB() {
+	characters.deleteAll();
+	console.log("Destroyed DB");
 }

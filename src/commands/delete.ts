@@ -6,7 +6,7 @@ import { ActionRowBuilder,
 	ButtonBuilder,
 	SlashCommandBuilder, 
 	userMention} from "discord.js";
-import { getCharacters, removeAll, removeCharacter } from "../maps";
+import { getCharacters, removeUser, removeCharacter } from "../maps";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -71,7 +71,7 @@ export default {
 			collector?.on("collect", async (i) => {
 				if (!interaction.guild) return;
 				if (i.customId === "confirm") {
-					removeAll(user.id, interaction.guild.id);
+					removeUser(user.id, interaction.guild.id);
 					await i.update({
 						content: `Tous les personnages de ${userMention(user.id)} ont été supprimés`,
 						components: []
