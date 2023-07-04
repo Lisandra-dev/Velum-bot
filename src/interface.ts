@@ -68,3 +68,12 @@ export const PARAMS = {
 	"user" : /^@/,
 	"cc" : /cc/i
 };
+
+export const IMAGE_STATISTIQUES  = {
+	force: "",
+	constitution: "",
+	agilite: "",
+	intelligence: "",
+	psychologie: "",
+	perception: ""
+};

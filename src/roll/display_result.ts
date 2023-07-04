@@ -78,7 +78,7 @@ export function displayResultAtq(param: Parameters, result: {roll: number, stats
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-
+	
 	return new EmbedBuilder()
 		.setAuthor({
 			name: `${author} • ${capitalize(param.statistiqueName)}`,
@@ -86,6 +86,7 @@ export function displayResultAtq(param: Parameters, result: {roll: number, stats
 		})
 		.setFooter({
 			text: `[ ${calculExplained} ] ${ccMsg.message}`,
+			iconURL: "https://imgur.com/1xGY5S1.png"
 		})
 		.setTitle(`- ${total} 💖`)
 		.setDescription(commentaire)
