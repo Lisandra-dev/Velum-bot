@@ -1,5 +1,5 @@
 import {Parameters} from "../interface";
-import {EmbedBuilder, GuildMember, Message, MessagePayload, MessagePayloadOption, userMention} from "discord.js";
+import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {logInDev} from "../utils";
 
 export function displayResultNeutre(param: Parameters, result: {roll: number, stats: number}, success: {success: boolean, EC: boolean, RC: boolean}) {

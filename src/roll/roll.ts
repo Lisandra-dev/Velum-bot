@@ -101,7 +101,7 @@ function getStatistiques(params: string[], guildID: string, param: Parameters) {
 
 function getCommentaire(params: string[]) {
 	const commentaireFind = params.find( (value) => value.match(PARAMS.commentaire));
-	let commentaire = "";
+	let commentaire: string;
 	if (params.length === 2 && !commentaireFind) {
 		commentaire = params[1];
 	} else {
