@@ -77,9 +77,9 @@ console.log(c.success(tlog.env + nodeEnvTrad));
 
 
 const envContent = dedent(`
-	DISCORD_TOKEN=${token.trim()}
-	CLIENT_ID=${clientId.trim()}
-	NODE_ENV=${nodeEnv.trim()}
+DISCORD_TOKEN=${token.trim()}
+CLIENT_ID=${clientId.trim()}
+NODE_ENV=${nodeEnv.trim()}
 `);
 
 
