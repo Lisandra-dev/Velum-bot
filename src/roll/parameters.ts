@@ -41,11 +41,9 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	const statistiques = getParamStats(messageContent, guildID, args);
 	messageContent = statistiques.params;
 	args.statistiques = statistiques.param.statistiques;
-	
 	const commentaire = getCommentaire(messageContent);
 	messageContent = commentaire.params;
 	args.commentaire = commentaire.commentaire;
-	
 	if (rollType === "neutre") {
 		const seuil = getSeuilInParameters(messageContent);
 		messageContent = seuil.params;
@@ -55,11 +53,9 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 		messageContent = cc.params;
 		args.cc = cc.cc;
 	}
-	
 	const modificateur = getModifier(messageContent);
 	messageContent = modificateur.params;
 	args.modificateur = modificateur.modificateur;
-	
 	if (messageContent.length > 0 && !args.commentaire) {
 		//set the rest of the message as comment
 		args.commentaire = messageContent.join(" ");
@@ -92,13 +88,12 @@ function getPersonnage(params: string[]) {
 
 function getParamStats(params: string[], guildID: string, param: Parameters) {
 	if (params.length >= 1) {
-		/** search right value of statistiques **/
-		const statistiquesArgs = STATISTIQUES.find( (value) => value.includes(latinize(params[0].toLowerCase()))) ?? "neutre";
-		param.statistiqueName = statistiquesArgs;
+		const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinize(params[0].toLowerCase())));
+		param.statistiqueName = statistiquesArgs ?? "Neutre";
 		params = removeFromArgumentsWithString(params, statistiquesArgs);
-		/** remove params[0] */
-		params = params.slice(1);
-		param.statistiques = getStatistique(param.user, guildID, statistiquesArgs, param.personnage ?? "main");
+		const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
+		param.statistiques = stats.modif;
+		param.fiche = stats.fiche;
 	}
 	return {params, param};
 }
