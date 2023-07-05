@@ -63,12 +63,12 @@ function displayResult(
 		}
 	};
 	logInDev(number);
-	number.modifStat = first !== 0 ? number.modifStat : "";
 	const secondWithoutSigne = number.second.value as number;
 	number.second.value = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
 	number.first = first > number.second.value ? first : number.second.value;
 	number.second.value = number.first > number.second.value ? number.second.value : first;
-	
+	number.modifStat = number.first !== 0 ? number.modifStat : "";
+
 	/**
 	 * Template :
 	 * ${result.roll} ${ccMs.indicatif} ${signe.modifStat} (${first.first}${second.signe}${second.second})
@@ -90,8 +90,10 @@ function displayResult(
 	 * - (first.first + second.second)
 	 * aka remove first - and replace the second signe by +
 	 */
+	const rollCC = param.cc ? `(${result.roll} x 2)` : `${result.roll}`;
 	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
-	const calculExplained = `${result.roll} ${ccMsg.indicatif}${number.modifStat}${formula}`;
+	const calculExplained = `${rollCC} ${number.modifStat}${formula}`;
+	logInDev(`calculExplained : ${calculExplained}`, "modif", number.modifStat);
 	
 	/** get member **/
 	if (!member) return {} as Result;

@@ -62,7 +62,9 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	args.modificateur = modificateur.modificateur;
 	if (messageContent.length > 0 && !args.commentaire) {
 		//set the rest of the message as comment
-		args.commentaire = messageContent.join(" ");
+		//remove all other parameters
+		messageContent = removeAllPARAMSregex(messageContent);
+		if (messageContent.length > 0) args.commentaire = messageContent.join(" ");
 	}
 	logInDev(args);
 	return args;
@@ -106,7 +108,7 @@ function getCommentaire(params: string[]) {
 	const commentaireFind = params.find( (value) => value.match(PARAMS.commentaire));
 	let commentaire: string;
 	if (params.length === 2 && !commentaireFind) {
-		commentaire = params[1];
+		commentaire = removeAllPARAMSregex(params).length > 0 ? params[1] : "";
 	} else {
 		const commentaireFind = params.find( (value) => value.match(PARAMS.commentaire));
 		commentaire = commentaireFind ? commentaireFind.replace(PARAMS.commentaire, "") : "";
@@ -195,4 +197,13 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 		};
 	}
 	return args;
+}
+
+function removeAllPARAMSregex(params: string[]) {
+	Object.values(PARAMS).forEach( (value) => {
+		if (value instanceof RegExp) {
+			params = removeFromArguments(params, value);
+		}
+	});
+	return params;
 }
