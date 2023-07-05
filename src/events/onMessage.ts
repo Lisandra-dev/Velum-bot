@@ -2,8 +2,9 @@ import {ChannelType, Client} from "discord.js";
 import {
 	logInDev,
 } from "../utils";
-import {getParameters, rollCombat, rollNeutre} from "../roll/roll";
-import {displayResultAtq, displayResultNeutre, ephemeralInfo} from "../roll/display_result";
+import {rollCombat, rollNeutre} from "../roll";
+import { getParameters } from "../roll/parameters";
+import {displayResultAtq, displayResultNeutre, ephemeralInfo} from "../display/results";
 import {exportMaps, getConfig} from "../maps";
 
 export default (client: Client): void => {
