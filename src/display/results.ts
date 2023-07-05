@@ -52,35 +52,32 @@ function displayResult(
 		ccMsg.message = seuilMessageSuccess(result);
 	}
 	
-	const signe = {
-		"modifStat" : param.modificateur + result.stats > 0 ? " + " : " - ",
-		"first" : param.modificateur > result.stats ? param.modificateur : result.stats,
-		"second" : param.modificateur > result.stats ? result.stats : param.modificateur,
-	};
-	const first = {
-		"first" : signe.first,
-	};
-	const second = {
-		"second" : signe.second !== 0 ?
-			signe.second : 0,
-		"signe" : signe.second !== 0 ? signe.second > 0 ? "+" : "-" : "",
+	const second = param.modificateur > result.stats ? result.stats : param.modificateur;
+	const first = param.modificateur > result.stats ? param.modificateur : result.stats;
+	const number = {
+		modifStat: param.modificateur + result.stats > 0 ? " + " : " - ",
+		first : first,
+		second: {
+			value: second !== 0 ? second : 0,
+			signe: second !== 0 ? second > 0 ? "+" : "-" : ""
+		}
 	};
 	
-	signe.modifStat = first.first !== 0 ? signe.modifStat : "";
-	const secondWithoutSigne = second.second as number;
-	second.second = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
+	number.modifStat = first !== 0 ? number.modifStat : "";
+	const secondWithoutSigne = number.second.value as number;
+	number.second.value = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
 	
 	/**
 	 * Template :
 	 * ${result.roll} ${ccMs.indicatif} ${signe.modifStat} (${first.first}${second.signe}${second.second})
 	 */
 
-	logInDev(`first : ${first.first} | second : ${signe.second}`);
+	logInDev(`first : ${number.first} | second : ${number.second.value}`);
 	let formula = "";
-	if (first.first !== 0) {
-		formula = second.second !== 0 ? ` (${first.first} ${second.signe} ${second.second})` : `${first.first}`;
+	if (number.first !== 0) {
+		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
 	} else {
-		formula = second.second !== 0 ? `${second.signe} ${second.second}` : "";
+		formula = number.second.value !== 0 ? `${number.second.signe} ${number.second.value}` : "";
 	}
 	
 	/**
@@ -91,8 +88,8 @@ function displayResult(
 	 * - (first.first + second.second)
 	 * aka remove first - and replace the second signe by +
 	 */
-	formula = signe.modifStat.trim() === "-" && first.first < 0 ? `(${second.second} + ${first.first * -1})` : formula;
-	const calculExplained = `${result.roll} ${ccMsg.indicatif}${signe.modifStat}${formula}`;
+	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
+	const calculExplained = `${result.roll} ${ccMsg.indicatif}${number.modifStat}${formula}`;
 	
 	/** get member **/
 	if (!member) return {} as Result;

@@ -14,7 +14,7 @@ import {getInteractionArgs} from "../roll/parseArg";
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName("roll")
+		.setName("r")
 		.setDescription("Lance 1D20 de jet d'action")
 		.addStringOption( (option) => option
 			.setName("statistique")
