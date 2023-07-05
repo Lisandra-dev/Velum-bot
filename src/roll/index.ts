@@ -1,4 +1,4 @@
-import {Parameters} from "../interface";
+import {Parameters, ResultRolls} from "../interface";
 import {
 	getNeutreSuccess, roundUp
 } from "../utils";
@@ -7,18 +7,18 @@ import {
 
 export function rollNeutre(param: Parameters)
 {
-	if (!param.seuil) return ;
+	if (!param.seuil) return {} as ResultRolls;
 	const stats = roundUp((param.statistiques - 11)/2) + param.modificateur;
 	const roll = Math.floor(Math.random() * 20) + 1;
 	const result = roll + stats;
 	const success = getNeutreSuccess(result, param.seuil);
-	return {roll, stats, success};
+	return {roll, stats, success} as ResultRolls;
 }
 
 export function rollCombat(param: Parameters) {
-	if (param.cc === undefined) return ;
+	if (param.cc === undefined) return {} as ResultRolls;
 	const stats = roundUp((param.statistiques - 11)/2);
 	const roll = Math.floor(Math.random() * 8) + 1;
-	return {roll, stats};
+	return {roll, stats} as ResultRolls;
 }
 
