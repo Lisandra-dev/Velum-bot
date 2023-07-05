@@ -8,10 +8,10 @@
         "build": "tsc",
         "prestart": "pnpm run build",
         "start": "pm2 start dist/src/index.js --name Velum-bot --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
-        "stop": "pm2 stop knitting-bot",
+        "stop": "pm2 stop Velum-bot",
         "prerestart": "pnpm run build",
-        "restart": "pm2 restart knitting-bot",
-        "delete": "pm2 delete knitting-bot",
+        "restart": "pm2 restart Velum-bot",
+        "delete": "pm2 delete Velum-bot",
         "dev": "ts-node-dev --respawn -- src/index.ts",
         "lint": "eslint --ext .ts src/",
         "lint:fix": "eslint --ext .ts src/ --fix"
