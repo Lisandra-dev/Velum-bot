@@ -62,10 +62,12 @@ function displayResult(
 			signe: second !== 0 ? second > 0 ? "+" : "-" : ""
 		}
 	};
-	
+	logInDev(number);
 	number.modifStat = first !== 0 ? number.modifStat : "";
 	const secondWithoutSigne = number.second.value as number;
 	number.second.value = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
+	number.first = first > number.second.value ? first : number.second.value;
+	number.second.value = number.first > number.second.value ? number.second.value : first;
 	
 	/**
 	 * Template :
@@ -95,7 +97,6 @@ function displayResult(
 	if (!member) return {} as Result;
 	let author = param.personnage !== "main" ? param.personnage : member.displayName;
 	author = author || member.nickname || member.user.username;
-	logInDev(`author : ${author}`, member.nickname, param.personnage);
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
