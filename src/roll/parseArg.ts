@@ -1,4 +1,4 @@
-import {CommandInteraction, CommandInteractionOptionResolver, Message, User, userMention} from "discord.js";
+import {CommandInteraction, CommandInteractionOptionResolver, Message, User} from "discord.js";
 import {DEFAULT_STATISTIQUE, Parameters, PARAMS, Seuil, SEUIL_KEYS, STATISTIQUES} from "../interface";
 import {
 	getSeuil,

@@ -36,7 +36,7 @@ function displayResult(
 	result: ResultRolls,
 	member: GuildMember | null,
 	roll: "combat" | "neutre") {
-	let total = 0;
+	let total : number;
 	logInDev(`param : ${JSON.stringify(result)}`);
 	let ccMsg = {
 		"indicatif": "",
@@ -75,7 +75,7 @@ function displayResult(
 	 */
 
 	logInDev(`first : ${number.first} | second : ${number.second.value}`);
-	let formula = "";
+	let formula : string;
 	if (number.first !== 0) {
 		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
 	} else {
