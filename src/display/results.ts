@@ -97,6 +97,8 @@ function displayResult(
 	/** get member **/
 	if (!member) return {} as Result;
 	let author = param.personnage !== "main" ? param.personnage : member.displayName;
+	author = !author ? member.nickname ?? member.user.username : author;
+	logInDev(`author : ${author}`, member.nickname, param.personnage);
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
@@ -113,7 +115,7 @@ function displayResult(
 	return finalResultMessage;
 }
 
-function capitalize(str: string) {
+export function capitalize(str: string) {
 	return str[0].toUpperCase() + str.slice(1);
 }
 

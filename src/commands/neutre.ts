@@ -1,12 +1,21 @@
-import { AutocompleteInteraction, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, User, userMention } from "discord.js";
-import { logInDev } from "../utils";
-import { DEFAULT_STATISTIQUE, Seuil } from "../interface";
-import { getCharacters } from "../maps";
+import {
+	AutocompleteInteraction,
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	GuildMember,
+	SlashCommandBuilder,
+	userMention
+} from "discord.js";
+import { Seuil} from "../interface";
+import {rollNeutre} from "../roll";
+import {displayNEUTRE} from "../display/results";
+import {logInDev} from "../utils";
+import {getInteractionArgs} from "../roll/parseArg";
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName("roll")
-		.setDescription("Lance 1D8 de dégât")
+		.setDescription("Lance 1D20 de jet d'action")
 		.addStringOption( (option) => option
 			.setName("statistique")
 			.setDescription("Statistique à utiliser")
@@ -57,61 +66,19 @@ export default {
 
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
-		const options = interaction.options as CommandInteractionOptionResolver;
-		const seuil = options.getString("seuil") || "moyen";
-		const stat = options.getString("statistique") || "neutre";
-		const name = options.getString("name") || "main";
-		const modificateur = options.getInteger("modificateur") || 0;
-		const commentaire = options.getString("commentaire") || "";
-		/** search seuil number */
-		const seuilValue = Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
-		/** search characters */
-		const user = interaction.user as User;
-		const guildID = interaction.guild.id;
-		let characters = getCharacters(guildID, user.id, name);
+		const args = getInteractionArgs(interaction, "neutre");
+		const result = rollNeutre(args);
+		const member = interaction.member as GuildMember;
+		logInDev(member);
+		const embed = displayNEUTRE(args, result, member);
 		let msgInfo = "";
-		if (!characters) {
-			msgInfo = `${userMention(user.id)} n'a pas de personnage ; Utilisation des statistiques par défaut (10)`;
-			characters = DEFAULT_STATISTIQUE;
+		if (!args.fiche) {
+			msgInfo = `${userMention(args.user)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} (10)`;
 		}
-		const roll = Math.floor(Math.random() * 20) + 1;
-		const charModif = characters.stats;
-		const statModif = charModif[stat as keyof typeof charModif] ?? 10;
-		logInDev("statModif", statModif);
-		const calcEditByStats = roundUp((statModif - 11)/2) + modificateur;
-		logInDev("calcEditByStats", calcEditByStats);
-		logInDev("roll", roll);
-		logInDev("seuilValue", seuilValue);
-		const result = roll + calcEditByStats;
-		const resultSuccess = {
-			"success" : result >= seuilValue,
-			"EC" : result === 1,
-			"RC" : result === 20
-		};
-		let msg = "";
-		const userMsg = name === "main" ? userMention(user.id) : `[${name}] (${userMention(user.id)})`;
-		if (resultSuccess.EC) {
-			msg = `${userMsg} fait un EC !`;
-		} else if (resultSuccess.RC) {
-			msg = `${userMsg} fait un RC !`;
-		} else {
-			msg = `${userMsg} fait un ${resultSuccess.success ? "succès" : "échec"} !`;
-		}
-		msg += `\n#Roll : ${roll} ${calcEditByStats} = ${result}`;
-		msg += `\n#Seuil : ${seuilValue}`;
-		msg += commentaire ? `\n#Commentaire : ${commentaire}` : "";
-		await interaction.reply({ content: msg });
+		await interaction.reply({ embeds: [embed] });
 		if (msgInfo) {
 			await interaction.followUp({ content: msgInfo, ephemeral: true });
 		}
 	}
 };
-
-function roundUp(num: number): number {
-	if (num >= 0) {
-		return Math.ceil(num);
-	} else {
-		return Math.floor(num);
-	}
-}
 

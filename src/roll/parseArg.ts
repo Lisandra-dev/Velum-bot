@@ -1,5 +1,5 @@
-import {Message} from "discord.js";
-import {Parameters, PARAMS, Seuil, SEUIL_KEYS, STATISTIQUES} from "../interface";
+import {CommandInteraction, CommandInteractionOptionResolver, Message, User, userMention} from "discord.js";
+import {DEFAULT_STATISTIQUE, Parameters, PARAMS, Seuil, SEUIL_KEYS, STATISTIQUES} from "../interface";
 import {
 	getSeuil,
 	getStatistique,
@@ -8,7 +8,8 @@ import {
 	removeFromArguments,
 	removeFromArgumentsWithString
 } from "../utils";
-import {getConfig} from "../maps";
+import {getCharacters, getConfig} from "../maps";
+import {capitalize} from "../display/results";
 
 
 export function getParameters(message: Message, rollType: "neutre"|"combat") {
@@ -149,4 +150,49 @@ function getCC(params: string[]) {
 	const cc = !!find;
 	params = removeFromArguments(params, PARAMS.cc);
 	return {params, cc};
+}
+
+export function getInteractionArgs(interaction: CommandInteraction, type: "combat" | "neutre") {
+	const options = interaction.options as CommandInteractionOptionResolver;
+	const stat = options.getString("statistique") || "neutre";
+	const name = options.getString("name") || "main";
+	const modificateur = options.getInteger("modificateur") || 0;
+	const commentaire = options.getString("commentaire") || "";
+	const user = interaction.user as User;
+	/**
+	 * the guildID is not null because the command is guild only
+	 * We check the guildID before the command is executed
+	 */
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	//@ts-ignore
+	const guildID = interaction.guild.id;
+	let characters = getCharacters(user.id, guildID, name);
+	let fiche = true;
+	if (!characters) {
+		characters = DEFAULT_STATISTIQUE;
+		fiche = false;
+	}
+	const charModif = characters.stats;
+	const statModif = charModif[stat as keyof typeof charModif] ?? 10;
+	
+	const args : Parameters = {
+		statistiques: statModif,
+		statistiqueName: capitalize(stat),
+		modificateur: modificateur,
+		commentaire: commentaire,
+		user: user.id,
+		fiche: fiche,
+	};
+	
+	if (type === "combat") {
+		args.cc = options.getBoolean("critique") || false;
+	} else {
+		const seuil = options.getString("seuil") || "moyen";
+		const seuilValue = Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
+		args.seuil = {
+			value: seuilValue,
+			name: isNaN(parseInt(seuil)) ? capitalize(seuil) : `Seuil : ${seuil}`
+		};
+	}
+	return args;
 }

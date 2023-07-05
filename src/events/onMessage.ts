@@ -24,6 +24,10 @@ export default (client: Client): void => {
 		}
 		const prefix = getConfig(message.guild?.id, "prefix");
 		if (message.content.toLowerCase().startsWith(`${prefix}r`)) {
+			if (message.content.toLowerCase().startsWith(`${prefix}r --help`)) {
+				await message.reply({ embeds: [helpCombat(message, "neutre")] });
+				return;
+			}
 			/** Parse parameters **/
 			const param = getParameters(message, "neutre");
 			const result = rollNeutre(param);
