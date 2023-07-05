@@ -29,7 +29,7 @@ export function helpCombat(message: Message) {
 		.addFields(
 			{
 				name: "Recherche de statistiques",
-				value: "La statistique à rechercher peut être écrite en abrégée ou en entière. Les caractères accentués sont remplacés par leur équivalent sans accent. Par exemple, `end` ou `endurance` pour `endurance`.",
+				value: "La statistique à rechercher peut être écrite en abrégée ou en entière. Les caractères accentués sont remplacés par leur équivalent sans accent. Par exemple, `agi` pour agilité, et `PSY` pour psychologie.",
 				inline: false
 			},
 			{
@@ -44,7 +44,7 @@ export function helpCombat(message: Message) {
 			{
 				name: "Exemples",
 				value: dedent(`
-				- \`${prefix}atq end +2 commentaire\`
+				- \`${prefix}atq agi +2 commentaire\`
 				- \`${prefix}atq &Némo +2 \`
 				`)
 			}
