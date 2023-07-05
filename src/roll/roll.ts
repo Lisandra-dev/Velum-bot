@@ -35,7 +35,7 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	params = perso.params;
 	param.personnage = perso.personnage;
 	param.fiche = perso.fiche;
-	const statistiques = getStatistiques(params, guildID, param);
+	const statistiques = getParamStats(params, guildID, param);
 	params = statistiques.params;
 	param.statistiques = statistiques.param.statistiques;
 	
@@ -88,12 +88,14 @@ function getPersonnage(params: string[]) {
 	return {params, personnage, fiche};
 }
 
-function getStatistiques(params: string[], guildID: string, param: Parameters) {
+function getParamStats(params: string[], guildID: string, param: Parameters) {
 	if (params.length >= 1) {
 		/** search right value of statistiques **/
 		const statistiquesArgs = STATISTIQUES.find( (value) => value.includes(latinize(params[0].toLowerCase()))) ?? "neutre";
 		param.statistiqueName = statistiquesArgs;
 		params = removeFromArgumentsWithString(params, statistiquesArgs);
+		/** remove params[0] */
+		params = params.slice(1);
 		param.statistiques = getStatistique(param.user, guildID, statistiquesArgs, param.personnage ?? "main");
 	}
 	return {params, param};

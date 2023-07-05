@@ -40,7 +40,7 @@ export const SEUIL_KEYS = Object.keys(Seuil).map(value => value.toString());
 export const STATISTIQUES = [
 	"force",
 	"constitution",
-	"agilite",
+	"agilité",
 	"intelligence",
 	"psychologie",
 	"perception"];
@@ -75,5 +75,6 @@ export const IMAGE_STATISTIQUES  = {
 	agilite: "https://imgur.com/dZDgdsa.png",
 	intelligence: "https://imgur.com/s8fYsGq.png",
 	psychologie: "https://imgur.com/cm34dpb.png",
-	perception: "https://imgur.com/BJEhRog.png"
+	perception: "https://imgur.com/BJEhRog.png",
+	neutre: "https://imgur.com/KRwpRxR.png"
 };

@@ -1,6 +1,6 @@
 import {IMAGE_STATISTIQUES, Parameters} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
-import {logInDev} from "../utils";
+import {latinize, logInDev} from "../utils";
 
 export function displayResultNeutre(param: Parameters, result: {roll: number, stats: number}, success: {success: boolean, EC: boolean, RC: boolean}) {
 	const EC = success.EC;
@@ -78,7 +78,8 @@ export function displayResultAtq(param: Parameters, result: {roll: number, stats
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	const imageStatistiques = IMAGE_STATISTIQUES[param.statistiqueName as keyof typeof IMAGE_STATISTIQUES];
+	const imageStatistiques = IMAGE_STATISTIQUES[latinize(param.statistiqueName.toLowerCase()) as keyof typeof IMAGE_STATISTIQUES];
+	logInDev(`Statistique : ${param.statistiqueName}`, "image :", IMAGE_STATISTIQUES);
 	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	return new EmbedBuilder()
 		.setAuthor({
