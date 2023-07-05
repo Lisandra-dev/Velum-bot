@@ -6,6 +6,7 @@
     "scripts": {
         "init": "pnpm i && node install.js",
         "build": "tsc",
+        "postbuild" : "pnpm run stop",
         "prestart": "pnpm run build",
         "start": "pm2 start dist/src/index.js --name Velum-bot --log-date-format=\"YYYY-MM-DD HH:mm Z\"",
         "stop": "pm2 stop Velum-bot",
