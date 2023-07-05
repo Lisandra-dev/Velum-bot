@@ -12,9 +12,6 @@ export default (client: Client): void => {
 				await command.execute(interaction);
 			} catch (error) {
 				console.log(error);
-				await interaction.channel?.send({
-					content: `\`\`\` ${error} \`\`\``,
-				});
 			}
 		} else if (interaction.isAutocomplete()) {
 			const interact = interaction as AutocompleteInteraction;
