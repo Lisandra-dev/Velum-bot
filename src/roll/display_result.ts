@@ -1,4 +1,4 @@
-import {Parameters} from "../interface";
+import {IMAGE_STATISTIQUES, Parameters} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {logInDev} from "../utils";
 
@@ -78,11 +78,12 @@ export function displayResultAtq(param: Parameters, result: {roll: number, stats
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	
+	const imageStatistiques = IMAGE_STATISTIQUES[param.statistiqueName as keyof typeof IMAGE_STATISTIQUES];
+	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	return new EmbedBuilder()
 		.setAuthor({
-			name: `${author} • ${capitalize(param.statistiqueName)}`,
-			iconURL: member.user.avatarURL() ?? undefined,
+			name: `${author}`,
+			iconURL: imageStatistiques,
 		})
 		.setFooter({
 			text: `[ ${calculExplained} ] ${ccMsg.message}`,

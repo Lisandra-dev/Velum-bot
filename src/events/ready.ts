@@ -34,7 +34,6 @@ export default (client: Client): void => {
 				{ body: serializeCmds }
 			);
 			logInDev(`Load in ${guild.name} done`);
-			logInDev(`Exporting maps for ${guild.name}`);
 			if (DESTROY) destroyDB();
 			loadGuild(guild.id);
 			//const exported = exportMaps();
