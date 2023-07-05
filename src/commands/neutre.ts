@@ -68,7 +68,7 @@ export default {
 		/** search characters */
 		const user = interaction.user as User;
 		const guildID = interaction.guild.id;
-		let characters = getCharacters(guildID, user.id);
+		let characters = getCharacters(guildID, user.id, name);
 		let msgInfo = "";
 		if (!characters) {
 			msgInfo = `${userMention(user.id)} n'a pas de personnage ; Utilisation des statistiques par défaut (10)`;
