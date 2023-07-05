@@ -4,17 +4,20 @@ import {
 } from "../utils";
 import {getParameters, rollCombat, rollNeutre} from "../roll/roll";
 import {displayResultAtq, displayResultNeutre, ephemeralInfo} from "../roll/display_result";
-import {exportMaps} from "../maps";
+import {exportMaps, getConfig} from "../maps";
 
 export default (client: Client): void => {
 	client.on("messageCreate", async (message) => {
 		if (message.author.bot) return;
 		if (message.channel.type === ChannelType.DM) return;
-		if (message.content.toLowerCase().startsWith("$db")) {
-			const db = exportMaps();
+		if (!message.guild) return;
+		if (message.content.toLowerCase().startsWith("$db") && process.env.NODE_ENV === "development") {
+			const db = JSON.stringify(exportMaps());
+			await message.reply(db);
 			logInDev(db);
 		}
-		if (message.content.toLowerCase().startsWith("$roll")) {
+		const prefix = getConfig(message.guild?.id, "prefix");
+		if (message.content.toLowerCase().startsWith(`${prefix}r`)) {
 			/** Parse parameters **/
 			const param = getParameters(message, "neutre");
 			const result = rollNeutre(param);
@@ -24,7 +27,7 @@ export default (client: Client): void => {
 			const success = result.success;
 			await message.reply(displayResultNeutre(param, result, success));
 			//@todo : Better display
-		} else if (message.content.toLowerCase().startsWith("$atq")) {
+		} else if (message.content.toLowerCase().startsWith(`${prefix}atq`)) {
 			const param = getParameters(message, "combat");
 			const result = rollCombat(param);
 			if (!result) return;

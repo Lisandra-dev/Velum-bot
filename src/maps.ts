@@ -18,6 +18,10 @@ const characters = new Enmap({name: "Characters",
 	autoFetch: true,
 	cloneLevel: "deep"});
 
+const configuration = new Enmap({name: "Configuration",
+	fetchAll: false,
+	autoFetch: true,
+	cloneLevel: "deep"});
 
 /**
  * Set a value in Emaps 
@@ -57,7 +61,13 @@ export function set(
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
 }
+export function getConfig(guildID: string, value: string) {
+	return configuration.get(guildID, value);
+}
 
+export function setConfig(guildID: string, key: string, value: string) {
+	configuration.set(guildID, value, key);
+}
 
 export function get(user: string, guildID: string): Statistiques[] {
 	return characters.get(guildID, user) ?? [] as Statistiques[] ;
@@ -105,6 +115,7 @@ export function removeCharacter(user: string, guildID: string, chara?: string) {
 export function removeGuild(guildID: string, guildName: string) {
 	//search all keys for guildID
 	characters.delete(guildID);
+	configuration.delete(guildID);
 	logInDev(`Removed ${guildName} (${guildID}) from characters`);
 }
 
@@ -114,10 +125,13 @@ export function exportMaps() {
 
 export function loadGuild(guildID: string) {
 	characters.ensure(guildID, {});
-	
+	configuration.ensure(guildID, {
+		"prefix": "$",
+	});
 }
 
 export function destroyDB() {
 	characters.deleteAll();
+	configuration.deleteAll();
 	console.log("Destroyed DB");
 }
