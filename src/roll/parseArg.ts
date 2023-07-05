@@ -24,7 +24,10 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	};
 	
 	if (rollType === "neutre") {
-		args.seuil = getSeuil("moyen");
+		args.seuil = {
+			value: Seuil.moyen,
+			name: "Moyen"
+		};
 	} else {
 		args.cc = false;
 	}
@@ -47,7 +50,7 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	if (rollType === "neutre") {
 		const seuil = getSeuilInParameters(messageContent);
 		messageContent = seuil.params;
-		args.seuil = seuil.seuil;
+		args.seuil = seuil.seuilValue;
 	} else if (rollType === "combat") {
 		const cc = getCC(messageContent);
 		messageContent = cc.params;
@@ -114,12 +117,24 @@ function getCommentaire(params: string[]) {
 function getSeuilInParameters(params: string[]) {
 	const seuilFind = params.find( (value) => value.match(PARAMS.seuil));
 	let seuil = Seuil.moyen;
+	let seuilName: string | undefined = "Moyen";
 	if (seuilFind) {
-		const seuilName = SEUIL_KEYS.find( (value) => value.includes(latinize(seuilFind.replace(PARAMS.seuil, "").toLowerCase()))) ?? "moyen";
-		seuil = getSeuil(seuilName);
+		seuilName = SEUIL_KEYS.find( (value) => value.includes(latinize(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
+		if (!seuilName && !isNaN(parseInt(seuilFind.replace(PARAMS.seuil, "")))) {
+			seuil = parseInt(seuilFind.replace(PARAMS.seuil, ""));
+			seuilName = seuil.toString();
+		} else {
+			seuil = getSeuil(seuilName ?? "Moyen");
+			seuilName = seuilName ?? "Moyen";
+		}
 		params = removeFromArguments(params, PARAMS.seuil);
 	}
-	return {params, seuil};
+	const seuilValue =
+		{
+			value: seuil,
+			name: seuilName ?? "Moyen"
+		};
+	return {params, seuilValue};
 }
 
 function getModifier(params: string[]) {
