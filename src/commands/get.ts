@@ -19,8 +19,6 @@ export default {
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
-
-
 		const user = options.getUser("user") || interaction.user;
 		const name = options.getString("name") || "main";
 		const chara = getCharacters(user.id, interaction.guild.id, name) as Statistiques;
@@ -42,5 +40,6 @@ export default {
 		await interaction.reply({
 			content,
 		});
+		return;
 	}
 };
