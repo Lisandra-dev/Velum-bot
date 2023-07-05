@@ -32,7 +32,7 @@ export function set(
 	guildID: string,
 	value: Statistiques
 ) {
-	const userCharacters = characters.get(guildID, user) as Statistiques[];
+	const userCharacters = get(user, guildID);
 	if (userCharacters) {
 		const charName = value.characterName ?? "main";
 		const charStats = userCharacters.find((s: Statistiques) => s.characterName === charName);
@@ -55,8 +55,7 @@ export function set(
 		 *   idUser: @type {Statistiques[]}
 		 * }
 		 */
-		const newUser = {[user]: [value]};
-		characters.set(guildID, newUser);
+		characters.set(guildID, {[user]: [value]});
 		logInDev(characters.get(guildID, user));
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
@@ -70,20 +69,29 @@ export function setConfig(guildID: string, key: string, value: string) {
 }
 
 export function get(user: string, guildID: string): Statistiques[] {
-	return characters.get(guildID, user) ?? [] as Statistiques[] ;
+	try {
+		return characters.get(guildID, user) ?? [] as Statistiques[] ;
+	} catch (error) {
+		logInDev(error);
+		return [] as Statistiques[];
+	}
 }
 
 export function getCharacters(user: string, guildID: string, characterName?: string): Statistiques | undefined{
-	const userCharacters = characters.get(guildID, user) as Statistiques[];
-	logInDev(userCharacters);
-	logInDev(characters.get(guildID));
-	logInDev(`getCharacters: ${user}'s characters:`, userCharacters);
-	if (userCharacters) {
-		return userCharacters.find((s: Statistiques) => {
-			s.characterName ??= "main";
-			if (!characterName) return;
-			return latinize(s.characterName).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
-		});
+	try {
+		const userCharacters = characters.get(guildID, user) as Statistiques[];
+		logInDev(userCharacters);
+		logInDev(characters.get(guildID));
+		logInDev(`getCharacters: ${user}'s characters:`, userCharacters);
+		if (userCharacters) {
+			return userCharacters.find((s: Statistiques) => {
+				s.characterName ??= "main";
+				if (!characterName) return;
+				return latinize(s.characterName).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
+			});
+		}
+	} catch (error) {
+		logInDev(error);
 	}
 	return undefined;
 }
