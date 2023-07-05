@@ -78,3 +78,25 @@ export const IMAGE_STATISTIQUES  = {
 	perception: "https://imgur.com/BJEhRog.png",
 	neutre: "https://imgur.com/KRwpRxR.png"
 };
+
+export interface Result {
+	author: string,
+	image: string,
+	calcul: string,
+	total: number,
+	ccMsg: {
+		indicatif: string,
+		message: string,
+	},
+	commentaire: string | null,
+}
+
+export interface ResultRolls {
+	roll: number,
+	stats: number,
+	success?: {
+		EC: boolean,
+		RC: boolean,
+		success: boolean
+	}
+}
