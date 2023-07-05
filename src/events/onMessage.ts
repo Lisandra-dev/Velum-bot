@@ -6,6 +6,7 @@ import {rollCombat, rollNeutre} from "../roll";
 import { getParameters } from "../roll/parameters";
 import {displayResultAtq, displayResultNeutre, ephemeralInfo} from "../display/results";
 import {exportMaps, getConfig} from "../maps";
+import {helpCombat} from "../display/help";
 
 export default (client: Client): void => {
 	client.on("messageCreate", async (message) => {
@@ -29,6 +30,10 @@ export default (client: Client): void => {
 			await message.reply(displayResultNeutre(param, result, success));
 			//@todo : Better display
 		} else if (message.content.toLowerCase().startsWith(`${prefix}atq`)) {
+			if (message.content.toLowerCase().startsWith(`${prefix}atq --help`)) {
+				await message.reply({ embeds: [helpCombat(message)] });
+				return;
+			}
 			const param = getParameters(message, "combat");
 			const result = rollCombat(param);
 			if (!result) return;
