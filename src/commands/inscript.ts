@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, userMention } from "@discordjs/builders";
+import { SlashCommandBuilder, userMention } from "discord.js";
 import {set} from "../maps";
 import { CommandInteraction, CommandInteractionOptionResolver, PermissionFlagsBits } from "discord.js";
 
