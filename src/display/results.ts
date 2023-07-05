@@ -19,6 +19,7 @@ function criticalSuccess(param: Parameters,
 
 function seuilMessageSuccess(result: ResultRolls) {
 	const success = result.success;
+	logInDev(`success : ${JSON.stringify(success)}`);
 	if (success?.EC) {
 		return "• Échec critique ! ";
 	} else if (success?.RC) {
@@ -36,7 +37,7 @@ function displayResult(
 	member: GuildMember | null,
 	roll: "combat" | "neutre") {
 	let total = 0;
-	
+	logInDev(`param : ${JSON.stringify(result)}`);
 	let ccMsg = {
 		"indicatif": "",
 		"message" : "",
@@ -61,7 +62,7 @@ function displayResult(
 	};
 	const second = {
 		"second" : signe.second !== 0 ?
-			signe.second : "",
+			signe.second : 0,
 		"signe" : signe.second !== 0 ? signe.second > 0 ? "+" : "-" : "",
 	};
 	
@@ -75,8 +76,12 @@ function displayResult(
 	 */
 
 	logInDev(`first : ${first.first} | second : ${signe.second}`);
-	let formula = first.first !== 0 ? ` (${first.first} ${second.signe} ${second.second})` : `${second.signe} ${second.second}`;
-	
+	let formula = "";
+	if (first.first !== 0) {
+		formula = second.second !== 0 ? ` (${first.first} ${second.signe} ${second.second})` : `${first.first}`;
+	} else {
+		formula = second.second !== 0 ? `${second.signe} ${second.second}` : "";
+	}
 	
 	/**
 	 * if first.first < 0 && signe.modifStat === "-"
@@ -142,17 +147,18 @@ export function displayNEUTRE(
 	member: GuildMember | null) {
 	const result = displayResult(param, resultRoll, member, "neutre");
 	const commentaire = result.commentaire ? `*${capitalize(result.commentaire)}*` : null;
-	const seuil = param.seuil ? param.seuil : Seuil.moyen;
+	const seuil = param.seuil ? param.seuil.value : Seuil.moyen;
+	const signeTotal = result.total > seuil ? ">" : "<";
 	return new EmbedBuilder()
 		.setAuthor({
-			name: `${result.author}`,
+			name: `${result.author} • ${param.seuil?.name}`,
 			iconURL: result.image,
 		})
 		.setFooter({
 			text: `[ ${result.calcul} ] `,
 			iconURL: "https://imgur.com/1xGY5S1.png"
 		})
-		.setTitle(`${result.total} ${result.ccMsg.message}`)
+		.setTitle(`${result.total} ${signeTotal} ${seuil} ${result.ccMsg.message}`)
 		.setDescription(commentaire)
 		.setColor(result.total > seuil ? "#33b666" : "#5e5e5e");
 }

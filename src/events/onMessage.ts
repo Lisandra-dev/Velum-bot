@@ -3,7 +3,7 @@ import {
 	logInDev,
 } from "../utils";
 import {rollCombat, rollNeutre} from "../roll";
-import { getParameters } from "../roll/parameters";
+import { getParameters } from "../roll/parseArg";
 import {displayATQ, displayNEUTRE, ephemeralInfo} from "../display/results";
 import {exportMaps, getConfig} from "../maps";
 import {helpCombat} from "../display/help";
@@ -37,7 +37,7 @@ export default (client: Client): void => {
 			return;
 		} else if (message.content.toLowerCase().startsWith(`${prefix}atq`)) {
 			if (message.content.toLowerCase().startsWith(`${prefix}atq --help`)) {
-				await message.reply({ embeds: [helpCombat(message)] });
+				await message.reply({ embeds: [helpCombat(message, "combat")] });
 				return;
 			}
 			const param = getParameters(message, "combat");

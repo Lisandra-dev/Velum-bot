@@ -122,7 +122,7 @@ function getSeuilInParameters(params: string[]) {
 		seuilName = SEUIL_KEYS.find( (value) => value.includes(latinize(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
 		if (!seuilName && !isNaN(parseInt(seuilFind.replace(PARAMS.seuil, "")))) {
 			seuil = parseInt(seuilFind.replace(PARAMS.seuil, ""));
-			seuilName = seuil.toString();
+			seuilName = `Seuil : ${seuil}`;
 		} else {
 			seuil = getSeuil(seuilName ?? "Moyen");
 			seuilName = seuilName ?? "Moyen";

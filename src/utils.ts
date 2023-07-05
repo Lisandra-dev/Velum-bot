@@ -31,11 +31,11 @@ export function getSeuil(seuil: string) {
 	return Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
 }
 
-export function getNeutreSuccess(result: number, seuilValue: number) {
+export function getNeutreSuccess(result: number, seuilValue: number, deNat: number) {
 	return {
 		"success" : result >= seuilValue,
-		"EC" : result === 1,
-		"RC" : result === 20
+		"EC" : deNat === 1,
+		"RC" : deNat === 20
 	};
 }
 

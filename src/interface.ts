@@ -48,7 +48,10 @@ export const STATISTIQUES = [
 export const PREFIX = "!";
 
 export interface Parameters {
-	seuil?: number;
+	seuil?: {
+		value: number,
+		name: string
+	}
 	cc?: boolean;
 	statistiques: number;
 	statistiqueName: string;
