@@ -70,10 +70,10 @@ export const PARAMS = {
 };
 
 export const IMAGE_STATISTIQUES  = {
-	force: "",
-	constitution: "",
-	agilite: "",
-	intelligence: "",
-	psychologie: "",
-	perception: ""
+	force: "https://imgur.com/I5cCHxJ.png",
+	constitution: "https://imgur.com/Fnf40Oh.png",
+	agilite: "https://imgur.com/dZDgdsa.png",
+	intelligence: "https://imgur.com/s8fYsGq.png",
+	psychologie: "https://imgur.com/cm34dpb.png",
+	perception: "https://imgur.com/BJEhRog.png"
 };
