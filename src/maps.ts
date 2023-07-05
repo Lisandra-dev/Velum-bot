@@ -70,7 +70,7 @@ export function setConfig(guildID: string, key: string, value: string) {
 
 export function get(user: string, guildID: string): Statistiques[] {
 	try {
-		return characters.get(guildID, user) ?? [] as Statistiques[] ;
+		return characters.get(guildID)[user] ?? [] as Statistiques[] ;
 	} catch (error) {
 		logInDev(error);
 		return [] as Statistiques[];
@@ -80,14 +80,16 @@ export function get(user: string, guildID: string): Statistiques[] {
 export function getCharacters(user: string, guildID: string, characterName?: string): Statistiques | undefined{
 	try {
 		const userCharacters = characters.get(guildID, user) as Statistiques[];
-		logInDev(userCharacters);
-		logInDev(characters.get(guildID));
-		logInDev(`getCharacters: ${user}'s characters:`, userCharacters);
 		if (userCharacters) {
-			return userCharacters.find((s: Statistiques) => {
-				s.characterName ??= "main";
+			logInDev(`getCharacters: ${user}'s characters:`, userCharacters.find((s: Statistiques) => {
 				if (!characterName) return;
-				return latinize(s.characterName).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
+				const name = s.characterName ?? "main";
+				return latinize(name).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
+			}));
+			return userCharacters.find((s: Statistiques) => {
+				if (!characterName) return;
+				const name = s.characterName ?? "main";
+				return latinize(name).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
 			});
 		}
 	} catch (error) {
@@ -128,7 +130,7 @@ export function removeGuild(guildID: string, guildName: string) {
 }
 
 export function exportMaps() {
-	return characters.export();
+	return characters.export() + "\n" + configuration.export();
 }
 
 export function loadGuild(guildID: string) {
