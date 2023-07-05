@@ -97,7 +97,7 @@ function displayResult(
 	/** get member **/
 	if (!member) return {} as Result;
 	let author = param.personnage !== "main" ? param.personnage : member.displayName;
-	author = !author ? member.nickname ?? member.user.username : author;
+	author = author || member.nickname || member.user.username;
 	logInDev(`author : ${author}`, member.nickname, param.personnage);
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
@@ -150,7 +150,7 @@ export function displayNEUTRE(
 	const result = displayResult(param, resultRoll, member, "neutre");
 	const commentaire = result.commentaire ? `*${capitalize(result.commentaire)}*` : null;
 	const seuil = param.seuil ? param.seuil.value : Seuil.moyen;
-	const signeTotal = result.total > seuil ? ">" : "<";
+	const signeTotal = result.total > seuil ? "⩾" : "⩽";
 	return new EmbedBuilder()
 		.setAuthor({
 			name: `${result.author} • ${param.seuil?.name}`,
