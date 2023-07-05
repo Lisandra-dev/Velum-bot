@@ -8,14 +8,15 @@ import {
 	removeFromArguments,
 	removeFromArgumentsWithString
 } from "../utils";
+import {getConfig} from "../maps";
 
 
 export function getParameters(message: Message, rollType: "neutre"|"combat") {
-	let params = message.content.split(" ");
+	let messageContent = message.content.split(" ");
 	//remove trigger
-	params.shift();
+	messageContent.shift();
 	
-	const param : Parameters = {
+	const args : Parameters = {
 		statistiques: 10,
 		statistiqueName: "Neutre",
 		user: message.author.id,
@@ -23,53 +24,54 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	};
 	
 	if (rollType === "neutre") {
-		param.seuil = getSeuil("moyen");
+		args.seuil = getSeuil("moyen");
 	} else {
-		param.cc = false;
+		args.cc = false;
 	}
 	const guildID = message.guild?.id ?? "";
-	const user = getUser(message, params, param);
-	params = user.params;
-	param.user = user.user;
-	const perso = getPersonnage(params);
-	params = perso.params;
-	param.personnage = perso.personnage;
-	param.fiche = perso.fiche;
-	const statistiques = getParamStats(params, guildID, param);
-	params = statistiques.params;
-	param.statistiques = statistiques.param.statistiques;
+	const roleStaff = getConfig(guildID, "staff");
+	const hasRoleStaff = message.member?.roles.cache.has(roleStaff) ?? false;
+	const user = getUser(message, messageContent, args, hasRoleStaff);
+	messageContent = user.params;
+	args.user = user.user;
+	const perso = getPersonnage(messageContent);
+	messageContent = perso.params;
+	args.personnage = perso.personnage;
+	args.fiche = perso.fiche;
+	const statistiques = getParamStats(messageContent, guildID, args);
+	messageContent = statistiques.params;
+	args.statistiques = statistiques.param.statistiques;
 	
-	const commentaire = getCommentaire(params);
-	params = commentaire.params;
-	param.commentaire = commentaire.commentaire;
+	const commentaire = getCommentaire(messageContent);
+	messageContent = commentaire.params;
+	args.commentaire = commentaire.commentaire;
 	
 	if (rollType === "neutre") {
-		const seuil = getSeuilInParameters(params);
-		params = seuil.params;
-		param.seuil = seuil.seuil;
+		const seuil = getSeuilInParameters(messageContent);
+		messageContent = seuil.params;
+		args.seuil = seuil.seuil;
 	} else if (rollType === "combat") {
-		const cc = getCC(params);
-		params = cc.params;
-		param.cc = cc.cc;
+		const cc = getCC(messageContent);
+		messageContent = cc.params;
+		args.cc = cc.cc;
 	}
 	
-	const modificateur = getModifier(params);
-	params = modificateur.params;
-	param.modificateur = modificateur.modificateur;
+	const modificateur = getModifier(messageContent);
+	messageContent = modificateur.params;
+	args.modificateur = modificateur.modificateur;
 	
-	if (params.length > 0 && !param.commentaire) {
+	if (messageContent.length > 0 && !args.commentaire) {
 		//set the rest of the message as comment
-		param.commentaire = params.join(" ");
+		args.commentaire = messageContent.join(" ");
 	}
-	logInDev(param);
-	return param;
+	logInDev(args);
+	return args;
 }
 
-function getUser(message: Message, params: string[], parameters: Parameters) {
+function getUser(message: Message, params: string[], parameters: Parameters, staff: boolean) {
 	const isSomeoneMentionned = message.mentions.users ?? false;
 	let user = parameters.user;
-	if (isSomeoneMentionned) {
-		logInDev(message.content);
+	if (isSomeoneMentionned && staff) {
 		user = message.mentions.users.first()?.id ?? parameters.user;
 		params = removeFromArgumentsWithString(params, `<@${parameters.user}>`);
 	}
