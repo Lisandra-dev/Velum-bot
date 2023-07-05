@@ -14,12 +14,17 @@ export function logInDev(...text: unknown[]) {
 }
 
 export function getStatistique(userId: string, guildId: string, stat: string, charName?: string) {
-	let characters = getCharacters( guildId, userId, charName);
+	let characters = getCharacters(userId, guildId, charName);
+	let fiche = true;
 	if (!characters) {
 		characters = DEFAULT_STATISTIQUE;
+		fiche = false;
 	}
 	const charModif = characters.stats;
-	return charModif[stat as keyof typeof charModif] ?? 10;
+	const modif = charModif[stat as keyof typeof charModif] ?? 10;
+	return {
+		modif,
+		fiche};
 }
 
 export function getSeuil(seuil: string) {
@@ -47,7 +52,8 @@ export function removeFromArguments(args: string[], toRemove: RegExp) {
 	return args.filter((arg) => !toRemove.test(arg));
 }
 
-export function removeFromArgumentsWithString(args: string[], toRemove: string) {
+export function removeFromArgumentsWithString(args: string[], toRemove: string | undefined) {
+	if (!toRemove) return args;
 	return args.filter((arg) => arg !== toRemove);
 }
 
