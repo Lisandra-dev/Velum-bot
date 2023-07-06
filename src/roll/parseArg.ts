@@ -189,7 +189,7 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 	if (type === "combat") {
 		args.cc = options.getBoolean("critique") || false;
 	} else {
-		const seuil = options.getString("seuil") || "moyen";
+		const seuil = (options.getString("seuil"))?.toLowerCase() || "moyen";
 		const seuilValue = Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
 		args.seuil = {
 			value: seuilValue,
