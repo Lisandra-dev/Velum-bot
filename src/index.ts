@@ -8,7 +8,6 @@ import onBotEnter from "./events/onBotEnter";
 import onMessage from "./events/onMessage";
 import onUserQuit from "./events/onUserQuit";
 import onBotRemoved from "./events/onBotRemoved";
-import {logInDev} from "./utils";
 
 dotenv.config();
 
