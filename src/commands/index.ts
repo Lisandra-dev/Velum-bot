@@ -1,7 +1,7 @@
 import create from "./inscript";
 import get from "./get";
 import deleteChar from "./delete";
-import neutre from "./neutre";
+import neutre from "./action";
 import config from "./config";
 import atq from "./atq";
 
