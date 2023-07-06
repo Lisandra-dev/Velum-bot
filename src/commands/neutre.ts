@@ -6,10 +6,10 @@ import {
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
-import { Seuil} from "../interface";
+import {Seuil, STATISTIQUES} from "../interface";
 import {rollNeutre} from "../roll";
-import {displayNEUTRE} from "../display/results";
-import {logInDev} from "../utils";
+import {capitalize, displayNEUTRE} from "../display/results";
+import {latinize, logInDev} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
 
 export default {
@@ -48,17 +48,11 @@ export default {
 		const focused = opt.getFocused(true);
 		let choices: string[] = [];
 		if (focused.name === "statistique") {
-			choices = [
-				"force",
-				"agilité",
-				"intelligence",
-				"psychologie",
-				"perception",
-			];
+			choices = STATISTIQUES.map(stat => capitalize(stat));
 		} else if (focused.name === "seuil") {
-			choices = Object.keys(Seuil).map(value => value.toString());
+			choices = Object.keys(Seuil).map(value => capitalize(value.toString()));
 		}
-		const results = choices.filter(choice => choice.startsWith(focused.value));
+		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
 		await interaction.respond(
 			results.map(result => ({ name: result, value: result }))
 		);

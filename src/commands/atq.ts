@@ -7,9 +7,10 @@ import {
 	userMention
 } from "discord.js";
 import {rollCombat} from "../roll";
-import {displayATQ} from "../display/results";
-import {logInDev} from "../utils";
+import {capitalize, displayATQ} from "../display/results";
+import {latinize, logInDev} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
+import {STATISTIQUES} from "../interface";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -44,15 +45,8 @@ export default {
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const opt = interaction.options as CommandInteractionOptionResolver;
 		const focused = opt.getFocused(true);
-		let choices: string[] = [];
-		choices = [
-			"force",
-			"agilité",
-			"intelligence",
-			"psychologie",
-			"perception",
-		];
-		const results = choices.filter(choice => choice.startsWith(focused.value));
+		const choices = STATISTIQUES.map(stat => capitalize(stat));
+		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
 		await interaction.respond(
 			results.map(result => ({ name: result, value: result }))
 		);
