@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "description": "Bot for roll",
     "main": "dist/index.js",
+    "repository": "github:lisandra-dev/velum-bot",
     "scripts": {
         "init": "pnpm i && node install.js",
         "build": "tsc",

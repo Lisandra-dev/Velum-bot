@@ -1,6 +1,7 @@
-import {IMAGE_STATISTIQUES, Parameters, Result, ResultRolls, Seuil} from "../interface";
+import {Parameters, Result, ResultRolls, Seuil, STATISTIQUES} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {latinize, logInDev} from "../utils";
+import {IMAGE_LINK} from "../index";
 
 function criticalSuccess(param: Parameters, 
 	result: {roll: number, stats: number}, 
@@ -102,11 +103,11 @@ function displayResult(
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	const imageStatistiques = IMAGE_STATISTIQUES[latinize(param.statistiqueName.toLowerCase()) as keyof typeof IMAGE_STATISTIQUES];
+	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
 	
 	const finalResultMessage: Result = {
 		author: author,
-		image: imageStatistiques,
+		image: `${IMAGE_LINK}/${imageStatistiques}.png`,
 		calcul: calculExplained,
 		total: total,
 		ccMsg: ccMsg,

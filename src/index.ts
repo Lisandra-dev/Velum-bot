@@ -8,6 +8,7 @@ import onBotEnter from "./events/onBotEnter";
 import onMessage from "./events/onMessage";
 import onUserQuit from "./events/onUserQuit";
 import onBotRemoved from "./events/onBotRemoved";
+import {logInDev} from "./utils";
 
 dotenv.config();
 
@@ -25,9 +26,10 @@ export const client = new Client({
 	],
 });
 
-export const EMOJI = process.env.MESSAGE && process.env.MESSAGE.trim().length > 0 ? process.env.MESSAGE : "🔄";
 export const VERSION = pkg.version ?? "0.0.0";
 export const DESTROY = process.env.DESTROY === "true";
+export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
+export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
 
 try {
 	ready(client);
