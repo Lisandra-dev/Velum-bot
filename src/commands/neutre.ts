@@ -63,7 +63,7 @@ export default {
 		const args = getInteractionArgs(interaction, "neutre");
 		const result = rollNeutre(args);
 		const member = interaction.member as GuildMember;
-		logInDev(member);
+		
 		const embed = displayNEUTRE(args, result, member);
 		let msgInfo = "";
 		if (!args.fiche) {
@@ -71,7 +71,7 @@ export default {
 		}
 		await interaction.reply({ embeds: [embed] });
 		if (msgInfo) {
-			await interaction.followUp({ content: msgInfo, ephemeral: true });
+			await interaction.followUp({ content: msgInfo});
 		}
 	}
 };
