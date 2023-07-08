@@ -103,8 +103,9 @@ function displayResult(
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
+	logInDev(param.statistiqueName);
 	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
-	
+	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	const finalResultMessage: Result = {
 		author: author,
 		image: `${IMAGE_LINK}/${imageStatistiques}.png`,

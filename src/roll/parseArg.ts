@@ -93,13 +93,26 @@ function getPersonnage(params: string[]) {
 }
 
 function getParamStats(params: string[], guildID: string, param: Parameters) {
+	const stats = getStatistique(param.user, guildID, "Neutre", param.personnage ?? "main");
+	param.fiche = stats.fiche;
 	if (params.length >= 1) {
-		const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinize(params[0].toLowerCase())));
-		param.statistiqueName = statistiquesArgs ?? "Neutre";
-		params = removeFromArgumentsWithString(params, statistiquesArgs);
-		const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
-		param.statistiques = stats.modif;
-		param.fiche = stats.fiche;
+		const stat = params[0];
+		logInDev(stat, isNaN(parseInt(stat)));
+		if (isNaN(parseInt(stat))) {
+			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinize(params[0].toLowerCase())));
+			param.statistiqueName = statistiquesArgs ?? "Neutre";
+			const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
+			param.statistiques = stats.modif;
+			param.fiche = stats.fiche;
+		} else if (!stat.match(PARAMS.modificateur)) {
+			param.statistiques = parseInt(stat);
+			param.fiche = stats.fiche;
+			param.statistiqueName = "Neutre";
+			params = removeFromArgumentsWithString(params, params[0]);
+		} else {
+			param.statistiques = 10;
+			param.statistiqueName = "Neutre";
+		}
 	}
 	return {params, param};
 }
@@ -175,11 +188,19 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 		fiche = false;
 	}
 	const charModif = characters.stats;
-	const statModif = charModif[stat as keyof typeof charModif] ?? 10;
+	let statModif: number;
+	let statistiqueName: string;
+	if (isNaN(parseInt(stat))) {
+		statModif = charModif[stat as keyof typeof charModif] ?? 10;
+		statistiqueName = capitalize(stat);
+	} else {
+		statModif = parseInt(stat);
+		statistiqueName = "Neutre";
+	}
 	
 	const args : Parameters = {
 		statistiques: statModif,
-		statistiqueName: capitalize(stat),
+		statistiqueName: statistiqueName,
 		modificateur: modificateur,
 		commentaire: commentaire,
 		user: user.id,

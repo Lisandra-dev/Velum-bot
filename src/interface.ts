@@ -42,7 +42,9 @@ export const STATISTIQUES = [
 	"agilité",
 	"intelligence",
 	"psychologie",
-	"perception"];
+	"perception",
+	"neutre"
+];
 
 export const PREFIX = "!";
 

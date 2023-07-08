@@ -9,7 +9,7 @@ import {
 import {Seuil, STATISTIQUES} from "../interface";
 import {rollNeutre} from "../roll";
 import {capitalize, displayNEUTRE} from "../display/results";
-import {latinize, logInDev} from "../utils";
+import {latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
 
 export default {
