@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import {rollCombat} from "../roll";
 import {capitalize, displayATQ} from "../display/results";
-import {latinize, logInDev} from "../utils";
+import {latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
 import {STATISTIQUES} from "../interface";
 
@@ -57,7 +57,6 @@ export default {
 		const args = getInteractionArgs(interaction, "combat");
 		const result = rollCombat(args);
 		const member = interaction.member as GuildMember;
-		logInDev(member);
 		const embed = displayATQ(args, result, member);
 		let msgInfo = "";
 		if (!args.fiche) {

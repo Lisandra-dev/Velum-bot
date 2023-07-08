@@ -97,7 +97,6 @@ function getParamStats(params: string[], guildID: string, param: Parameters) {
 	param.fiche = stats.fiche;
 	if (params.length >= 1) {
 		const stat = params[0];
-		logInDev(stat, isNaN(parseInt(stat)));
 		if (isNaN(parseInt(stat))) {
 			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinize(params[0].toLowerCase())));
 			param.statistiqueName = statistiquesArgs ?? "Neutre";

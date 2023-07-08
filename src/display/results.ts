@@ -63,7 +63,6 @@ function displayResult(
 			signe: second !== 0 ? second > 0 ? "+" : "-" : ""
 		}
 	};
-	logInDev(number);
 	const secondWithoutSigne = number.second.value as number;
 	number.second.value = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
 	number.first = first > number.second.value ? first : number.second.value;
@@ -103,7 +102,6 @@ function displayResult(
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	logInDev(param.statistiqueName);
 	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
 	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	const finalResultMessage: Result = {
