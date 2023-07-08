@@ -103,7 +103,8 @@ function getParamStats(params: string[], guildID: string, param: Parameters) {
 			const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
 			param.statistiques = stats.modif;
 			param.fiche = stats.fiche;
-		} else if (!stat.match(PARAMS.modificateur)) {
+		} else if (noMatchInParam(params[0])) {
+			logInDev("no match in param", noMatchInParam(params[0]));
 			param.statistiques = parseInt(stat);
 			param.fiche = stats.fiche;
 			param.statistiqueName = "Neutre";
@@ -226,4 +227,19 @@ function removeAllPARAMSregex(params: string[]) {
 		}
 	});
 	return params;
+}
+
+function noMatchInParam(param: string): boolean {
+	return !Object.values(PARAMS).some( (value) => {
+		if (value instanceof RegExp) {
+			return param.match(value);
+		} else {
+			/** value is string[] */
+			value.forEach( (val) => {
+				if (param.match(val)) {
+					return true;
+				}
+			});
+		}
+	});
 }
