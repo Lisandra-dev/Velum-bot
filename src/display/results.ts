@@ -20,7 +20,6 @@ function criticalSuccess(param: Parameters,
 
 function seuilMessageSuccess(result: ResultRolls) {
 	const success = result.success;
-	logInDev(`success : ${JSON.stringify(success)}`);
 	if (success?.EC) {
 		return "• Échec critique ! ";
 	} else if (success?.RC) {
@@ -103,7 +102,6 @@ function displayResult(
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
 	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
-	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	const finalResultMessage: Result = {
 		author: author,
 		image: `${IMAGE_LINK}/${imageStatistiques}.png`,

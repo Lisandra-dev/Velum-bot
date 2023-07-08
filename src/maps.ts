@@ -81,11 +81,6 @@ export function getCharacters(user: string, guildID: string, characterName?: str
 	try {
 		const userCharacters = characters.get(guildID, user) as Statistiques[];
 		if (userCharacters) {
-			logInDev(`getCharacters: ${user}'s characters:`, userCharacters.find((s: Statistiques) => {
-				if (!characterName) return;
-				const name = s.characterName ?? "main";
-				return latinize(name).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
-			}));
 			return userCharacters.find((s: Statistiques) => {
 				if (!characterName) return;
 				const name = s.characterName ?? "main";
