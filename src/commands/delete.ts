@@ -109,11 +109,18 @@ export default {
 			collector?.on("collect", async (i) => {
 				if (!interaction.guild) return;
 				if (i.customId === "confirm") {
-					removeCharacter(user.id, interaction.guild.id, name);
-					await i.update({
-						content: `Le personnage ${name === "main" ? "principal" : name} de ${userMention(user.id)} a été supprimé`,
-						components: []
-					});
+					const deleted = removeCharacter(user.id, interaction.guild.id, name);
+					if (deleted) {
+						await i.update({
+							content: `Le personnage ${name === "main" ? "principal" : name} de ${userMention(user.id)} a été supprimé`,
+							components: []
+						});
+					} else {
+						await i.update({
+							content: `Le personnage ${name === "main" ? "principal" : name} de ${userMention(user.id)} n'existe pas`,
+							components: []
+						});
+					}
 				}
 				if (i.customId === "cancel") {
 					await i.update({

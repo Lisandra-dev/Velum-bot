@@ -60,8 +60,8 @@ export function set(
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
 }
-export function getConfig(guildID: string, value: string) {
-	return configuration.get(guildID, value);
+export function getConfig(guildID: string, key: string) {
+	return configuration.ensure(guildID, "!", key);
 }
 
 export function setConfig(guildID: string, key: string, value: string) {
@@ -94,7 +94,11 @@ export function getCharacters(user: string, guildID: string, characterName?: str
 }
 
 export function removeUser(user: string, guildID: string) {
-	characters.delete(guildID, user);
+	try {
+		characters.delete(guildID, user);
+	} catch (error) {
+		logInDev(error);
+	}
 }
 export function removeCharacter(user: string, guildID: string, chara?: string) {
 	const userCharacters = characters.get(guildID, user) as Statistiques[];
@@ -111,17 +115,22 @@ export function removeCharacter(user: string, guildID: string, chara?: string) {
 			if (userCharacters.length === 0) {
 				removeUser(user, guildID);
 			}
+			return true;
 		}
 	} else {
 		logInDev(`No characters found for ${user}`);
-	} 
+	}
+	return false;
 }
 
 export function removeGuild(guildID: string, guildName: string) {
-	//search all keys for guildID
-	characters.delete(guildID);
-	configuration.delete(guildID);
-	logInDev(`Removed ${guildName} (${guildID}) from characters`);
+	try {
+		characters.delete(guildID);
+		configuration.delete(guildID);
+		logInDev(`Removed ${guildName} (${guildID}) from characters`);
+	} catch (error) {
+		logInDev(error);
+	}
 }
 
 export function exportMaps() {
