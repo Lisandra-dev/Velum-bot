@@ -95,6 +95,8 @@ export default {
 				await interaction.reply("La catégorie de ticket n'a pas été trouvée, veuillez contacter un administrateur !");
 				return;
 			}
+			const staff = getConfig(interaction.guild.id, "staff");
+			const staffRole = guild.roles.cache.find( (role) => role.id === staff);
 			const nickName = user.nickname ?? user.displayName;
 			const newTicket = await channelFindByID?.children.create({name: `${startEmoji}╏${nickName}${raison}`,
 				permissionOverwrites: [
@@ -113,9 +115,13 @@ export default {
 						deny: [PermissionFlagsBits.ViewChannel],
 					}
 				]});
+			
 			if (!newTicket) {
 				await interaction.reply("Le ticket n'a pas pu être créé, veuillez contacter un administrateur !");
 				return;
+			}
+			if (staffRole) {
+				await newTicket.permissionOverwrites.create(staffRole, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
 			}
 			await interaction.reply({content: `Votre ticket a été créé dans ${channelMention(newTicket.id)}`,
 				ephemeral: true});
