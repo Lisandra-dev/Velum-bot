@@ -24,7 +24,7 @@ export default {
 			.setRequired(false)
 		)
 		.addStringOption( (option) => option
-			.setName("name")
+			.setName("alias")
 			.setDescription("Nom du personnage")
 			.setRequired(false)
 		),
@@ -32,7 +32,7 @@ export default {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const user = options.getUser("user") || interaction.user;
-		const name = options.getString("name") ?? "main";
+		const name = options.getString("alias") ?? "main";
 		const all = options.getBoolean("all") ?? false;
 		const row = new ActionRowBuilder<ButtonBuilder>()
 			.addComponents(

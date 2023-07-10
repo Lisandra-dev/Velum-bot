@@ -1,7 +1,7 @@
 import { Statistiques } from "src/interface";
 import {getCharacters} from "../maps";
 import {dedent} from "ts-dedent";
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, userMention } from "discord.js";
+import {CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, User, userMention} from "discord.js";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -13,14 +13,14 @@ export default {
 			.setRequired(false)
 		)
 		.addStringOption( (option) => option
-			.setName("name")
+			.setName("alias")
 			.setDescription("Si vous voulez voir les stats d'un personnage")
 		),
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
-		const user = options.getUser("user") || interaction.user;
-		const name = options.getString("name") || "main";
+		const user = options.getUser("user") as User || interaction.user;
+		const name = options.getString("alias") || "main";
 		const chara = getCharacters(user.id, interaction.guild.id, name) as Statistiques;
 		if (!chara) {
 			await interaction.reply({

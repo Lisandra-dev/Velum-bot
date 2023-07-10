@@ -1,4 +1,4 @@
-import create from "./inscript";
+import create from "./create";
 import get from "./get";
 import deleteChar from "./delete";
 import neutre from "./action";

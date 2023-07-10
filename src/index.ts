@@ -9,7 +9,8 @@ import onMessage from "./events/onMessage";
 import onUserQuit from "./events/onUserQuit";
 import onBotRemoved from "./events/onBotRemoved";
 
-dotenv.config();
+if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});
+else dotenv.config({path: ".env"});
 
 export const client = new Client({
 	intents: [
