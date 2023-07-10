@@ -1,12 +1,17 @@
-import { ActionRowBuilder,
-	ButtonStyle, 
-	CommandInteraction, 
-	CommandInteractionOptionResolver, 
-	PermissionFlagsBits, 
+import {
+	ActionRowBuilder,
+	ButtonStyle,
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	PermissionFlagsBits,
 	ButtonBuilder,
-	SlashCommandBuilder, 
-	userMention} from "discord.js";
-import { getCharacters, removeUser, removeCharacter } from "../maps";
+	SlashCommandBuilder,
+	userMention, AutocompleteInteraction
+} from "discord.js";
+import {getCharacters, removeUser, removeCharacter, get} from "../maps";
+import {Statistiques} from "../interface";
+import {latinize} from "../utils";
+import {capitalize} from "../display/results";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -27,12 +32,31 @@ export default {
 			.setName("alias")
 			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)
+			.setAutocomplete(true)
 		),
+	async autocomplete(interaction: AutocompleteInteraction) {
+		const opt = interaction.options as CommandInteractionOptionResolver;
+		const focused = opt.getFocused(true);
+		const choices: string[] = [];
+		const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+		/** list all characters */
+		if (chara) {
+			chara.forEach((value: Statistiques) => {
+				if (value.characterName) {
+					choices.push(capitalize(value.characterName.replace("main", "personnage principal")));
+				}
+			});
+		}
+		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
+		await interaction.respond(
+			results.map(result => ({ name: result, value: result }))
+		);
+	},
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const user = options.getUser("user") || interaction.user;
-		const name = options.getString("alias") ?? "main";
+		const name = options.getString("alias")?.replace(/personnage principal/i, "main") ?? "main";
 		const all = options.getBoolean("all") ?? false;
 		const row = new ActionRowBuilder<ButtonBuilder>()
 			.addComponents(

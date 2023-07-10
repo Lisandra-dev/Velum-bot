@@ -6,17 +6,18 @@ import {
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
-import {Seuil, STATISTIQUES} from "../interface";
+import {Seuil, Statistiques, STATISTIQUES} from "../interface";
 import {rollNeutre} from "../roll";
 import {capitalize, displayNEUTRE} from "../display/results";
-import {latinize} from "../utils";
+import {getStatistique, latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
+import {get, getCharacters} from "../maps";
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName("act")
 		.setDescription("Lance 1D20 de jet d'action")
-		.addStringOption( (option) => option
+		.addStringOption((option) => option
 			.setName("statistique")
 			.setDescription("Statistique à utiliser")
 			.setRequired(false)
@@ -28,11 +29,6 @@ export default {
 			.setRequired(false)
 			.setAutocomplete(true)
 		)
-		.addStringOption((option) => option
-			.setName("alias")
-			.setDescription("Alias du personnage secondaire (DC)")
-			.setRequired(false)
-		)
 		.addIntegerOption((option) => option
 			.setName("modificateur")
 			.setDescription("Bonus ou malus sur le jet")
@@ -42,6 +38,12 @@ export default {
 			.setName("commentaire")
 			.setDescription("Commentaire sur le jet")
 			.setRequired(false)
+		)
+		.addStringOption((option) => option
+			.setName("alias")
+			.setDescription("Alias du personnage secondaire (DC)")
+			.setRequired(false)
+			.setAutocomplete(true)
 		),
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const opt = interaction.options as CommandInteractionOptionResolver;
@@ -51,13 +53,23 @@ export default {
 			choices = STATISTIQUES.map(stat => capitalize(stat));
 		} else if (focused.name === "seuil") {
 			choices = Object.keys(Seuil).map(value => capitalize(value.toString()));
+		} else if (focused.name === "alias") {
+			const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+			/** list all characters */
+			if (chara) {
+				chara.forEach((value: Statistiques) => {
+					if (value.characterName) {
+						choices.push(capitalize(value.characterName.replace("main", "personnage principal")));
+					}
+				});
+			}
 		}
-		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
+		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase().replace("principal", "main"))));
 		await interaction.respond(
-			results.map(result => ({ name: result, value: result }))
+			results.map(result => ({name: result, value: result}))
 		);
 	},
-
+	
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const args = getInteractionArgs(interaction, "neutre");
@@ -69,9 +81,9 @@ export default {
 		if (!args.fiche) {
 			msgInfo = `${userMention(args.user)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} (10)`;
 		}
-		await interaction.reply({ embeds: [embed] });
+		await interaction.reply({embeds: [embed]});
 		if (msgInfo) {
-			await interaction.followUp({ content: msgInfo});
+			await interaction.followUp({content: msgInfo});
 		}
 	}
 };

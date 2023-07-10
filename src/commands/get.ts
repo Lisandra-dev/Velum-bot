@@ -1,7 +1,16 @@
 import { Statistiques } from "src/interface";
-import {getCharacters} from "../maps";
+import {get, getCharacters} from "../maps";
 import {dedent} from "ts-dedent";
-import {CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, User, userMention} from "discord.js";
+import {
+	AutocompleteInteraction,
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	SlashCommandBuilder,
+	User,
+	userMention
+} from "discord.js";
+import {latinize, logInDev} from "../utils";
+import {capitalize} from "../display/results";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,12 +24,31 @@ export default {
 		.addStringOption( (option) => option
 			.setName("alias")
 			.setDescription("Alias du personnage secondaire (DC)")
+			.setAutocomplete(true)
 		),
+	async autocomplete(interaction: AutocompleteInteraction) {
+		const opt = interaction.options as CommandInteractionOptionResolver;
+		const focused = opt.getFocused(true);
+		const choices: string[] = [];
+		const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+		/** list all characters */
+		if (chara) {
+			chara.forEach((value: Statistiques) => {
+				if (value.characterName) {
+					choices.push(capitalize(value.characterName.replace("main", "personnage principal")));
+				}
+			});
+		}
+		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value).toLowerCase()));
+		await interaction.respond(
+			results.map(result => ({ name: result, value: result }))
+		);
+	},
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const user = options.getUser("user") as User || interaction.user;
-		const name = options.getString("alias") || "main";
+		const name = options.getString("alias")?.replace(/personnage principal/i, "main") || "main";
 		const chara = getCharacters(user.id, interaction.guild.id, name) as Statistiques;
 		if (!chara) {
 			await interaction.reply({

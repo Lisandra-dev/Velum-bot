@@ -10,7 +10,8 @@ import {rollCombat} from "../roll";
 import {capitalize, displayATQ} from "../display/results";
 import {latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
-import {STATISTIQUES} from "../interface";
+import {Statistiques, STATISTIQUES} from "../interface";
+import {get, getCharacters} from "../maps";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -27,11 +28,6 @@ export default {
 			.setDescription("Les dégâts seront doublés en cas de critique")
 			.setRequired(false)
 		)
-		.addStringOption((option) => option
-			.setName("alias")
-			.setDescription("Alias du personnage secondaire (DC)")
-			.setRequired(false)
-		)
 		.addIntegerOption((option) => option
 			.setName("modificateur")
 			.setDescription("Bonus ou malus sur le jet")
@@ -41,11 +37,30 @@ export default {
 			.setName("commentaire")
 			.setDescription("Commentaire sur le jet")
 			.setRequired(false)
+		)
+		.addStringOption((option) => option
+			.setName("alias")
+			.setDescription("Alias du personnage secondaire (DC)")
+			.setRequired(false)
+			.setAutocomplete(true)
 		),
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const opt = interaction.options as CommandInteractionOptionResolver;
 		const focused = opt.getFocused(true);
-		const choices = STATISTIQUES.map(stat => capitalize(stat));
+		let choices: string[] = [];
+		if (focused.name === "statistique") {
+			choices = STATISTIQUES.map(stat => capitalize(stat));
+		} else if (focused.name === "alias") {
+			const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+			/** list all characters */
+			if (chara) {
+				chara.forEach((value: Statistiques) => {
+					if (value.characterName) {
+						choices.push(capitalize(value.characterName.replace("main", "personnage principal")));
+					}
+				});
+			}
+		}
 		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
 		await interaction.respond(
 			results.map(result => ({ name: result, value: result }))

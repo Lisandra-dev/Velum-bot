@@ -170,7 +170,7 @@ function getCC(params: string[]) {
 export function getInteractionArgs(interaction: CommandInteraction, type: "combat" | "neutre") {
 	const options = interaction.options as CommandInteractionOptionResolver;
 	const stat = options.getString("statistique") || "neutre";
-	const name = options.getString("alias") || "main";
+	const name = options.getString("alias")?.replace(/personnage principal/i, "main") ?? "main";
 	const modificateur = options.getInteger("modificateur") || 0;
 	const commentaire = options.getString("commentaire") || "";
 	const user = interaction.user as User;
