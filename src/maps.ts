@@ -141,6 +141,7 @@ export function loadGuild(guildID: string) {
 	characters.ensure(guildID, {});
 	configuration.ensure(guildID, {
 		"prefix": "$",
+		"staff" : "",
 	});
 }
 
