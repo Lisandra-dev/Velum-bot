@@ -2,7 +2,7 @@ import {
 	CategoryChannel, channelMention,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	EmbedBuilder, Guild, GuildMember, GuildTextBasedChannel, OverwriteType, PermissionFlagsBits,
+	EmbedBuilder, GuildMember, GuildTextBasedChannel, OverwriteType, PermissionFlagsBits,
 	SlashCommandBuilder, TextChannel, userMention
 } from "discord.js";
 import {getConfig} from "../../maps";
