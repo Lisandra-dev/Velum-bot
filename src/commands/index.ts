@@ -1,10 +1,11 @@
-import create from "./create";
-import get from "./get";
-import deleteChar from "./delete";
-import neutre from "./action";
-import config from "./config";
-import atq from "./atq";
-import bonus from "./calcForMe";
+import create from "./db/create";
+import get from "./db/get";
+import deleteChar from "./db/delete";
+import neutre from "./roll/action";
+import config from "./db/config";
+import atq from "./roll/atq";
+import bonus from "./utils/calcForMe";
+import ticket from "./utils/ticket";
 
-export const commands = [create, get, deleteChar, atq, config, neutre, bonus];
+export const commands = [create, get, deleteChar, atq, config, neutre, bonus, ticket];
 export const autoCompleteCmd = [atq, neutre, get, deleteChar];

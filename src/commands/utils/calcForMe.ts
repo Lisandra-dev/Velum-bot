@@ -1,5 +1,5 @@
 import {CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder} from "discord.js";
-import {logInDev, roundUp} from "../utils";
+import {logInDev, roundUp} from "../../utils";
 
 export default {
 	data: new SlashCommandBuilder()

@@ -1,7 +1,6 @@
 import {SlashCommandBuilder, User, userMention} from "discord.js";
-import {set} from "../maps";
+import {set} from "../../maps";
 import { CommandInteraction, CommandInteractionOptionResolver, PermissionFlagsBits } from "discord.js";
-import {logInDev} from "../utils";
 
 export default {
 	data: new SlashCommandBuilder()

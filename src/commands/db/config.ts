@@ -3,8 +3,14 @@
  * Like prefix 
  */
 
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
-import { setConfig } from "../maps";
+import {
+	channelMention,
+	ChannelType,
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	SlashCommandBuilder
+} from "discord.js";
+import { setConfig } from "../../maps";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -17,6 +23,16 @@ export default {
 				.setName("prefix")
 				.setDescription("Nouveau prefix")
 				.setRequired(true)
+			)
+		)
+		.addSubcommand( (subcommand) => subcommand
+			.setName("ticket")
+			.setDescription("Permet de définir la category où les tickets seront créés")
+			.addChannelOption( (option) => option
+				.setName("category")
+				.setDescription("Category des tickets")
+				.setRequired(true)
+				.addChannelTypes(ChannelType.GuildCategory)
 			)
 		)
 		.addSubcommand( (subcommand) => subcommand
@@ -42,6 +58,11 @@ export default {
 			if (!role) return;
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
+		} else if (subcommand === "ticket") {
+			const category = options.getChannel("category");
+			if (!category) return;
+			setConfig(interaction.guild.id, "ticket", category.id);
+			await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
 		}
 	},
 };
