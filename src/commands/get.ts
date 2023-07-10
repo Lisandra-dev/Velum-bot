@@ -14,7 +14,7 @@ export default {
 		)
 		.addStringOption( (option) => option
 			.setName("alias")
-			.setDescription("Si vous voulez voir les stats d'un personnage")
+			.setDescription("Alias du personnage secondaire (DC)")
 		),
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;

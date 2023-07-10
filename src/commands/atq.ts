@@ -29,7 +29,7 @@ export default {
 		)
 		.addStringOption((option) => option
 			.setName("alias")
-			.setDescription("Nom du personnage pour le personnage secondaire")
+			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)
 		)
 		.addIntegerOption((option) => option

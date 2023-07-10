@@ -25,7 +25,7 @@ export default {
 		)
 		.addStringOption( (option) => option
 			.setName("alias")
-			.setDescription("Nom du personnage")
+			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)
 		),
 	async execute(interaction: CommandInteraction) {
