@@ -9,7 +9,6 @@ import {destroyDB, loadGuild} from "../maps";
 
 if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});
 else dotenv.config({path: ".env"});
-console.log(process.env.CLIENT_ID);
 
 const rest = new REST().setToken(process.env.DISCORD_TOKEN ?? "0");
 

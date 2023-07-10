@@ -63,3 +63,4 @@ export function removeFromArgumentsWithString(args: string[], toRemove: string |
 export function latinize(str: string){
 	return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
+
