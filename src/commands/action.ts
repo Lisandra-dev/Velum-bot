@@ -9,9 +9,9 @@ import {
 import {Seuil, Statistiques, STATISTIQUES} from "../interface";
 import {rollNeutre} from "../roll";
 import {capitalize, displayNEUTRE} from "../display/results";
-import {getStatistique, latinize} from "../utils";
+import {latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
-import {get, getCharacters} from "../maps";
+import {get} from "../maps";
 
 export default {
 	data: new SlashCommandBuilder()

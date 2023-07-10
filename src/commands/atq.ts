@@ -11,7 +11,7 @@ import {capitalize, displayATQ} from "../display/results";
 import {latinize} from "../utils";
 import {getInteractionArgs} from "../roll/parseArg";
 import {Statistiques, STATISTIQUES} from "../interface";
-import {get, getCharacters} from "../maps";
+import {get} from "../maps";
 
 export default {
 	data: new SlashCommandBuilder()

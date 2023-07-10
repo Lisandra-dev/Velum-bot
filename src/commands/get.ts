@@ -9,7 +9,7 @@ import {
 	User,
 	userMention
 } from "discord.js";
-import {latinize, logInDev} from "../utils";
+import {latinize} from "../utils";
 import {capitalize} from "../display/results";
 
 export default {
