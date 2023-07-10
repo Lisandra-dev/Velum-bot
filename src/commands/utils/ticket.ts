@@ -30,7 +30,7 @@ export default {
 				.setRequired(true)
 				.addChoices(
 					{
-						name: "Commencé",
+						name: "Commencée",
 						value: "📩",
 					},
 					{
@@ -42,7 +42,7 @@ export default {
 						value: "⌛",
 					},
 					{
-						name: "Terminé",
+						name: "Validée",
 						value: "✅",
 					})
 			)
