@@ -51,28 +51,33 @@ export default {
 			.setName("close")
 			.setDescription("Ferme un ticket (Modérateur uniquement)")
 		)
-		.addSubcommand( (subcommand) => subcommand
-			.setName("add")
-			.setDescription("Ajoute un membre à un ticket (Modérateur uniquement)")
-			.addUserOption( (option) => option
-				.setName("membre")
-				.setDescription("Membre à ajouter")
-				.setRequired(true)
+		.addSubcommandGroup( (subcommandGroup) => subcommandGroup
+			.setName("members")
+			.setDescription("Gère les membres d'un ticket")
+			.addSubcommand( (subcommand) => subcommand
+				.setName("add")
+				.setDescription("Ajoute un membre à un ticket (Modérateur uniquement)")
+				.addUserOption( (option) => option
+					.setName("membre")
+					.setDescription("Membre à ajouter")
+					.setRequired(true)
+				)
 			)
-		)
-		.addSubcommand( (subcommand) => subcommand
-			.setName("remove")
-			.setDescription("Retire un membre d'un ticket (Modérateur uniquement)")
-			.addUserOption( (option) => option
-				.setName("membre")
-				.setDescription("Membre à retirer")
-				.setRequired(true)
+			.addSubcommand( (subcommand) => subcommand
+				.setName("remove")
+				.setDescription("Retire un membre d'un ticket (Modérateur uniquement)")
+				.addUserOption( (option) => option
+					.setName("membre")
+					.setDescription("Membre à retirer")
+					.setRequired(true)
+				)
 			)
 		),
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild || !interaction.member) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand();
+		const group = options.getSubcommandGroup();
 		if (subcommand === "open") {
 			let raison :string | null = options.getString("raison") ?? "";
 			if (raison) raison = ` ${raison}`;
@@ -151,7 +156,7 @@ export default {
 			//delete ticket
 			await ticket.delete();
 			
-		} else if (subcommand === "add") {
+		} else if (group === "members" && subcommand === "add") {
 			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
 			if (!hasRole) {
 				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
@@ -167,7 +172,7 @@ export default {
 			await ticket.permissionOverwrites.create(user, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
 			await interaction.reply({content: `${userMention(user.id)} a bien été ajouté au ticket`, ephemeral: true});
 		}
-		else if (subcommand === "remove") {
+		else if (group === "members" && subcommand === "remove") {
 			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
 			if (!hasRole) {
 				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
