@@ -64,7 +64,6 @@ export default {
 		if (!interaction.guildId) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const user = options.getUser("user") as User;
-		logInDev(user.id);
 		const name = options.getString("alias") ?? "main";
 		const force = options.getNumber("force") ?? 10;
 		const constitution = options.getNumber("constitution") ?? 10;
