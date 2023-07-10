@@ -49,18 +49,15 @@ export default {
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const subcommand = options.getSubcommand();
 		if (subcommand === "prefix") {
-			const prefix = options.getString("prefix");
-			if (!prefix) return;
+			const prefix = options.getString("prefix", true);
 			setConfig(interaction.guild.id, "prefix", prefix);
 			await interaction.reply(`Le prefix est maintenant \`${prefix}\``);
 		} else if (subcommand === "staff") {
-			const role = options.getRole("role");
-			if (!role) return;
+			const role = options.getRole("role", true);
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
 		} else if (subcommand === "ticket") {
-			const category = options.getChannel("category");
-			if (!category) return;
+			const category = options.getChannel("category", true);
 			setConfig(interaction.guild.id, "ticket", category.id);
 			await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
 		}

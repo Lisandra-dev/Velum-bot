@@ -55,7 +55,7 @@ export default {
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
-		const user = options.getUser("user") || interaction.user;
+		const user = options.getUser("user", true);
 		const name = options.getString("alias")?.replace(/personnage principal/i, "main") ?? "main";
 		const all = options.getBoolean("all") ?? false;
 		const row = new ActionRowBuilder<ButtonBuilder>()

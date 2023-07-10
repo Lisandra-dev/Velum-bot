@@ -26,7 +26,7 @@ export default {
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const option = interaction.options as CommandInteractionOptionResolver;
-		const value = option.getInteger("valeur");
+		const value = option.getInteger("valeur", true);
 		const bonusValue = option.getInteger("bonus") ?? 0;
 		let malusValue = option.getInteger("malus") ?? 0;
 		malusValue = malusValue > 0 ? -malusValue : malusValue;

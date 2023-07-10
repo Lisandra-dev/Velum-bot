@@ -62,7 +62,7 @@ export default {
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guildId) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
-		const user = options.getUser("user") as User;
+		const user = options.getUser("user", true) as User;
 		const name = options.getString("alias") ?? "main";
 		const force = options.getNumber("force") ?? 10;
 		const constitution = options.getNumber("constitution") ?? 10;

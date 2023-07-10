@@ -6,7 +6,7 @@ import {
 	SlashCommandBuilder, TextChannel, userMention
 } from "discord.js";
 import {getConfig} from "../../maps";
-import {hasStaffRole, verifTicket} from "../../utils";
+import {hasStaffRole, logInDev, verifTicket} from "../../utils";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -98,6 +98,8 @@ export default {
 			const staff = getConfig(interaction.guild.id, "staff");
 			const staffRole = guild.roles.cache.find( (role) => role.id === staff);
 			const nickName = user.nickname ?? user.displayName;
+			logInDev(user as GuildMember);
+			logInDev(`Ticket de ${nickName} créé`);
 			const newTicket = await channelFindByID?.children.create({name: `${startEmoji}╏${nickName}${raison}`,
 				permissionOverwrites: [
 					{
@@ -144,7 +146,7 @@ export default {
 				return;
 			}
 			const ticket = interaction.channel as GuildTextBasedChannel;
-			const etat = options.getString("etat") ?? "";
+			const etat = options.getString("etat", true);
 			await ticket.setName(ticket.name.replace(/[📩📝⌛✅]/u, etat));
 			await interaction.reply({content: "Le ticket a été mis à jour !", ephemeral: true});
 		} else if (subcommand === "close") {
