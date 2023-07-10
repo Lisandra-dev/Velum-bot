@@ -29,7 +29,7 @@ export default {
 			.setAutocomplete(true)
 		)
 		.addStringOption((option) => option
-			.setName("name")
+			.setName("alias")
 			.setDescription("Nom du personnage")
 			.setRequired(false)
 		)

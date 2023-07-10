@@ -7,7 +7,9 @@ import { logInDev } from "../utils";
 import {DESTROY, VERSION} from "../index";
 import {destroyDB, loadGuild} from "../maps";
 
-dotenv.config();
+if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});
+else dotenv.config({path: ".env"});
+console.log(process.env.CLIENT_ID);
 
 const rest = new REST().setToken(process.env.DISCORD_TOKEN ?? "0");
 

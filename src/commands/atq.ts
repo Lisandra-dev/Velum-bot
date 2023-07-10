@@ -28,8 +28,8 @@ export default {
 			.setRequired(false)
 		)
 		.addStringOption((option) => option
-			.setName("name")
-			.setDescription("Nom du personnage")
+			.setName("alias")
+			.setDescription("Nom du personnage pour le personnage secondaire")
 			.setRequired(false)
 		)
 		.addIntegerOption((option) => option
