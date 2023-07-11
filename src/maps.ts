@@ -66,6 +66,7 @@ export function getConfig(guildID: string, key: string) {
 
 export function setConfig(guildID: string, key: string, value: string) {
 	configuration.set(guildID, value, key);
+	logInDev(`Set ${key} to ${value} for ${guildID}`);
 }
 
 export function get(user: string, guildID: string): Statistiques[] {
