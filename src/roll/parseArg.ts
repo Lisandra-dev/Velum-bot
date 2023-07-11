@@ -1,5 +1,14 @@
-import {CommandInteraction, CommandInteractionOptionResolver, Message, User} from "discord.js";
-import {DEFAULT_STATISTIQUE, Parameters, PARAMS, Seuil, SEUIL_KEYS, STATISTIQUES} from "../interface";
+import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, Message, User} from "discord.js";
+import {
+	DEFAULT_STATISTIQUE,
+	Parameters,
+	PARAMS,
+	Result,
+	ResultRolls,
+	Seuil,
+	SEUIL_KEYS,
+	STATISTIQUES
+} from "../interface";
 import {
 	getSeuil,
 	getStatistique,
@@ -9,7 +18,8 @@ import {
 	removeFromArgumentsWithString
 } from "../utils";
 import {getCharacters, getConfig} from "../maps";
-import {capitalize} from "../display/results";
+import {capitalize} from "./results";
+import {IMAGE_LINK} from "../index";
 
 
 export function getParameters(message: Message, rollType: "neutre"|"combat") {
@@ -243,3 +253,114 @@ function noMatchInParam(param: string): boolean {
 		}
 	});
 }
+
+function criticalSuccess(param: Parameters, 
+	result: {roll: number, stats: number}, 
+	ccMsg:  {indicatif: string, message: string}) {
+
+	if (param.cc) {
+		ccMsg.indicatif = "x 2";
+		ccMsg.message = "• Coup-Critique ! ";
+	}
+	const total = param.cc ? result.roll * 2 + result.stats + param.modificateur : result.roll + result.stats + param.modificateur;
+	if (total <= 0) {
+		ccMsg.message = "• Échec critique ! ";
+	}
+	return {ccMsg, total};
+}
+
+function seuilMessageSuccess(result: ResultRolls) {
+	const success = result.success;
+	if (success?.EC) {
+		return "• Échec critique ! ";
+	} else if (success?.RC) {
+		return "• Réussite critique ! ";
+	} else if (success?.success) {
+		return "• Réussite ! ";
+	} else {
+		return "• Échec ! ";
+	}
+}
+
+export function parseResult(
+	param: Parameters,
+	result: ResultRolls,
+	member: GuildMember | null,
+	roll: "combat" | "neutre") {
+	let total : number;
+	logInDev(`param : ${JSON.stringify(result)}`);
+	let ccMsg = {
+		"indicatif": "",
+		"message" : "",
+	};
+	
+	if (roll === "combat") {
+		const critical = criticalSuccess(param, result, ccMsg);
+		ccMsg = critical.ccMsg;
+		total = critical.total;
+	} else {
+		total = result.roll + result.stats + param.modificateur;
+		ccMsg.message = seuilMessageSuccess(result);
+	}
+	
+	const second = param.modificateur > result.stats ? result.stats : param.modificateur;
+	const first = param.modificateur > result.stats ? param.modificateur : result.stats;
+	const number = {
+		modifStat: param.modificateur + result.stats > 0 ? " + " : " - ",
+		first : first,
+		second: {
+			value: second !== 0 ? second : 0,
+			signe: second !== 0 ? second > 0 ? "+" : "-" : ""
+		}
+	};
+	const secondWithoutSigne = number.second.value as number;
+	number.second.value = secondWithoutSigne < 0 ? secondWithoutSigne * -1 : secondWithoutSigne;
+	number.first = first > number.second.value ? first : number.second.value;
+	number.second.value = number.first > number.second.value ? number.second.value : first;
+	number.modifStat = number.first !== 0 ? number.modifStat : "";
+
+	/**
+	 * Template :
+	 * ${result.roll} ${ccMs.indicatif} ${signe.modifStat} (${first.first}${second.signe}${second.second})
+	 */
+
+	logInDev(`first : ${number.first} | second : ${number.second.value}`);
+	let formula : string;
+	if (number.first !== 0) {
+		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
+	} else {
+		formula = number.second.value !== 0 ? `${number.second.signe} ${number.second.value}` : "";
+	}
+	
+	/**
+	 * if first.first < 0 && signe.modifStat === "-"
+	 * Remove all signe
+	 * The second will be always < first.first
+	 * So at the end, the formula must become:
+	 * - (first.first + second.second)
+	 * aka remove first - and replace the second signe by +
+	 */
+	const rollCC = param.cc ? `(${result.roll} x 2)` : `${result.roll}`;
+	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
+	const calculExplained = `${rollCC} ${number.modifStat}${formula}`;
+	logInDev(`calculExplained : ${calculExplained}`, "modif", number.modifStat);
+	
+	/** get member **/
+	if (!member) return {} as Result;
+	let author = param.personnage !== "main" ? param.personnage : member.user.globalName ?? member.displayName;
+	author = author ?? member.user.globalName ?? member.displayName;
+	author = `⌈${author}⌋`;
+	let commentaire: string | null = param.commentaire ? param.commentaire : "";
+	commentaire = commentaire.length > 0 ? commentaire : null;
+	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
+	const finalResultMessage: Result = {
+		author: author,
+		image: `${IMAGE_LINK}/${imageStatistiques}.png`,
+		calcul: calculExplained,
+		total: total,
+		ccMsg: ccMsg,
+		commentaire: commentaire,
+	};
+	return finalResultMessage;
+}
+
