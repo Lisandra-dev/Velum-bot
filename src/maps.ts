@@ -100,8 +100,15 @@ export function remove(guildID: string, key: string, value: string) {
 }
 
 export function check(guildID: string, key: string, value: string) {
-	configuration.ensure(guildID, [], key);
-	return configuration.get(guildID, key).includes(value);
+	try {
+		configuration.ensure(guildID, [], key);
+		return configuration.get(guildID, key).includes(value);
+	} catch (error) {
+		/** delete key and retry */
+		configuration.delete(guildID, key);
+		configuration.ensure(guildID, [], key);
+		return configuration.get(guildID, key).includes(value);
+	}
 }
 
 export function get(user: string, guildID: string): Statistiques[] {
