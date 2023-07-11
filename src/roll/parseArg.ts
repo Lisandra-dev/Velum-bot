@@ -12,13 +12,13 @@ import {
 import {
 	getSeuil,
 	getStatistique,
-	latinize,
+	latinise,
 	logInDev,
 	removeFromArguments,
-	removeFromArgumentsWithString
+	removeFromArgumentsWithString,
+	capitalize,
 } from "../utils";
 import {getCharacters, getConfig} from "../maps";
-import {capitalize} from "./results";
 import {IMAGE_LINK} from "../index";
 
 
@@ -108,7 +108,7 @@ function getParamStats(params: string[], guildID: string, param: Parameters) {
 	if (params.length >= 1) {
 		const stat = params[0];
 		if (isNaN(parseInt(stat))) {
-			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinize(params[0].toLowerCase())));
+			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinise(params[0].toLowerCase())));
 			param.statistiqueName = statistiquesArgs ?? "Neutre";
 			const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
 			param.statistiques = stats.modif;
@@ -145,7 +145,7 @@ function getSeuilInParameters(params: string[]) {
 	let seuil = Seuil.moyen;
 	let seuilName: string | undefined = "Moyen";
 	if (seuilFind) {
-		seuilName = SEUIL_KEYS.find( (value) => value.includes(latinize(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
+		seuilName = SEUIL_KEYS.find( (value) => value.includes(latinise(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
 		if (!seuilName && !isNaN(parseInt(seuilFind.replace(PARAMS.seuil, "")))) {
 			seuil = parseInt(seuilFind.replace(PARAMS.seuil, ""));
 			seuilName = `Seuil : ${seuil}`;
@@ -352,7 +352,7 @@ export function parseResult(
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	const imageStatistiques = STATISTIQUES.find(stats =>latinize(param.statistiqueName.toLowerCase()) === latinize(stats.toLowerCase()));
+	const imageStatistiques = STATISTIQUES.find(stats =>latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
 	const finalResultMessage: Result = {
 		author: author,
 		image: `${IMAGE_LINK}/${imageStatistiques}.png`,

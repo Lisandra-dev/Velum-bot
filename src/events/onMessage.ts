@@ -4,7 +4,7 @@ import {
 } from "../utils";
 import {rollCombat, rollNeutre} from "../roll";
 import { getParameters } from "../roll/parseArg";
-import {displayATQ, displayNEUTRE, ephemeralInfo} from "../display/results";
+import {displayATQ, displayNEUTRE, ephemeralInfo} from "../roll/results";
 import {exportMaps, getConfig} from "../maps";
 import {helpCombat} from "../display/help";
 import {dedent} from "ts-dedent";

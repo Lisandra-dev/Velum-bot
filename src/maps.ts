@@ -1,5 +1,5 @@
 import Enmap from "enmap";
-import {latinize, logInDev} from "./utils";
+import {latinise, logInDev} from "./utils";
 import {Statistiques } from "./interface";
 
 /**
@@ -84,7 +84,7 @@ export function getCharacters(user: string, guildID: string, characterName?: str
 			return userCharacters.find((s: Statistiques) => {
 				if (!characterName) return;
 				const name = s.characterName ?? "main";
-				return latinize(name).toLowerCase().trim() === latinize(characterName).toLowerCase().trim();
+				return latinise(name).toLowerCase().trim() === latinise(characterName).toLowerCase().trim();
 			});
 		}
 	} catch (error) {

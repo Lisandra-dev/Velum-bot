@@ -7,8 +7,8 @@ import {
 	userMention
 } from "discord.js";
 import {rollCombat} from "../../roll";
-import {capitalize, displayATQ} from "../../display/results";
-import {latinize} from "../../utils";
+import {displayATQ} from "../../roll/results";
+import {capitalize, latinise} from "../../utils";
 import {getInteractionArgs} from "../../roll/parseArg";
 import {Statistiques, STATISTIQUES} from "../../interface";
 import {get} from "../../maps";
@@ -61,7 +61,7 @@ export default {
 				});
 			}
 		}
-		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase())));
+		const results = choices.filter(choice => latinise(choice.toLowerCase()).includes(latinise(focused.value.toLowerCase())));
 		await interaction.respond(
 			results.map(result => ({ name: result, value: result }))
 		);

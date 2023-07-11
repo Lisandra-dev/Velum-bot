@@ -1,6 +1,6 @@
 import {getCharacters, getConfig} from "./maps";
 import {DEFAULT_STATISTIQUE, Seuil} from "./interface";
-import {Guild, GuildMember, PermissionFlagsBits, TextBasedChannel} from "discord.js";
+import {Guild, GuildMember, PermissionFlagsBits, Role, TextBasedChannel} from "discord.js";
 
 export function logInDev(...text: unknown[]) {
 	const time= new Date();
@@ -61,7 +61,7 @@ export function removeFromArgumentsWithString(args: string[], toRemove: string |
 	return args.filter((arg) => arg !== toRemove);
 }
 
-export function latinize(str: string){
+export function latinise(str: string){
 	return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
@@ -71,9 +71,9 @@ export function latinize(str: string){
  * @param guildID {@link string} Guild ID to get the staff role
  * @returns {boolean} True if the member has the staff role
  */
-export function hasStaffRole(member: GuildMember, guildID: string) {
+export function hasStaffRole(member: GuildMember, guildID: string) : boolean {
 	const staffRole = getConfig(guildID, "staff");
-	const hasRole = member.roles.cache.find((role) => role.id === staffRole);
+	const hasRole = !!member.roles.cache.find((role) => role.id === staffRole);
 	return hasRole || member.permissions.has(PermissionFlagsBits.ManageRoles);
 }
 
@@ -90,5 +90,8 @@ export function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
 	const ticketCategory = getConfig(guildID, "ticket");
 	const ticketParent = ticket.parent ? ticket.parent.id : "0";
 	return (ticketParent || ticketParent === ticketCategory);
-	
+}
+
+export function capitalize(str: string) {
+	return str[0].toUpperCase() + str.slice(1);
 }

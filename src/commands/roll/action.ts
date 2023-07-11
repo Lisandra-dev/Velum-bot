@@ -8,8 +8,8 @@ import {
 } from "discord.js";
 import {Seuil, Statistiques, STATISTIQUES} from "../../interface";
 import {rollNeutre} from "../../roll";
-import {capitalize, displayNEUTRE} from "../../display/results";
-import {latinize} from "../../utils";
+import {displayNEUTRE} from "../../roll/results";
+import {latinise, capitalize} from "../../utils";
 import {getInteractionArgs} from "../../roll/parseArg";
 import {get} from "../../maps";
 
@@ -64,7 +64,7 @@ export default {
 				});
 			}
 		}
-		const results = choices.filter(choice => latinize(choice.toLowerCase()).includes(latinize(focused.value.toLowerCase().replace("principal", "main"))));
+		const results = choices.filter(choice => latinise(choice.toLowerCase()).includes(latinise(focused.value.toLowerCase().replace("principal", "main"))));
 		await interaction.respond(
 			results.map(result => ({name: result, value: result}))
 		);

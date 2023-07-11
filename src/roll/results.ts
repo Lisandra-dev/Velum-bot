@@ -1,10 +1,9 @@
 import {Parameters, ResultRolls, Seuil} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {parseResult} from "./parseArg";
+import {capitalize} from "../utils";
 
-export function capitalize(str: string) {
-	return str[0].toUpperCase() + str.slice(1);
-}
+
 
 export function ephemeralInfo(param: Parameters): string | undefined{
 	if (!param.fiche) {
