@@ -16,9 +16,9 @@ import {
 	logInDev,
 	removeFromArguments,
 	removeFromArgumentsWithString,
-	capitalize,
+	capitalize, hasStaffRole,
 } from "../utils";
-import {getCharacters, getConfig} from "../maps";
+import {getCharacters} from "../maps";
 import {IMAGE_LINK} from "../index";
 
 
@@ -30,7 +30,7 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 	const args : Parameters = {
 		statistiques: 10,
 		statistiqueName: "Neutre",
-		user: message.author.id,
+		user: message.author,
 		modificateur: 0,
 	};
 	
@@ -43,9 +43,7 @@ export function getParameters(message: Message, rollType: "neutre"|"combat") {
 		args.cc = false;
 	}
 	const guildID = message.guild?.id ?? "";
-	const roleStaff = getConfig(guildID, "staff");
-	const hasRoleStaff = message.member?.roles.cache.has(roleStaff) ?? false;
-	const user = getUser(message, messageContent, args, hasRoleStaff);
+	const user = getUser(message, messageContent, args, hasStaffRole(message.member as GuildMember, guildID));
 	messageContent = user.params;
 	args.user = user.user;
 	const perso = getPersonnage(messageContent);
@@ -84,7 +82,7 @@ function getUser(message: Message, params: string[], parameters: Parameters, sta
 	const isSomeoneMentionned = message.mentions.users ?? false;
 	let user = parameters.user;
 	if (isSomeoneMentionned && staff) {
-		user = message.mentions.users.first()?.id ?? parameters.user;
+		user = message.mentions.users.first() ?? parameters.user;
 		params = removeFromArgumentsWithString(params, `<@${parameters.user}>`);
 	}
 	return {params, user};
@@ -103,14 +101,14 @@ function getPersonnage(params: string[]) {
 }
 
 function getParamStats(params: string[], guildID: string, param: Parameters) {
-	const stats = getStatistique(param.user, guildID, "Neutre", param.personnage ?? "main");
+	const stats = getStatistique(param.user.id, guildID, "Neutre", param.personnage ?? "main");
 	param.fiche = stats.fiche;
 	if (params.length >= 1) {
 		const stat = params[0];
 		if (isNaN(parseInt(stat))) {
 			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinise(params[0].toLowerCase())));
 			param.statistiqueName = statistiquesArgs ?? "Neutre";
-			const stats = getStatistique(param.user, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
+			const stats = getStatistique(param.user.id, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
 			param.statistiques = stats.modif;
 			param.fiche = stats.fiche;
 		} else if (noMatchInParam(params[0])) {
@@ -183,7 +181,7 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 	const name = options.getString("alias")?.replace(/personnage principal/i, "main") ?? "main";
 	const modificateur = options.getInteger("modificateur") || 0;
 	const commentaire = options.getString("commentaire") || "";
-	const user = interaction.user as User;
+	const user = options.getUser("user") && hasStaffRole(interaction.member as GuildMember, interaction.guild?.id) ? options.getUser("user") as User : interaction.user as User;
 	/**
 	 * the guildID is not null because the command is guild only
 	 * We check the guildID before the command is executed
@@ -207,13 +205,12 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 		statModif = parseInt(stat);
 		statistiqueName = "Neutre";
 	}
-	
 	const args : Parameters = {
 		statistiques: statModif,
 		statistiqueName: statistiqueName,
 		modificateur: modificateur,
 		commentaire: commentaire,
-		user: user.id,
+		user: user,
 		fiche: fiche,
 	};
 	
@@ -285,7 +282,6 @@ function seuilMessageSuccess(result: ResultRolls) {
 export function parseResult(
 	param: Parameters,
 	result: ResultRolls,
-	member: GuildMember | null,
 	roll: "combat" | "neutre") {
 	let total : number;
 	logInDev(`param : ${JSON.stringify(result)}`);
@@ -346,9 +342,8 @@ export function parseResult(
 	logInDev(`calculExplained : ${calculExplained}`, "modif", number.modifStat);
 	
 	/** get member **/
-	if (!member) return {} as Result;
-	let author = param.personnage !== "main" ? param.personnage : member.user.globalName ?? member.displayName;
-	author = author ?? member.user.globalName ?? member.displayName;
+	let author = param.personnage !== "main" ? param.personnage : param.user.globalName ?? param.user.displayName;
+	author = author ?? param.user.globalName ?? param.user.displayName;
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;

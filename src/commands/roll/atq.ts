@@ -16,6 +16,8 @@ import {get} from "../../maps";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("atq")
+		.setDMPermission(false)
+
 		.setDescription("Lance 1D8 de jet d'attaque")
 		.addStringOption( (option) => option
 			.setName("statistique")
@@ -43,6 +45,11 @@ export default {
 			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)
 			.setAutocomplete(true)
+		)
+		.addUserOption((option) => option
+			.setName("user")
+			.setDescription("Utilisateur à qui attribuer le jet - Modérateur uniquement")
+			.setRequired(false)
 		),
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const opt = interaction.options as CommandInteractionOptionResolver;
@@ -71,11 +78,10 @@ export default {
 		if (!interaction.guild) return;
 		const args = getInteractionArgs(interaction, "combat");
 		const result = rollCombat(args);
-		const member = interaction.member as GuildMember;
-		const embed = displayATQ(args, result, member);
+		const embed = displayATQ(args, result);
 		let msgInfo = "";
-		if (!args.fiche) {
-			msgInfo = `${userMention(args.user)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} (10)`;
+		if (!args.fiche && args.statistiqueName === "Neutre" && args.statistiques === 10) {
+			msgInfo = `${userMention(args.user.id)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} [${args.statistiques}]`;
 		}
 		await interaction.reply({ embeds: [embed] });
 		if (msgInfo) {

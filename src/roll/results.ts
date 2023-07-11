@@ -6,15 +6,15 @@ import {capitalize} from "../utils";
 
 
 export function ephemeralInfo(param: Parameters): string | undefined{
-	if (!param.fiche) {
-		const char = param.personnage !== "main" ? `${param.personnage} (${userMention(param.user)})` : userMention(param.user);
-		return `*${char} n'a pas de fiche de personnage ! ${capitalize(param.statistiqueName)} appliquée : [10]* \n_ _`;
+	if (!param.fiche && param.statistiqueName === "Neutre" && param.statistiques === 10) {
+		const char = param.personnage !== "main" ? `${param.personnage} (${userMention(param.user.id)})` : userMention(param.user.id);
+		return `*${char} n'a pas de fiche de personnage ! ${capitalize(param.statistiqueName)} appliquée : [${param.statistiques}]* \n_ _`;
 	}
 	return undefined;
 }
 
-export function displayATQ(param: Parameters, resultRoll: ResultRolls, member: GuildMember | null) {
-	const result = parseResult(param, resultRoll, member, "combat");
+export function displayATQ(param: Parameters, resultRoll: ResultRolls) {
+	const result = parseResult(param, resultRoll, "combat");
 	return new EmbedBuilder()
 		.setAuthor({
 			name: `${result.author}`,
@@ -31,9 +31,8 @@ export function displayATQ(param: Parameters, resultRoll: ResultRolls, member: G
 
 export function displayNEUTRE(
 	param: Parameters,
-	resultRoll: ResultRolls,
-	member: GuildMember | null) {
-	const result = parseResult(param, resultRoll, member, "neutre");
+	resultRoll: ResultRolls) {
+	const result = parseResult(param, resultRoll, "neutre");
 	const commentaire = result.commentaire ? `*${capitalize(result.commentaire)}*` : null;
 	const seuil = param.seuil ? param.seuil.value : Seuil.moyen;
 	const signeTotal = result.total > seuil ? "⩾" : "⩽";

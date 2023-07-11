@@ -1,3 +1,5 @@
+import {User} from "discord.js";
+
 export interface Characters {
     stats: Statistiques[];
 }
@@ -59,7 +61,7 @@ export interface Parameters {
 	modificateur: number;
 	commentaire?: string;
 	personnage?: string;
-	user: string;
+	user: User;
 	fiche?: boolean;
 }
 

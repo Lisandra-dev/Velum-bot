@@ -33,7 +33,7 @@ export default (client: Client): void => {
 			const result = rollNeutre(param);
 			if (!result?.success) return;
 
-			const embed = displayNEUTRE(param, result, message.member);
+			const embed = displayNEUTRE(param, result);
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,
@@ -47,8 +47,7 @@ export default (client: Client): void => {
 			const param = getParameters(message, "combat");
 			const result = rollCombat(param);
 			if (!result) return;
-			const member = message.guild?.members.cache.get(param.user) ?? message.member;
-			const embed = displayATQ(param, result, member);
+			const embed = displayATQ(param, result);
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,
