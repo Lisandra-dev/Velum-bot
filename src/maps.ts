@@ -13,7 +13,7 @@ import {Statistiques} from "./interface";
  */
 
 
-const characters = new Enmap({
+const characters: Enmap = new Enmap({
 	name: "Characters",
 	fetchAll: false,
 	autoFetch: true,
@@ -65,8 +65,21 @@ export function set(
 	}
 }
 
-export function getConfig(guildID: string, key: string) {
-	return configuration.ensure(guildID, "!", key);
+export function getConfig(guildID: string, key: string): string | string[] {
+	switch (key) {
+	case "prefix":
+		return configuration.ensure(guildID, "!", "prefix") as string;
+	case "role.add":
+		return configuration.ensure(guildID, [], "role.add") as string[];
+	case "role.remove":
+		return configuration.ensure(guildID, [], "role.remove") as string[];
+	case "staff":
+		return configuration.ensure(guildID, "", "staff") as string;
+	case "ticket":
+		return configuration.ensure(guildID, "", "ticket") as string;
+	default:
+		return configuration.ensure(guildID, "", key);
+	}
 }
 
 export function setConfig(guildID: string, key: string, value: string) {

@@ -10,7 +10,7 @@ import {
 	CommandInteractionOptionResolver,
 	SlashCommandBuilder
 } from "discord.js";
-import {getConfig, push, remove, setConfig} from "../../maps";
+import {check, getConfig, push, remove, setConfig} from "../../maps";
 import dedent from "ts-dedent";
 
 export default {
@@ -122,7 +122,7 @@ export default {
 				if (choices === "add") {
 					await interaction.deferReply();
 					const role = options.getRole("role", true);
-					const isRemoved = getConfig(interaction.guild.id, "role.remove").includes(role.id);
+					const isRemoved = check(interaction.guild.id, "role.remove", role.id);
 					if (isRemoved) {
 						await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à retirer. Suppression`);
 						remove(interaction.guild.id, "role.remove", role.id);
@@ -132,7 +132,7 @@ export default {
 				} else if (choices === "remove") {
 					await interaction.deferReply();
 					const role = options.getRole("role", true);
-					const isAdded = getConfig(interaction.guild.id, "role.add").includes(role.id);
+					const isAdded = check(interaction.guild.id, "role.add", role.id);
 					if (isAdded) {
 						await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à ajouter. Suppression`);
 						remove(interaction.guild.id, "role.add", role.id);
@@ -151,8 +151,8 @@ export default {
 					await interaction.reply(`Le rôle ${role.name} ne sera plus retiré lors de l'utilisation de la commande create`);
 				}
 			} else if (subcommand === "liste") {
-				const roleToAdd = getConfig(interaction.guild.id, "role.add");
-				const roleToRemove = getConfig(interaction.guild.id, "role.remove");
+				const roleToAdd = getConfig(interaction.guild.id, "role.add") as string[];
+				const roleToRemove = getConfig(interaction.guild.id, "role.remove") as string[];
 				const message = dedent(`
 					**Rôles à ajouter**
 					- ${roleToAdd.map((id: string) => `<@&${id}>`).join("\n- ")}
