@@ -11,6 +11,8 @@ import {hasStaffRole, logInDev, verifTicket} from "../../utils";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("ticket")
+		.setDMPermission(false)
+
 		.setDescription("Crée un ticket pour contacter le staff")
 		.addSubcommand( (subcommand) => subcommand
 			.setName("open")

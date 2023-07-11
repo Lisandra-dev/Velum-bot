@@ -15,6 +15,7 @@ import {latinise, capitalize} from "../../utils";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("delete")
+		.setDMPermission(false)
 		.setDescription("Supprimer un personnage")
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.addUserOption( (option) => option

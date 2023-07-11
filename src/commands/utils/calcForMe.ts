@@ -4,6 +4,7 @@ import {logInDev, roundUp} from "../../utils";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("stat")
+		.setDMPermission(false)
 		.setDescription("Calcule pour vous la valeur apportée par une statistique")
 		.addIntegerOption((option) =>
 			option

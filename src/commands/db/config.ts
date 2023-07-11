@@ -15,6 +15,8 @@ import { setConfig } from "../../maps";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("config")
+		.setDMPermission(false)
+
 		.setDescription("Configure le bot")
 		.addSubcommand( (subcommand) => subcommand
 			.setName("prefix")

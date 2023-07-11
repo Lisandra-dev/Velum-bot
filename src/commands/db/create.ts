@@ -7,6 +7,8 @@ export default {
 		.setName("create")
 		.setDescription("Créer un personnage")
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
+		.setDMPermission(false)
+
 		.addUserOption( (option) => option
 			.setName("user")
 			.setDescription("Utilisateur à qui créer le personnage")

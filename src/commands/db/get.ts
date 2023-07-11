@@ -14,6 +14,7 @@ import {latinise, capitalize} from "../../utils";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("get")
+		.setDMPermission(false)
 		.setDescription("Voir ses statistiques, ou celles d'un autre utilisateur ou personnage.")
 		.addUserOption( (option) => option
 			.setName("user")
