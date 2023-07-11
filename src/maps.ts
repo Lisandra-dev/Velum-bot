@@ -88,8 +88,15 @@ export function setConfig(guildID: string, key: string, value: string) {
 }
 
 export function push(guildID: string, key: string, value: string) {
-	configuration.ensure(guildID, [], key);
-	configuration.push(guildID, value, key, false);
+	try {
+		configuration.ensure(guildID, [], key);
+		configuration.push(guildID, value, key, false);
+	} catch (error) {
+		/** delete key and retry */
+		configuration.delete(guildID, key);
+		configuration.ensure(guildID, [], key);
+		configuration.push(guildID, value, key, false);
+	}
 	logInDev(`Pushed ${value} to ${key} for ${guildID}`);
 }
 
