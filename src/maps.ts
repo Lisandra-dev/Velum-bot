@@ -74,6 +74,23 @@ export function setConfig(guildID: string, key: string, value: string) {
 	logInDev(`Set ${key} to ${value} for ${guildID}`);
 }
 
+export function push(guildID: string, key: string, value: string) {
+	configuration.ensure(guildID, [], key);
+	configuration.push(guildID, value, key, false);
+	logInDev(`Pushed ${value} to ${key} for ${guildID}`);
+}
+
+export function remove(guildID: string, key: string, value: string) {
+	configuration.ensure(guildID, [], key);
+	configuration.remove(guildID, value, key);
+	logInDev(`Removed ${value} from ${key} for ${guildID}`);
+}
+
+export function check(guildID: string, key: string, value: string) {
+	configuration.ensure(guildID, [], key);
+	return configuration.get(guildID, key).includes(value);
+}
+
 export function get(user: string, guildID: string): Statistiques[] {
 	try {
 		return characters.get(guildID)[user] ?? [] as Statistiques[];

@@ -6,7 +6,7 @@ import {
 	User,
 	userMention
 } from "discord.js";
-import {set} from "../../maps";
+import {getConfig, set} from "../../maps";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -68,9 +68,11 @@ export default {
 			.setRequired(false)
 		),
 	async execute(interaction: CommandInteraction) {
-		if (!interaction.guildId) return;
+		if (!interaction.guild) return;
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const user = options.getUser("user", true) as User;
+		const member = interaction.guild.members.cache.get(user.id);
+		if (!member) return;
 		const name = options.getString("alias") ?? "main";
 		const force = options.getNumber("force") ?? 10;
 		const constitution = options.getNumber("constitution") ?? 10;
@@ -89,7 +91,19 @@ export default {
 				perception: perception
 			}
 		};
-		set(user.id, interaction.guildId, stats);
+		set(user.id, interaction.guild.id, stats);
+		const roleIDToAdd = getConfig(interaction.guild.id, "role.add") as string[];
+		const roleIDToRemove = getConfig(interaction.guild.id, "role.remove") as string[];
+		if (roleIDToAdd.length > 0) {
+			roleIDToAdd.forEach((id) => {
+				member.roles.add(id);
+			});
+		}
+		if (roleIDToRemove.length > 0) {
+			roleIDToRemove.forEach((id) => {
+				member.roles.remove(id);
+			});
+		}
 		await interaction.reply(`Personnage ${name === "main" ? "principal" : name} créé pour ${userMention(user.id)}`);
 	}
 };

@@ -94,3 +94,13 @@ export function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
 export function capitalize(str: string) {
 	return str[0].toUpperCase() + str.slice(1);
 }
+
+export function discordCut(str: string, maxLength: number=2000) {
+	const content = JSON.stringify(str);
+	const morceaux: string[] = [];
+	for (let i = 0; i < content.length; i += maxLength) {
+		const morceau = content.substring(i, maxLength);
+		morceaux.push(morceau);
+	}
+	return morceaux;
+}

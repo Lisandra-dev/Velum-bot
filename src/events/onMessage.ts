@@ -5,7 +5,6 @@ import {getParameters} from "../roll/parseArg";
 import {displayATQ, displayNEUTRE, ephemeralInfo} from "../roll/results";
 import {exportMaps, getConfig} from "../maps";
 import {helpCombat} from "../display/help";
-import {dedent} from "ts-dedent";
 
 export default (client: Client): void => {
 	client.on("messageCreate", async (message) => {
@@ -14,9 +13,9 @@ export default (client: Client): void => {
 		if (!message.guild) return;
 		if (message.content.toLowerCase().startsWith("$db") && process.env.NODE_ENV === "development") {
 			const db = exportMaps();
-			await message.reply(dedent(`\`\`\`json
-			${db}
-			\`\`\``));
+			await message.reply({
+				content: "Regarder la console",
+			});
 			logInDev(db);
 			return;
 		}
