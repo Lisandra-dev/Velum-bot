@@ -1,6 +1,6 @@
 import {Parameters, ResultRolls, Seuil} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
-import {parseResult} from "../roll/parseArg";
+import {parseResult} from "./parseArg";
 
 export function capitalize(str: string) {
 	return str[0].toUpperCase() + str.slice(1);
