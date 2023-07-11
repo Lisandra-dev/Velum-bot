@@ -71,7 +71,10 @@ export function latinise(str: string){
  * @param guildID {@link string} Guild ID to get the staff role
  * @returns {boolean} True if the member has the staff role
  */
-export function hasStaffRole(member: GuildMember, guildID: string) : boolean {
+export function hasStaffRole(member: GuildMember, guildID?: string) : boolean {
+	if (!guildID) {
+		return false;
+	}
 	const staffRole = getConfig(guildID, "staff");
 	const hasRole = !!member.roles.cache.find((role) => role.id === staffRole);
 	return hasRole || member.permissions.has(PermissionFlagsBits.ManageRoles);
