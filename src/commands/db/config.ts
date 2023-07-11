@@ -1,6 +1,6 @@
 /**
  * Configure little things on the bot
- * Like prefix 
+ * Like prefix
  */
 
 import {
@@ -10,37 +10,37 @@ import {
 	CommandInteractionOptionResolver,
 	SlashCommandBuilder
 } from "discord.js";
-import { setConfig } from "../../maps";
+import {setConfig} from "../../maps";
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName("config")
 		.setDMPermission(false)
-
+		
 		.setDescription("Configure le bot")
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("prefix")
 			.setDescription("Change le prefix")
-			.addStringOption( (option) => option
+			.addStringOption((option) => option
 				.setName("prefix")
 				.setDescription("Nouveau prefix")
 				.setRequired(true)
 			)
 		)
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("ticket")
 			.setDescription("Permet de définir la category où les tickets seront créés")
-			.addChannelOption( (option) => option
+			.addChannelOption((option) => option
 				.setName("category")
 				.setDescription("Category des tickets")
 				.setRequired(true)
 				.addChannelTypes(ChannelType.GuildCategory)
 			)
 		)
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("staff")
 			.setDescription("Permet de définir le rôle staff pour donner le droit de faire des jets de dés pour les autres")
-			.addRoleOption( (option) => option
+			.addRoleOption((option) => option
 				.setName("role")
 				.setDescription("Rôle staff")
 				.setRequired(true)

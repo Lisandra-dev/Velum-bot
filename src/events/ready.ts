@@ -1,9 +1,9 @@
-import { REST } from "@discordjs/rest";
-import { Client, Routes } from "discord.js";
+import {REST} from "@discordjs/rest";
+import {Client, Routes} from "discord.js";
 import dotenv from "dotenv";
 import process from "process";
-import { commands } from "../commands";
-import { logInDev } from "../utils";
+import {commands} from "../commands";
+import {logInDev} from "../utils";
 import {DESTROY, VERSION} from "../index";
 import {destroyDB, loadGuild} from "../maps";
 
@@ -19,20 +19,20 @@ export default (client: Client): void => {
 		}
 		
 		console.info(`${client.user.username} is online; v.${VERSION}`);
-		const serializeCmds = commands.map( (command) => {
+		const serializeCmds = commands.map((command) => {
 			return command.data.toJSON();
 		});
 		for (const guild of client.guilds.cache.values()) {
 			logInDev(`Load in ${guild.name}`);
 			//delete all commands
-			guild.client.application?.commands.cache.forEach( (command) => {
+			guild.client.application?.commands.cache.forEach((command) => {
 				logInDev(`Delete ${command.name}`);
 				command.delete();
 			});
 			//add all commands
 			await rest.put(
 				Routes.applicationGuildCommands(process.env.CLIENT_ID, guild.id),
-				{ body: serializeCmds }
+				{body: serializeCmds}
 			);
 			logInDev(`Load in ${guild.name} done`);
 			if (DESTROY) destroyDB();

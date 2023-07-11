@@ -1,6 +1,6 @@
-import { Client } from "discord.js";
-import { commands } from "../commands";
-import { logInDev } from "../utils";
+import {Client} from "discord.js";
+import {commands} from "../commands";
+import {logInDev} from "../utils";
 
 /**
  * When the bot arrive on a server, check all thread and add members that have the permission to view the thread
@@ -8,7 +8,7 @@ import { logInDev } from "../utils";
  * @returns {void}
  */
 
-export default (client: Client):void => {
+export default (client: Client): void => {
 	client.on("guildCreate", async (guild) => {
 		try {
 			for (const command of commands) {

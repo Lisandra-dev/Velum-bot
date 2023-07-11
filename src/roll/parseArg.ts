@@ -10,24 +10,25 @@ import {
 	STATISTIQUES
 } from "../interface";
 import {
+	capitalize,
 	getSeuil,
 	getStatistique,
+	hasStaffRole,
 	latinise,
 	logInDev,
 	removeFromArguments,
 	removeFromArgumentsWithString,
-	capitalize, hasStaffRole,
 } from "../utils";
 import {getCharacters} from "../maps";
 import {IMAGE_LINK} from "../index";
 
 
-export function getParameters(message: Message, rollType: "neutre"|"combat") {
+export function getParameters(message: Message, rollType: "neutre" | "combat") {
 	let messageContent = message.content.split(" ");
 	//remove trigger
 	messageContent.shift();
 	
-	const args : Parameters = {
+	const args: Parameters = {
 		statistiques: 10,
 		statistiqueName: "Neutre",
 		user: message.author,
@@ -89,7 +90,7 @@ function getUser(message: Message, params: string[], parameters: Parameters, sta
 }
 
 function getPersonnage(params: string[]) {
-	const personnageFind = params.find( (value) => value.match(PARAMS.personnage));
+	const personnageFind = params.find((value) => value.match(PARAMS.personnage));
 	let fiche = false;
 	let personnage = "main";
 	if (personnageFind) {
@@ -126,12 +127,12 @@ function getParamStats(params: string[], guildID: string, param: Parameters) {
 }
 
 function getCommentaire(params: string[]) {
-	const commentaireFind = params.find( (value) => value.match(PARAMS.commentaire));
+	const commentaireFind = params.find((value) => value.match(PARAMS.commentaire));
 	let commentaire: string;
 	if (params.length === 2 && !commentaireFind) {
 		commentaire = removeAllPARAMSregex(params).length > 0 ? params[1] : "";
 	} else {
-		const commentaireFind = params.find( (value) => value.match(PARAMS.commentaire));
+		const commentaireFind = params.find((value) => value.match(PARAMS.commentaire));
 		commentaire = commentaireFind ? commentaireFind.replace(PARAMS.commentaire, "") : "";
 		params = removeFromArguments(params, PARAMS.commentaire);
 	}
@@ -139,11 +140,11 @@ function getCommentaire(params: string[]) {
 }
 
 function getSeuilInParameters(params: string[]) {
-	const seuilFind = params.find( (value) => value.match(PARAMS.seuil));
+	const seuilFind = params.find((value) => value.match(PARAMS.seuil));
 	let seuil = Seuil.moyen;
 	let seuilName: string | undefined = "Moyen";
 	if (seuilFind) {
-		seuilName = SEUIL_KEYS.find( (value) => value.includes(latinise(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
+		seuilName = SEUIL_KEYS.find((value) => value.includes(latinise(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
 		if (!seuilName && !isNaN(parseInt(seuilFind.replace(PARAMS.seuil, "")))) {
 			seuil = parseInt(seuilFind.replace(PARAMS.seuil, ""));
 			seuilName = `Seuil : ${seuil}`;
@@ -162,14 +163,14 @@ function getSeuilInParameters(params: string[]) {
 }
 
 function getModifier(params: string[]) {
-	const find = params.find( (value) => value.match(PARAMS.modificateur));
+	const find = params.find((value) => value.match(PARAMS.modificateur));
 	const modificateur = find ? parseInt(find) : 0;
 	params = removeFromArguments(params, PARAMS.modificateur);
 	return {params, modificateur};
 }
 
 function getCC(params: string[]) {
-	const find = params.find( (value) => value.match(PARAMS.cc));
+	const find = params.find((value) => value.match(PARAMS.cc));
 	const cc = !!find;
 	params = removeFromArguments(params, PARAMS.cc);
 	return {params, cc};
@@ -205,7 +206,7 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 		statModif = parseInt(stat);
 		statistiqueName = "Neutre";
 	}
-	const args : Parameters = {
+	const args: Parameters = {
 		statistiques: statModif,
 		statistiqueName: statistiqueName,
 		modificateur: modificateur,
@@ -228,7 +229,7 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 }
 
 function removeAllPARAMSregex(params: string[]) {
-	Object.values(PARAMS).forEach( (value) => {
+	Object.values(PARAMS).forEach((value) => {
 		if (value instanceof RegExp) {
 			params = removeFromArguments(params, value);
 		}
@@ -237,12 +238,12 @@ function removeAllPARAMSregex(params: string[]) {
 }
 
 function noMatchInParam(param: string): boolean {
-	return !Object.values(PARAMS).some( (value) => {
+	return !Object.values(PARAMS).some((value) => {
 		if (value instanceof RegExp) {
 			return param.match(value);
 		} else {
 			/** value is string[] */
-			value.forEach( (val) => {
+			value.forEach((val) => {
 				if (param.match(val)) {
 					return true;
 				}
@@ -251,10 +252,10 @@ function noMatchInParam(param: string): boolean {
 	});
 }
 
-function criticalSuccess(param: Parameters, 
-	result: {roll: number, stats: number}, 
-	ccMsg:  {indicatif: string, message: string}) {
-
+function criticalSuccess(param: Parameters,
+	result: { roll: number, stats: number },
+	ccMsg: { indicatif: string, message: string }) {
+	
 	if (param.cc) {
 		ccMsg.indicatif = "x 2";
 		ccMsg.message = "• Coup-Critique ! ";
@@ -283,11 +284,11 @@ export function parseResult(
 	param: Parameters,
 	result: ResultRolls,
 	roll: "combat" | "neutre") {
-	let total : number;
+	let total: number;
 	logInDev(`param : ${JSON.stringify(result)}`);
 	let ccMsg = {
 		"indicatif": "",
-		"message" : "",
+		"message": "",
 	};
 	
 	if (roll === "combat") {
@@ -303,7 +304,7 @@ export function parseResult(
 	const first = param.modificateur > result.stats ? param.modificateur : result.stats;
 	const number = {
 		modifStat: param.modificateur + result.stats > 0 ? " + " : " - ",
-		first : first,
+		first: first,
 		second: {
 			value: second !== 0 ? second : 0,
 			signe: second !== 0 ? second > 0 ? "+" : "-" : ""
@@ -314,14 +315,14 @@ export function parseResult(
 	number.first = first > number.second.value ? first : number.second.value;
 	number.second.value = number.first > number.second.value ? number.second.value : first;
 	number.modifStat = number.first !== 0 ? number.modifStat : "";
-
+	
 	/**
 	 * Template :
 	 * ${result.roll} ${ccMs.indicatif} ${signe.modifStat} (${first.first}${second.signe}${second.second})
 	 */
-
+	
 	logInDev(`first : ${number.first} | second : ${number.second.value}`);
-	let formula : string;
+	let formula: string;
 	if (number.first !== 0) {
 		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
 	} else {
@@ -347,7 +348,7 @@ export function parseResult(
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
-	const imageStatistiques = STATISTIQUES.find(stats =>latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
+	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
 	const finalResultMessage: Result = {
 		author: author,
 		image: `${IMAGE_LINK}/${imageStatistiques}.png`,

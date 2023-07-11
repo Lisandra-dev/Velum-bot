@@ -1,19 +1,19 @@
 import {User} from "discord.js";
 
 export interface Characters {
-    stats: Statistiques[];
+	stats: Statistiques[];
 }
 
 export interface Statistiques {
-    characterName?: string;
-    stats: {
-        force: number;
-        constitution: number;
-        agilite: number;
-        intelligence: number;
-        psychologie: number;
-        perception: number;
-    };
+	characterName?: string;
+	stats: {
+		force: number;
+		constitution: number;
+		agilite: number;
+		intelligence: number;
+		psychologie: number;
+		perception: number;
+	};
 }
 
 export const DEFAULT_STATISTIQUE: Statistiques = {
@@ -28,12 +28,12 @@ export const DEFAULT_STATISTIQUE: Statistiques = {
 };
 
 export const Seuil = {
-	trivial : 6,
-	facile : 8,
-	moyen : 10,
-	difficile : 13,
-	epique : 16,
-	impossible : 20
+	trivial: 6,
+	facile: 8,
+	moyen: 10,
+	difficile: 13,
+	epique: 16,
+	impossible: 20
 };
 
 export const SEUIL_KEYS = Object.keys(Seuil).map(value => value.toString());
@@ -54,7 +54,7 @@ export interface Parameters {
 	seuil?: {
 		value: number,
 		name: string
-	}
+	};
 	cc?: boolean;
 	statistiques: number;
 	statistiqueName: string;
@@ -66,13 +66,13 @@ export interface Parameters {
 }
 
 export const PARAMS = {
-	"seuil" : /^[><]/,
-	"statistiques" : STATISTIQUES,
-	"modificateur" : /^[+-]/,
-	"commentaire" : /^#/,
-	"personnage" : /^&/,
-	"user" : /^@/,
-	"cc" : /cc/i
+	"seuil": /^[><]/,
+	"statistiques": STATISTIQUES,
+	"modificateur": /^[+-]/,
+	"commentaire": /^#/,
+	"personnage": /^&/,
+	"user": /^@/,
+	"cc": /cc/i
 };
 
 export interface Result {

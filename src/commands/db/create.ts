@@ -1,6 +1,12 @@
-import {SlashCommandBuilder, User, userMention} from "discord.js";
+import {
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	PermissionFlagsBits,
+	SlashCommandBuilder,
+	User,
+	userMention
+} from "discord.js";
 import {set} from "../../maps";
-import { CommandInteraction, CommandInteractionOptionResolver, PermissionFlagsBits } from "discord.js";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -8,55 +14,55 @@ export default {
 		.setDescription("Créer un personnage")
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.setDMPermission(false)
-
-		.addUserOption( (option) => option
+		
+		.addUserOption((option) => option
 			.setName("user")
 			.setDescription("Utilisateur à qui créer le personnage")
 			.setRequired(true)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("force")
 			.setDescription("Force du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("constitution")
 			.setDescription("Constitution du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("agilite")
 			.setDescription("Agilité du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("intelligence")
-			.setDescription("Intelligence du personnage")	
+			.setDescription("Intelligence du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("psychologie")
 			.setDescription("Psychologie du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addNumberOption( (option) => option
+		.addNumberOption((option) => option
 			.setName("perception")
 			.setDescription("Perception du personnage")
 			.setRequired(false)
 			.setMinValue(1)
 			.setMaxValue(20)
 		)
-		.addStringOption( (option) => option
+		.addStringOption((option) => option
 			.setName("alias")
 			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)

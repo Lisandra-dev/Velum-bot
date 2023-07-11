@@ -1,9 +1,7 @@
 import {ChannelType, Client} from "discord.js";
-import {
-	logInDev,
-} from "../utils";
+import {logInDev,} from "../utils";
 import {rollCombat, rollNeutre} from "../roll";
-import { getParameters } from "../roll/parseArg";
+import {getParameters} from "../roll/parseArg";
 import {displayATQ, displayNEUTRE, ephemeralInfo} from "../roll/results";
 import {exportMaps, getConfig} from "../maps";
 import {helpCombat} from "../display/help";
@@ -25,23 +23,24 @@ export default (client: Client): void => {
 		const prefix = getConfig(message.guild?.id, "prefix");
 		if (message.content.toLowerCase().startsWith(`${prefix}r`)) {
 			if (message.content.toLowerCase().startsWith(`${prefix}r --help`)) {
-				await message.reply({ embeds: [helpCombat(message, "neutre")] });
+				await message.reply({embeds: [helpCombat(message, "neutre")]});
 				return;
 			}
 			/** Parse parameters **/
 			const param = getParameters(message, "neutre");
 			const result = rollNeutre(param);
 			if (!result?.success) return;
-
+			
 			const embed = displayNEUTRE(param, result);
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,
-				embeds: [embed]});
+				embeds: [embed]
+			});
 			return;
 		} else if (message.content.toLowerCase().startsWith(`${prefix}atq`)) {
 			if (message.content.toLowerCase().startsWith(`${prefix}atq --help`)) {
-				await message.reply({ embeds: [helpCombat(message, "combat")] });
+				await message.reply({embeds: [helpCombat(message, "combat")]});
 				return;
 			}
 			const param = getParameters(message, "combat");
@@ -51,7 +50,8 @@ export default (client: Client): void => {
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,
-				embeds: [embed]});
+				embeds: [embed]
+			});
 			return;
 		}
 	});

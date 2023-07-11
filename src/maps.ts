@@ -1,6 +1,6 @@
 import Enmap from "enmap";
 import {latinise, logInDev} from "./utils";
-import {Statistiques } from "./interface";
+import {Statistiques} from "./interface";
 
 /**
  * Create a new Enmap "Characters"
@@ -13,18 +13,22 @@ import {Statistiques } from "./interface";
  */
 
 
-const characters = new Enmap({name: "Characters",
+const characters = new Enmap({
+	name: "Characters",
 	fetchAll: false,
 	autoFetch: true,
-	cloneLevel: "deep"});
+	cloneLevel: "deep"
+});
 
-const configuration = new Enmap({name: "Configuration",
+const configuration = new Enmap({
+	name: "Configuration",
 	fetchAll: false,
 	autoFetch: true,
-	cloneLevel: "deep"});
+	cloneLevel: "deep"
+});
 
 /**
- * Set a value in Emaps 
+ * Set a value in Emaps
  */
 
 export function set(
@@ -60,6 +64,7 @@ export function set(
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
 }
+
 export function getConfig(guildID: string, key: string) {
 	return configuration.ensure(guildID, "!", key);
 }
@@ -71,14 +76,14 @@ export function setConfig(guildID: string, key: string, value: string) {
 
 export function get(user: string, guildID: string): Statistiques[] {
 	try {
-		return characters.get(guildID)[user] ?? [] as Statistiques[] ;
+		return characters.get(guildID)[user] ?? [] as Statistiques[];
 	} catch (error) {
 		logInDev(error);
 		return [] as Statistiques[];
 	}
 }
 
-export function getCharacters(user: string, guildID: string, characterName?: string): Statistiques | undefined{
+export function getCharacters(user: string, guildID: string, characterName?: string): Statistiques | undefined {
 	try {
 		const userCharacters = characters.get(guildID, user) as Statistiques[];
 		if (userCharacters) {
@@ -101,6 +106,7 @@ export function removeUser(user: string, guildID: string) {
 		logInDev(error);
 	}
 }
+
 export function removeCharacter(user: string, guildID: string, chara?: string) {
 	const userCharacters = characters.get(guildID, user) as Statistiques[];
 	if (userCharacters) {
@@ -142,7 +148,7 @@ export function loadGuild(guildID: string) {
 	characters.ensure(guildID, {});
 	configuration.ensure(guildID, {
 		"prefix": "$",
-		"staff" : "",
+		"staff": "",
 	});
 }
 

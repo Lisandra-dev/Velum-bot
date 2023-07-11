@@ -1,4 +1,4 @@
-import { Statistiques } from "src/interface";
+import {Statistiques} from "src/interface";
 import {get, getCharacters} from "../../maps";
 import {dedent} from "ts-dedent";
 import {
@@ -9,19 +9,19 @@ import {
 	User,
 	userMention
 } from "discord.js";
-import {latinise, capitalize} from "../../utils";
+import {capitalize, latinise} from "../../utils";
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName("get")
 		.setDMPermission(false)
 		.setDescription("Voir ses statistiques, ou celles d'un autre utilisateur ou personnage.")
-		.addUserOption( (option) => option
+		.addUserOption((option) => option
 			.setName("user")
 			.setDescription("Si vous voulez voir les stats d'un autre utilisateur")
 			.setRequired(false)
 		)
-		.addStringOption( (option) => option
+		.addStringOption((option) => option
 			.setName("alias")
 			.setDescription("Alias du personnage secondaire (DC)")
 			.setAutocomplete(true)
@@ -41,7 +41,7 @@ export default {
 		}
 		const results = choices.filter(choice => latinise(choice.toLowerCase()).includes(latinise(focused.value).toLowerCase()));
 		await interaction.respond(
-			results.map(result => ({ name: result, value: result }))
+			results.map(result => ({name: result, value: result}))
 		);
 	},
 	async execute(interaction: CommandInteraction) {

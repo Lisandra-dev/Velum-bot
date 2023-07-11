@@ -1,9 +1,16 @@
 import {
-	CategoryChannel, channelMention,
+	CategoryChannel,
+	channelMention,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	EmbedBuilder, GuildMember, GuildTextBasedChannel, OverwriteType, PermissionFlagsBits,
-	SlashCommandBuilder, TextChannel, userMention
+	EmbedBuilder,
+	GuildMember,
+	GuildTextBasedChannel,
+	OverwriteType,
+	PermissionFlagsBits,
+	SlashCommandBuilder,
+	TextChannel,
+	userMention
 } from "discord.js";
 import {getConfig} from "../../maps";
 import {hasStaffRole, logInDev, verifTicket} from "../../utils";
@@ -12,21 +19,21 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName("ticket")
 		.setDMPermission(false)
-
+		
 		.setDescription("Crée un ticket pour contacter le staff")
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("open")
 			.setDescription("Ouvre un ticket")
-			.addStringOption( (option) => option
+			.addStringOption((option) => option
 				.setName("raison")
 				.setDescription("Raison du ticket")
 				.setRequired(false)
 			)
 		)
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("update")
 			.setDescription("Met à jour un ticket (Modérateur uniquement)")
-			.addStringOption( (option) => option
+			.addStringOption((option) => option
 				.setName("etat")
 				.setDescription("Etat du ticket")
 				.setRequired(true)
@@ -49,26 +56,26 @@ export default {
 					})
 			)
 		)
-		.addSubcommand( (subcommand) => subcommand
+		.addSubcommand((subcommand) => subcommand
 			.setName("close")
 			.setDescription("Ferme un ticket (Modérateur uniquement)")
 		)
-		.addSubcommandGroup( (subcommandGroup) => subcommandGroup
+		.addSubcommandGroup((subcommandGroup) => subcommandGroup
 			.setName("members")
 			.setDescription("Gère les membres d'un ticket")
-			.addSubcommand( (subcommand) => subcommand
+			.addSubcommand((subcommand) => subcommand
 				.setName("add")
 				.setDescription("Ajoute un membre à un ticket (Modérateur uniquement)")
-				.addUserOption( (option) => option
+				.addUserOption((option) => option
 					.setName("membre")
 					.setDescription("Membre à ajouter")
 					.setRequired(true)
 				)
 			)
-			.addSubcommand( (subcommand) => subcommand
+			.addSubcommand((subcommand) => subcommand
 				.setName("remove")
 				.setDescription("Retire un membre d'un ticket (Modérateur uniquement)")
-				.addUserOption( (option) => option
+				.addUserOption((option) => option
 					.setName("membre")
 					.setDescription("Membre à retirer")
 					.setRequired(true)
@@ -81,7 +88,7 @@ export default {
 		const subcommand = options.getSubcommand();
 		const group = options.getSubcommandGroup();
 		if (subcommand === "open") {
-			let raison :string | null = options.getString("raison") ?? "";
+			let raison: string | null = options.getString("raison") ?? "";
 			if (raison) raison = ` ${raison}`;
 			else raison = "";
 			const user = interaction.member as GuildMember;
@@ -92,17 +99,18 @@ export default {
 				await interaction.reply("Aucune catégorie de ticket n'a été définie, vous ne pouvez pas utiliser cette commande !");
 				return;
 			}
-			const channelFindByID = guild.channels.cache.find( (channel) => channel.id === ticketCategory) as CategoryChannel;
+			const channelFindByID = guild.channels.cache.find((channel) => channel.id === ticketCategory) as CategoryChannel;
 			if (!channelFindByID) {
 				await interaction.reply("La catégorie de ticket n'a pas été trouvée, veuillez contacter un administrateur !");
 				return;
 			}
 			const staff = getConfig(interaction.guild.id, "staff");
-			const staffRole = guild.roles.cache.find( (role) => role.id === staff);
+			const staffRole = guild.roles.cache.find((role) => role.id === staff);
 			const nickName = user.nickname ?? user.user.globalName ?? user.displayName;
 			logInDev(user as GuildMember);
 			logInDev(`Ticket de ${nickName} créé`);
-			const newTicket = await channelFindByID?.children.create({name: `${startEmoji}╏${nickName}${raison}`,
+			const newTicket = await channelFindByID?.children.create({
+				name: `${startEmoji}╏${nickName}${raison}`,
 				permissionOverwrites: [
 					{
 						id: user,
@@ -118,7 +126,8 @@ export default {
 						id: guild.roles.everyone,
 						deny: [PermissionFlagsBits.ViewChannel],
 					}
-				]});
+				]
+			});
 			
 			if (!newTicket) {
 				await interaction.reply("Le ticket n'a pas pu être créé, veuillez contacter un administrateur !");
@@ -127,8 +136,10 @@ export default {
 			if (staffRole) {
 				await newTicket.permissionOverwrites.create(staffRole, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
 			}
-			await interaction.reply({content: `Votre ticket a été créé dans ${channelMention(newTicket.id)}`,
-				ephemeral: true});
+			await interaction.reply({
+				content: `Votre ticket a été créé dans ${channelMention(newTicket.id)}`,
+				ephemeral: true
+			});
 			raison = raison.length > 0 ? "Raison : " + raison : null;
 			const reply = new EmbedBuilder()
 				.setTitle(`Ticket de ${nickName}`)
@@ -181,8 +192,7 @@ export default {
 			const user = options.getUser("membre", true);
 			await ticket.permissionOverwrites.create(user, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
 			await interaction.reply({content: `${userMention(user.id)} a bien été ajouté au ticket`, ephemeral: true});
-		}
-		else if (group === "members" && subcommand === "remove") {
+		} else if (group === "members" && subcommand === "remove") {
 			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
 			if (!hasRole) {
 				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});

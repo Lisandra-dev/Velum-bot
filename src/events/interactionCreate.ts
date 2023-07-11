@@ -1,5 +1,5 @@
-import { AutocompleteInteraction, BaseInteraction, Client } from "discord.js";
-import { commands, autoCompleteCmd } from "../commands";
+import {AutocompleteInteraction, BaseInteraction, Client} from "discord.js";
+import {autoCompleteCmd, commands} from "../commands";
 
 export default (client: Client): void => {
 	client.on("interactionCreate", async (interaction: BaseInteraction) => {
@@ -19,8 +19,7 @@ export default (client: Client): void => {
 				(cmd) => cmd.data.name === interact.commandName);
 			try {
 				await auto?.autocomplete(interact);
-			}
-			catch (error) {
+			} catch (error) {
 				console.log(error);
 			}
 		}

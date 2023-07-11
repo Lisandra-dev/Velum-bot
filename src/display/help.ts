@@ -6,14 +6,14 @@ export function helpCombat(message: Message, type: "combat" | "neutre") {
 	if (!message.guild) return new EmbedBuilder().setTitle("Erreur").setDescription("Cette commande n'est pas disponible en message privé.");
 	const staffRole = getConfig(message.guild?.id, "staff") as string;
 	/** vérifie si l'utilisateur est staff */
-	let staffMSG  = "";
+	let staffMSG = "";
 	if (message.member?.roles.cache.has(staffRole)) {
 		staffMSG = "- `@` : Mentionne un joueur pour faire un jet à sa place. (Modérateur uniquement)";
 	}
 	let trivialMSG = "";
 	let example = "";
 	const prefix = getConfig(message.guild?.id, "prefix") as string;
-
+	
 	if (type === "combat") {
 		trivialMSG = dedent(`
 		- \`CC\` : Indique que le jet est un coup critique
@@ -39,7 +39,7 @@ export function helpCombat(message: Message, type: "combat" | "neutre") {
 	${staffMSG}
 	`);
 	
-
+	
 	return new EmbedBuilder()
 		.setTitle("Aide")
 		.setColor("#14b296")

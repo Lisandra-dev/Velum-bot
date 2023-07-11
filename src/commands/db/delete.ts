@@ -1,16 +1,17 @@
 import {
 	ActionRowBuilder,
+	AutocompleteInteraction,
+	ButtonBuilder,
 	ButtonStyle,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
 	PermissionFlagsBits,
-	ButtonBuilder,
 	SlashCommandBuilder,
-	userMention, AutocompleteInteraction
+	userMention
 } from "discord.js";
-import {getCharacters, removeUser, removeCharacter, get} from "../../maps";
+import {get, getCharacters, removeCharacter, removeUser} from "../../maps";
 import {Statistiques} from "../../interface";
-import {latinise, capitalize} from "../../utils";
+import {capitalize, latinise} from "../../utils";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -18,17 +19,17 @@ export default {
 		.setDMPermission(false)
 		.setDescription("Supprimer un personnage")
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
-		.addUserOption( (option) => option
+		.addUserOption((option) => option
 			.setName("user")
 			.setDescription("Utilisateur à qui supprimer le personnage")
 			.setRequired(true)
 		)
-		.addBooleanOption( (option) => option
+		.addBooleanOption((option) => option
 			.setName("all")
 			.setDescription("Supprimer tous les personnages")
 			.setRequired(false)
 		)
-		.addStringOption( (option) => option
+		.addStringOption((option) => option
 			.setName("alias")
 			.setDescription("Alias du personnage secondaire (DC)")
 			.setRequired(false)
@@ -49,7 +50,7 @@ export default {
 		}
 		const results = choices.filter(choice => latinise(choice.toLowerCase()).includes(latinise(focused.value.toLowerCase())));
 		await interaction.respond(
-			results.map(result => ({ name: result, value: result }))
+			results.map(result => ({name: result, value: result}))
 		);
 	},
 	async execute(interaction: CommandInteraction) {
