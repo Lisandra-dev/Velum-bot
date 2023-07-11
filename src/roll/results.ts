@@ -1,11 +1,10 @@
 import {Parameters, ResultRolls, Seuil} from "../interface";
-import {EmbedBuilder, GuildMember, userMention} from "discord.js";
+import {EmbedBuilder, userMention} from "discord.js";
 import {parseResult} from "./parseArg";
 import {capitalize} from "../utils";
 
 
-
-export function ephemeralInfo(param: Parameters): string | undefined{
+export function ephemeralInfo(param: Parameters): string | undefined {
 	if (!param.fiche && param.statistiqueName === "Neutre" && param.statistiques === 10) {
 		const char = param.personnage !== "main" ? `${param.personnage} (${userMention(param.user.id)})` : userMention(param.user.id);
 		return `*${char} n'a pas de fiche de personnage ! ${capitalize(param.statistiqueName)} appliquée : [${param.statistiques}]* \n_ _`;
@@ -24,7 +23,7 @@ export function displayATQ(param: Parameters, resultRoll: ResultRolls) {
 			text: `${result.total} [ ${result.calcul} ] ${result.ccMsg.message}`,
 			iconURL: "https://imgur.com/FGT5437.png"
 		})
-		.setTitle(`${result.total < 0 ? 0 : "-" + result.total } 💖`)
+		.setTitle(`${result.total < 0 ? 0 : "-" + result.total} 💖`)
 		.setDescription(result.commentaire)
 		.setColor(result.total > 0 ? "#b91111" : "#5b5d62");
 }

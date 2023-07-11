@@ -2,14 +2,13 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	GuildMember,
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
 import {Seuil, Statistiques, STATISTIQUES} from "../../interface";
 import {rollNeutre} from "../../roll";
 import {displayNEUTRE} from "../../roll/results";
-import {latinise, capitalize} from "../../utils";
+import {capitalize, latinise} from "../../utils";
 import {getInteractionArgs} from "../../roll/parseArg";
 import {get} from "../../maps";
 

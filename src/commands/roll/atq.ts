@@ -2,7 +2,6 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	GuildMember,
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
@@ -17,9 +16,9 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName("atq")
 		.setDMPermission(false)
-
+		
 		.setDescription("Lance 1D8 de jet d'attaque")
-		.addStringOption( (option) => option
+		.addStringOption((option) => option
 			.setName("statistique")
 			.setDescription("Statistique à utiliser")
 			.setRequired(false)
@@ -70,10 +69,10 @@ export default {
 		}
 		const results = choices.filter(choice => latinise(choice.toLowerCase()).includes(latinise(focused.value.toLowerCase())));
 		await interaction.respond(
-			results.map(result => ({ name: result, value: result }))
+			results.map(result => ({name: result, value: result}))
 		);
 	},
-
+	
 	async execute(interaction: CommandInteraction) {
 		if (!interaction.guild) return;
 		const args = getInteractionArgs(interaction, "combat");
@@ -83,9 +82,9 @@ export default {
 		if (!args.fiche && args.statistiqueName === "Neutre" && args.statistiques === 10) {
 			msgInfo = `${userMention(args.user.id)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} [${args.statistiques}]`;
 		}
-		await interaction.reply({ embeds: [embed] });
+		await interaction.reply({embeds: [embed]});
 		if (msgInfo) {
-			await interaction.followUp({ content: msgInfo });
+			await interaction.followUp({content: msgInfo});
 		}
 	}
 };
