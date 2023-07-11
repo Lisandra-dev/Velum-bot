@@ -80,9 +80,9 @@ export function getParameters(message: Message, rollType: "neutre" | "combat") {
 }
 
 function getUser(message: Message, params: string[], parameters: Parameters, staff: boolean) {
-	const isSomeoneMentionned = message.mentions.users ?? false;
+	const isSomeoneMentioned = message.mentions.users ?? false;
 	let user = parameters.user;
-	if (isSomeoneMentionned && staff) {
+	if (isSomeoneMentioned && staff) {
 		user = message.mentions.users.first() ?? parameters.user;
 		params = removeFromArgumentsWithString(params, `<@${parameters.user}>`);
 	}
