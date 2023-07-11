@@ -1,6 +1,6 @@
 import {getCharacters, getConfig} from "./maps";
 import {DEFAULT_STATISTIQUE, Seuil} from "./interface";
-import {Guild, GuildMember, PermissionFlagsBits, Role, TextBasedChannel} from "discord.js";
+import {Guild, GuildMember, PermissionFlagsBits, TextBasedChannel} from "discord.js";
 
 export function logInDev(...text: unknown[]) {
 	const time= new Date();
