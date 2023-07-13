@@ -49,7 +49,9 @@ export function getParameters(message: Message, rollType: "neutre" | "combat") {
 	args.user = user.user;
 	const perso = getPersonnage(messageContent);
 	messageContent = perso.params;
-	args.personnage = perso.personnage;
+	if (perso.personnage !== "main") {
+		args.personnage = perso.personnage;
+	}
 	args.fiche = perso.fiche;
 	const statistiques = getParamStats(messageContent, guildID, args);
 	messageContent = statistiques.params;
@@ -214,6 +216,9 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 		user: user,
 		fiche: fiche,
 	};
+	if (name !== "main") {
+		args.personnage = name;
+	}
 	
 	if (type === "combat") {
 		args.cc = options.getBoolean("critique") || false;

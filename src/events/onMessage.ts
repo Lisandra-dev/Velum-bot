@@ -1,4 +1,4 @@
-import {ChannelType, Client} from "discord.js";
+import {ChannelType, Client, GuildMember} from "discord.js";
 import {logInDev,} from "../utils";
 import {rollCombat, rollNeutre} from "../roll";
 import {getParameters} from "../roll/parseArg";
@@ -29,8 +29,8 @@ export default (client: Client): void => {
 			const param = getParameters(message, "neutre");
 			const result = rollNeutre(param);
 			if (!result?.success) return;
-			
-			const embed = displayNEUTRE(param, result);
+			const member = message.guild?.members.cache.get(param.user.id) as GuildMember;
+			const embed = displayNEUTRE(param, result, member);
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,
@@ -45,7 +45,8 @@ export default (client: Client): void => {
 			const param = getParameters(message, "combat");
 			const result = rollCombat(param);
 			if (!result) return;
-			const embed = displayATQ(param, result);
+			const member = message.guild?.members.cache.get(param.user.id) as GuildMember;
+			const embed = displayATQ(param, result, member);
 			const info = ephemeralInfo(param);
 			await message.reply({
 				content: info,

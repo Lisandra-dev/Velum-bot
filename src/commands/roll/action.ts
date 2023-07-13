@@ -1,7 +1,7 @@
 import {
 	AutocompleteInteraction,
 	CommandInteraction,
-	CommandInteractionOptionResolver,
+	CommandInteractionOptionResolver, GuildMember,
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
@@ -76,10 +76,11 @@ export default {
 	},
 	
 	async execute(interaction: CommandInteraction) {
+		if (!interaction.guildId) return;
 		const args = getInteractionArgs(interaction, "neutre");
 		const result = rollNeutre(args);
-		
-		const embed = displayNEUTRE(args, result);
+		const member = interaction.guild!.members.cache.get(args.user.id) as GuildMember;
+		const embed = displayNEUTRE(args, result, member as GuildMember);
 		let msgInfo = "";
 		if (!args.fiche && args.statistiqueName === "Neutre" && args.statistiques === 10) {
 			msgInfo = `${userMention(args.user.id)} n'a pas de personnage ; Utilisation de la valeur par défaut pour ${args.statistiqueName} [${args.statistiques}]`;

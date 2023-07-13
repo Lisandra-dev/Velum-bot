@@ -1,5 +1,5 @@
 import {Parameters, ResultRolls, Seuil} from "../interface";
-import {EmbedBuilder, userMention} from "discord.js";
+import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {parseResult} from "./parseArg";
 import {capitalize} from "../utils";
 
@@ -12,8 +12,8 @@ export function ephemeralInfo(param: Parameters): string | undefined {
 	return undefined;
 }
 
-export function displayATQ(param: Parameters, resultRoll: ResultRolls) {
-	const result = parseResult(param, resultRoll, "combat");
+export function displayATQ(param: Parameters, resultRoll: ResultRolls, member: GuildMember) {
+	const result = parseResult(param, resultRoll, "combat", member);
 	return new EmbedBuilder()
 		.setAuthor({
 			name: `${result.author}`,
@@ -30,8 +30,9 @@ export function displayATQ(param: Parameters, resultRoll: ResultRolls) {
 
 export function displayNEUTRE(
 	param: Parameters,
-	resultRoll: ResultRolls) {
-	const result = parseResult(param, resultRoll, "neutre");
+	resultRoll: ResultRolls,
+	member: GuildMember) {
+	const result = parseResult(param, resultRoll, "neutre", member);
 	const commentaire = result.commentaire ? `*${capitalize(result.commentaire)}*` : null;
 	const seuil = param.seuil ? param.seuil.value : Seuil.moyen;
 	const signeTotal = result.total > seuil ? "⩾" : "⩽";
