@@ -60,7 +60,6 @@ export function set(
 		 * }
 		 */
 		characters.set(guildID, {[user]: [value]});
-		logInDev(characters.get(guildID, user));
 		logInDev(`Added ${user}'s main stats:`, value);
 	}
 }

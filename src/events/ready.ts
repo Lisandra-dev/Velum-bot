@@ -37,8 +37,6 @@ export default (client: Client): void => {
 			logInDev(`Load in ${guild.name} done`);
 			if (DESTROY) destroyDB();
 			loadGuild(guild.id);
-			//const exported = exportMaps();
-			//logInDev(exported);
 		}
 	});
 };

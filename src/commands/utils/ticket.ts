@@ -107,7 +107,6 @@ export default {
 			const staff = getConfig(interaction.guild.id, "staff");
 			const staffRole = guild.roles.cache.find((role) => role.id === staff);
 			const nickName = user.nickname ?? user.user.globalName ?? user.displayName;
-			logInDev(user as GuildMember);
 			logInDev(`Ticket de ${nickName} créé`);
 			const newTicket = await channelFindByID?.children.create({
 				name: `${startEmoji}╏${nickName}${raison}`,
