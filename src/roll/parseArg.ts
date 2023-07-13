@@ -53,12 +53,15 @@ export function getParameters(message: Message, rollType: "neutre" | "combat") {
 		args.personnage = perso.personnage;
 	}
 	args.fiche = perso.fiche;
+
 	const statistiques = getParamStats(messageContent, guildID, args);
-	messageContent = statistiques.params;
-	args.statistiques = statistiques.param.statistiques;
+	messageContent = statistiques.messageContent;
+	args.statistiques = statistiques.args.statistiques;
+	args.fiche = statistiques.args.fiche;
 	const commentaire = getCommentaire(messageContent);
 	messageContent = commentaire.params;
 	args.commentaire = commentaire.commentaire;
+
 	if (rollType === "neutre") {
 		const seuil = getSeuilInParameters(messageContent);
 		messageContent = seuil.params;
@@ -68,9 +71,11 @@ export function getParameters(message: Message, rollType: "neutre" | "combat") {
 		messageContent = cc.params;
 		args.cc = cc.cc;
 	}
+
 	const modificateur = getModifier(messageContent);
 	messageContent = modificateur.params;
 	args.modificateur = modificateur.modificateur;
+
 	if (messageContent.length > 0 && !args.commentaire) {
 		//set the rest of the message as comment
 		//remove all other parameters
@@ -86,7 +91,7 @@ function getUser(message: Message, params: string[], parameters: Parameters, sta
 	let user = parameters.user;
 	if (isSomeoneMentioned && staff) {
 		user = message.mentions.users.first() ?? parameters.user;
-		params = removeFromArgumentsWithString(params, `<@${parameters.user}>`);
+		params = removeFromArgumentsWithString(params, `<@${user.id}>`);
 	}
 	return {params, user};
 }
@@ -103,29 +108,30 @@ function getPersonnage(params: string[]) {
 	return {params, personnage, fiche};
 }
 
-function getParamStats(params: string[], guildID: string, param: Parameters) {
-	const stats = getStatistique(param.user.id, guildID, "Neutre", param.personnage ?? "main");
-	param.fiche = stats.fiche;
-	if (params.length >= 1) {
-		const stat = params[0];
+function getParamStats(messageContent: string[], guildID: string, args: Parameters) {
+	const stats = getStatistique(args.user.id, guildID, "Neutre", args.personnage ?? "main");
+	args.fiche = stats.fiche;
+	if (messageContent.length >= 1) {
+		const stat = messageContent[0];
 		if (isNaN(parseInt(stat))) {
-			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinise(params[0].toLowerCase())));
-			param.statistiqueName = statistiquesArgs ?? "Neutre";
-			const stats = getStatistique(param.user.id, guildID, statistiquesArgs ?? "Neutre", param.personnage ?? "main");
-			param.statistiques = stats.modif;
-			param.fiche = stats.fiche;
-		} else if (noMatchInParam(params[0])) {
-			logInDev("no match in param", noMatchInParam(params[0]));
-			param.statistiques = parseInt(stat);
-			param.fiche = stats.fiche;
-			param.statistiqueName = "Neutre";
-			params = removeFromArgumentsWithString(params, params[0]);
+			const statistiquesArgs = STATISTIQUES.find((value) => value.includes(latinise(messageContent[0].toLowerCase())));
+			args.statistiqueName = statistiquesArgs ?? "Neutre";
+			const stats = getStatistique(args.user.id, guildID, statistiquesArgs ?? "Neutre", args.personnage ?? "main");
+			args.statistiques = stats.modif;
+			args.fiche = stats.fiche;
+			messageContent = removeFromArgumentsWithString(messageContent, stat);
+		} else if (noMatchInParam(messageContent[0])) {
+			logInDev("no match in args", noMatchInParam(messageContent[0]));
+			args.statistiques = parseInt(stat);
+			args.fiche = stats.fiche;
+			args.statistiqueName = "Neutre";
+			messageContent = removeFromArgumentsWithString(messageContent, messageContent[0]);
 		} else {
-			param.statistiques = 10;
-			param.statistiqueName = "Neutre";
+			args.statistiques = 10;
+			args.statistiqueName = "Neutre";
 		}
 	}
-	return {params, param};
+	return {messageContent, args};
 }
 
 function getCommentaire(params: string[]) {
@@ -202,7 +208,7 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 	let statModif: number;
 	let statistiqueName: string;
 	if (isNaN(parseInt(stat))) {
-		statModif = charModif[stat as keyof typeof charModif] ?? 10;
+		statModif = charModif[latinise(stat.toLowerCase()) as keyof typeof charModif] ?? 10;
 		statistiqueName = capitalize(stat);
 	} else {
 		statModif = parseInt(stat);
@@ -288,7 +294,8 @@ function seuilMessageSuccess(result: ResultRolls) {
 export function parseResult(
 	param: Parameters,
 	result: ResultRolls,
-	roll: "combat" | "neutre") {
+	roll: "combat" | "neutre",
+	member: GuildMember) {
 	let total: number;
 	logInDev(`param : ${JSON.stringify(result)}`);
 	let ccMsg = {
@@ -346,10 +353,9 @@ export function parseResult(
 	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
 	const calculExplained = `${rollCC} ${number.modifStat}${formula}`;
 	logInDev(`calculExplained : ${calculExplained}`, "modif", number.modifStat);
-	
 	/** get member **/
-	let author = param.personnage !== "main" ? param.personnage : param.user.globalName ?? param.user.displayName;
-	author = author ?? param.user.globalName ?? param.user.displayName;
+	let author = param.personnage ? param.personnage : member.nickname;
+	author = author !== undefined ? author : param.user.globalName ?? param.user.displayName;
 	author = `⌈${author}⌋`;
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;

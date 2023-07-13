@@ -70,8 +70,14 @@ export function getConfig(guildID: string, key: string): string | string[] {
 	case "prefix":
 		return configuration.ensure(guildID, "!", "prefix") as string;
 	case "role.add":
+		if (!(configuration.get(guildID, "role.add") instanceof Array)) {
+			configuration.set(guildID, [], "role.add");
+		}
 		return configuration.ensure(guildID, [], "role.add") as string[];
 	case "role.remove":
+		if (!(configuration.get(guildID, "role.add") instanceof Array)) {
+			configuration.set(guildID, [], "role.add");
+		}
 		return configuration.ensure(guildID, [], "role.remove") as string[];
 	case "staff":
 		return configuration.ensure(guildID, "", "staff") as string;
