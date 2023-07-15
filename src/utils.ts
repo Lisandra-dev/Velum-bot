@@ -81,15 +81,7 @@ export function hasStaffRole(member: GuildMember, guildID?: string): boolean {
 	return hasRole || member.permissions.has(PermissionFlagsBits.ManageRoles);
 }
 
-export function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
-	if (!ticket || ticket.isDMBased()) {
-		return false;
-	}
-	/** verification that the ticket is in the category ticket */
-	const ticketCategory = getConfig(guildID, "ticket");
-	const ticketParent = ticket.parent ? ticket.parent.id : "0";
-	return (ticketParent || ticketParent === ticketCategory);
-}
+
 
 export function capitalize(str: string) {
 	return str[0].toUpperCase() + str.slice(1);

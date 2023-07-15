@@ -8,12 +8,12 @@ import {
 	GuildTextBasedChannel,
 	OverwriteType,
 	PermissionFlagsBits,
-	SlashCommandBuilder,
+	SlashCommandBuilder, TextBasedChannel,
 	TextChannel,
 	userMention
 } from "discord.js";
 import {getConfig} from "../../maps";
-import {hasStaffRole, logInDev, verifTicket} from "../../utils";
+import {hasStaffRole, logInDev} from "../../utils";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -213,3 +213,13 @@ export default {
 		}
 	}
 };
+
+function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
+	if (!ticket || ticket.isDMBased()) {
+		return false;
+	}
+	/** verification that the ticket is in the category ticket */
+	const ticketCategory = getConfig(guildID, "ticket");
+	const ticketParent = ticket.parent ? ticket.parent.id : "0";
+	return (ticketParent || ticketParent === ticketCategory);
+}
