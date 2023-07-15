@@ -198,6 +198,9 @@ export function loadGuild(guildID: string) {
 	configuration.ensure(guildID, {
 		"prefix": "$",
 		"staff": "",
+		"ticket": "",
+		"role.add": [],
+		"role.remove": []
 	});
 }
 
