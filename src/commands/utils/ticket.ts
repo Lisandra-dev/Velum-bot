@@ -109,7 +109,7 @@ export default {
 			const nickName = user.nickname ?? user.user.globalName ?? user.displayName;
 			logInDev(`Ticket de ${nickName} créé`);
 			const newTicket = await channelFindByID?.children.create({
-				name: `${startEmoji}╏${nickName}${raison}`,
+				name: `${startEmoji}╏⌈${nickName}⌋${raison}`,
 				permissionOverwrites: [
 					{
 						id: user,
