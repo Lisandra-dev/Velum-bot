@@ -89,8 +89,6 @@ export default {
 		const group = options.getSubcommandGroup();
 		if (subcommand === "open") {
 			let raison: string | null = options.getString("raison") ?? "";
-			if (raison) raison = ` ${raison}`;
-			else raison = "";
 			const user = interaction.member as GuildMember;
 			const guild = interaction.guild;
 			const startEmoji = "📩";
