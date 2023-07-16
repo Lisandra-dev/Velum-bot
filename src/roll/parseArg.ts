@@ -1,6 +1,6 @@
 import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, Message, User} from "discord.js";
 import {
-	DEFAULT_STATISTIQUE, Formula,
+	DEFAULT_STATISTIQUE,
 	Parameters,
 	PARAMS,
 	Result,
