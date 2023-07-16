@@ -42,7 +42,7 @@ export function displayNEUTRE(
 			iconURL: result.image,
 		})
 		.setFooter({
-			text: `[ ${result.calcul} ] `,
+			text: `[ ${result.calcul} ]`,
 			iconURL: "https://imgur.com/1xGY5S1.png"
 		})
 		.setTitle(`${result.total} ${signeTotal} ${seuil} ${result.ccMsg.message}`)

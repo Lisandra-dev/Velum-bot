@@ -1,5 +1,4 @@
-import {getConfig} from "../maps";
-import {GuildMember, PermissionFlagsBits} from "discord.js";
+
 
 export function logInDev(...text: unknown[]) {
 	const time = new Date();
