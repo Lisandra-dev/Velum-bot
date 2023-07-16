@@ -1,6 +1,6 @@
 import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, Message, User} from "discord.js";
 import {
-	DEFAULT_STATISTIQUE,
+	DEFAULT_STATISTIQUE, Formula,
 	Parameters,
 	PARAMS,
 	Result,
@@ -11,9 +11,6 @@ import {
 } from "../interface";
 import {
 	capitalize,
-	getSeuil,
-	getStatistique,
-	hasStaffRole,
 	latinise,
 	logInDev,
 	removeFromArguments,
@@ -21,6 +18,8 @@ import {
 } from "../utils";
 import {getCharacters} from "../maps";
 import {IMAGE_LINK} from "../index";
+import {hasStaffRole} from "../utils/data_check";
+import {getSeuil, getStatistique} from "../utils/get";
 
 
 export function getParameters(message: Message, rollType: "neutre" | "combat") {
@@ -311,7 +310,23 @@ export function parseResult(
 		total = result.roll + result.stats + param.modificateur;
 		ccMsg.message = seuilMessageSuccess(result);
 	}
-	
+	let author =getAuthor(member, param);
+	author = `⌈${author}⌋`;
+	let commentaire: string | null = param.commentaire ? param.commentaire : "";
+	commentaire = commentaire.length > 0 ? commentaire : null;
+	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
+	const finalResultMessage: Result = {
+		author: author,
+		image: `${IMAGE_LINK}/${imageStatistiques}.png`,
+		calcul: createFormula(param, result),
+		total: total,
+		ccMsg: ccMsg,
+		commentaire: commentaire,
+	};
+	return finalResultMessage;
+}
+
+function createNumber(param: Parameters, result: ResultRolls) {
 	const second = param.modificateur > result.stats ? result.stats : param.modificateur;
 	const first = param.modificateur > result.stats ? param.modificateur : result.stats;
 	const number = {
@@ -327,13 +342,12 @@ export function parseResult(
 	number.first = first > number.second.value ? first : number.second.value;
 	number.second.value = number.first > number.second.value ? number.second.value : first;
 	number.modifStat = number.first !== 0 ? number.modifStat : "";
-	
-	/**
-	 * Template :
-	 * ${result.roll} ${ccMs.indicatif} ${signe.modifStat} (${first.first}${second.signe}${second.second})
-	 */
-	
 	logInDev(`first : ${number.first} | second : ${number.second.value}`);
+	return number as Formula;
+}
+
+function createFormula(param: Parameters, result: ResultRolls) {
+	const number = createNumber(param, result);
 	let formula: string;
 	if (number.first !== 0) {
 		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
@@ -341,33 +355,19 @@ export function parseResult(
 		formula = number.second.value !== 0 ? `${number.second.signe} ${number.second.value}` : "";
 	}
 	
-	/**
-	 * if first.first < 0 && signe.modifStat === "-"
-	 * Remove all signe
-	 * The second will be always < first.first
-	 * So at the end, the formula must become:
-	 * - (first.first + second.second)
-	 * aka remove first - and replace the second signe by +
-	 */
 	const rollCC = param.cc ? `(${result.roll} x 2)` : `${result.roll}`;
 	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
 	const calculExplained = `${rollCC} ${number.modifStat}${formula}`;
 	logInDev(`calculExplained : ${calculExplained}`, "modif", number.modifStat);
-	/** get member **/
-	let author = param.personnage ? param.personnage : member.nickname;
-	author = author !== undefined ? author : param.user.globalName ?? param.user.displayName;
-	author = `⌈${author}⌋`;
-	let commentaire: string | null = param.commentaire ? param.commentaire : "";
-	commentaire = commentaire.length > 0 ? commentaire : null;
-	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
-	const finalResultMessage: Result = {
-		author: author,
-		image: `${IMAGE_LINK}/${imageStatistiques}.png`,
-		calcul: calculExplained,
-		total: total,
-		ccMsg: ccMsg,
-		commentaire: commentaire,
-	};
-	return finalResultMessage;
+	return calculExplained;
 }
 
+function getAuthor(member: GuildMember, param: Parameters) {
+	if (param.personnage) {
+		return param.personnage;
+	} else if (member.nickname === null) {
+		return param.user.displayName ?? param.user.globalName;
+	} else {
+		return member.nickname;
+	}
+}

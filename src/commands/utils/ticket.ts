@@ -13,7 +13,8 @@ import {
 	userMention
 } from "discord.js";
 import {getConfig} from "../../maps";
-import {hasStaffRole, logInDev} from "../../utils";
+import {logInDev} from "../../utils";
+import {hasStaffRole} from "../../utils/data_check";
 
 export default {
 	data: new SlashCommandBuilder()

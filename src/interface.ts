@@ -96,3 +96,14 @@ export interface ResultRolls {
 		success: boolean
 	}
 }
+
+type signe = {
+	value: number,
+	signe: string
+}
+
+export type Formula = {
+	modifStat: string,
+	first: number,
+	second: signe,
+};

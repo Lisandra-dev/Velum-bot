@@ -1,5 +1,7 @@
 import {Parameters, ResultRolls} from "../interface";
-import {getNeutreSuccess, roundUp} from "../utils";
+import {roundUp} from "../utils";
+import {getNeutreSuccess} from "../utils/get";
+
 
 
 export function rollNeutre(param: Parameters) {
