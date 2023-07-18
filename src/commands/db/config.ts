@@ -27,14 +27,28 @@ export default {
 				.setRequired(true)
 			)
 		)
-		.addSubcommand((subcommand) => subcommand
+		.addSubcommandGroup((subcommand) => subcommand
 			.setName("ticket")
-			.setDescription("Permet de définir la category où les tickets seront créés")
-			.addChannelOption((option) => option
+			.setDescription("Permet de définir les paramètres des tickets")
+			.addSubcommand((subcommand) => subcommand
 				.setName("category")
-				.setDescription("Category des tickets")
-				.setRequired(true)
-				.addChannelTypes(ChannelType.GuildCategory)
+				.setDescription("Permet de définir la categories où les tickets seront créés")
+				.addChannelOption((option) => option
+					.setName("category")
+					.setDescription("Categories des tickets")
+					.setRequired(true)
+					.addChannelTypes(ChannelType.GuildCategory)
+				)
+			)
+			.addSubcommand((subcommand) => subcommand
+				.setName("transcript")
+				.setDescription("Permet de définir le channel où les transcriptions des tickets seront envoyés")
+				.addChannelOption((option) => option
+					.setName("channel")
+					.setDescription("Channel des transcriptions")
+					.setRequired(true)
+					.addChannelTypes(ChannelType.GuildText)
+				)
 			)
 		)
 		.addSubcommand((subcommand) => subcommand
@@ -47,14 +61,14 @@ export default {
 			)
 		)
 		.addSubcommandGroup((subcommand) => subcommand
-			.setName("role-player")
+			.setName("autorole")
 			.setDescription("Permet de définir les rôles à ajouter ou retirer avec la commande create")
 			.addSubcommand((subcommand) => subcommand
 				.setName("liste")
 				.setDescription("Affiche la liste des rôles qui seront ajoutés ou retirés")
 			)
 			.addSubcommand((subcommand) => subcommand
-				.setName("adjust")
+				.setName("set")
 				.setDescription("Permet d'ajouter ou retirer un rôle")
 				.addStringOption((option) => option
 					.setName("dans")
@@ -112,12 +126,19 @@ export default {
 			const role = options.getRole("role", true);
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
-		} else if (subcommand === "ticket") {
-			const category = options.getChannel("category", true);
-			setConfig(interaction.guild.id, "ticket", category.id);
-			await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
-		} else if (subGroup === "role-player") {
-			if (subcommand === "adjust") {
+		} else if (subGroup === "ticket") {
+			if (subcommand === "category") {
+				const category = options.getChannel("category", true);
+				setConfig(interaction.guild.id, "ticket", category.id);
+				await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
+			}
+			if (subcommand === "transcript") {
+				const channel = options.getChannel("channel", true);
+				setConfig(interaction.guild.id, "transcript", channel.id);
+				await interaction.reply(`Le channel des transcriptions est maintenant ${channelMention(channel.id)}`);
+			}
+		} else if (subGroup === "autorole") {
+			if (subcommand === "set") {
 				const choices = options.getString("dans", true);
 				if (choices === "add") {
 					await interaction.deferReply();

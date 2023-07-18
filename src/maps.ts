@@ -82,6 +82,8 @@ export function getConfig(guildID: string, key: string): string | string[] {
 		return configuration.ensure(guildID, "", "staff") as string;
 	case "ticket":
 		return configuration.ensure(guildID, "", "ticket") as string;
+	case "transcript" :
+		return configuration.ensure(guildID, "", "transcript") as string;
 	default:
 		return configuration.ensure(guildID, "", key);
 	}
