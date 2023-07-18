@@ -274,29 +274,48 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 		return null;
 	}
 	const messages = await fetchAllMessages(ticket);
+	let firstAuthor = messages.messages[0].message.author.id;
 	const formattedContent = messages.messages
 		.sort((a, b) => a.message.createdAt.getTime() - b.message.createdAt.getTime())
 		.map((message) => {
+			
 			if (message.message.attachments.size > 0) {
-				return `\`[${formatDate(message.message.createdAt)}] ${message.message.author.displayName}:\`\n- ${message.message.attachments.map((attachment) => {
-					return attachment.url.split("/").pop();
-				}).join("\n- ")}\n`;
+				if (firstAuthor !== message.message.author.id) {
+					firstAuthor = message.message.author.id;
+					return `\n---\n\`[${formatDate(message.message.createdAt)}] ${message.message.author.displayName}:\`\n- ${message.message.attachments.map((attachment) => {
+						return attachment.url.split("/").pop();
+					}).join("\n- ")}\n`;
+				} else {
+					return `- ${message.message.attachments.map((attachment) => {
+						return attachment.url.split("/").pop();
+					}).join("\n- ")}`;
+				}
 			} else if (message.message.content.trim().length > 0) {
 				const author = message.message.author.displayName;
-				const content = message.message.content.replace(/\n/g, "\n  ");
+				const content = message.message.content.replace(/\n/g, "\n  ").replace(/[\u200B-\u200D\uFEFF]/g, "");
 				const date = formatDate(message.message.createdAt);
-				return `\`[${date}] ${author}:\`\n  ${content}\n`;
+				if (message.message.author.id !== firstAuthor) {
+					firstAuthor = message.message.author.id;
+					return `\n---\n\`[${date}] ${author}:\`\n  ${content}`;
+				} else {
+					return `  ${content}`;
+				}
 			} else if (message.embeds) {
 				const author = message.message.author.displayName;
 				const date = formatDate(message.message.createdAt);
 				const embed = message.embeds.map((embed) => {
 					return formatEmbed(embed);
 				});
-				return `\`[${date}] ${author}:\`\n${embed.join("\n")}`;
+				if (message.message.author.id !== firstAuthor) {
+					firstAuthor = message.message.author.id;
+					return `\n---\n\`[${date}] ${author}:\`\n${embed.join("\n")}`;
+				} else {
+					return `  ${embed.join("\n")}`;
+				}
 			}
 			return "";
 		})
-		.join("\n---\n");
+		.join("\n");
 	
 	/** create a txt file with the content of the ticket using fs */
 	fs.writeFileSync(`${ticket.name}.md`, formattedContent, "utf-8");

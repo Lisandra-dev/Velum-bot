@@ -47,7 +47,7 @@ export default {
 					.setName("channel")
 					.setDescription("Channel des transcriptions")
 					.setRequired(true)
-					.addChannelTypes(ChannelType.GuildText)
+					.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
 				)
 			)
 		)
