@@ -25,6 +25,14 @@ import {hasStaffRole} from "../../utils/data_check";
 import * as fs from "fs";
 
 
+interface FetchAllMessagesResult {
+	messages: {
+		message: Message;
+		embeds: Embed[];
+	}[];
+	messageFiles: Attachment[];
+}
+
 export default {
 	data: new SlashCommandBuilder()
 		.setName("ticket")
@@ -102,153 +110,17 @@ export default {
 		const subcommand = options.getSubcommand();
 		const group = options.getSubcommandGroup();
 		if (subcommand === "open") {
-			let raison: string | null = options.getString("raison") ?? "";
-			const user = interaction.member as GuildMember;
-			const guild = interaction.guild;
-			const startEmoji = "📩";
-			const ticketCategory = getConfig(interaction.guild.id, "ticket");
-			if (!ticketCategory) {
-				await interaction.reply("Aucune catégorie de ticket n'a été définie, vous ne pouvez pas utiliser cette commande !");
-				return;
-			}
-			const channelFindByID = guild.channels.cache.find((channel) => channel.id === ticketCategory) as CategoryChannel;
-			if (!channelFindByID) {
-				await interaction.reply("La catégorie de ticket n'a pas été trouvée, veuillez contacter un administrateur !");
-				return;
-			}
-			const staff = getConfig(interaction.guild.id, "staff");
-			const staffRole = guild.roles.cache.find((role) => role.id === staff);
-			const nickName = user.nickname ?? user.user.globalName ?? user.displayName;
-			logInDev(`Ticket de ${nickName} créé`);
-			const newTicket = await channelFindByID?.children.create({
-				name: `${startEmoji}╏⌈${nickName}⌋${raison}`,
-				permissionOverwrites: [
-					{
-						id: user,
-						allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
-						type: OverwriteType.Member
-					},
-					{
-						id: interaction.client.user,
-						allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
-						type: OverwriteType.Member
-					},
-					{
-						id: guild.roles.everyone,
-						deny: [PermissionFlagsBits.ViewChannel],
-					}
-				]
-			});
-			
-			if (!newTicket) {
-				await interaction.reply("Le ticket n'a pas pu être créé, veuillez contacter un administrateur !");
-				return;
-			}
-			if (staffRole) {
-				await newTicket.permissionOverwrites.create(staffRole, {
-					ViewChannel: true,
-					SendMessages: true,
-					ReadMessageHistory: true
-				});
-			}
-			await interaction.reply({
-				content: `Votre ticket a été créé dans ${channelMention(newTicket.id)}`,
-				ephemeral: true
-			});
-			raison = raison.length > 0 ? "Raison : " + raison : null;
-			const reply = new EmbedBuilder()
-				.setTitle(`Ticket de ${nickName}`)
-				.setDescription(raison)
-				.setColor("#276083");
-			await newTicket.send({embeds: [reply]});
+			await openTicket(interaction, options);
 		} else if (subcommand === "update") {
-			/** Allow only moderator to update ticket */
-			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
-			if (!hasRole) {
-				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
-				return;
-			}
-			const verif = verifTicket(interaction.channel, interaction.guild.id);
-			if (!verif) {
-				await interaction.reply({content: "Ce salon n'est pas un ticket !", ephemeral: true});
-				return;
-			}
-			const ticket = interaction.channel as GuildTextBasedChannel;
-			const etat = options.getString("etat", true);
-			await ticket.setName(ticket.name.replace(/[📩📝⌛✅]/u, etat));
-			await interaction.reply({content: "Le ticket a été mis à jour !", ephemeral: true});
+			await updateStatut(interaction, options);
 		} else if (subcommand === "close") {
-			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
-			await interaction.deferReply({ephemeral: true});
-			if (!hasRole) {
-				await interaction.editReply({content: "Vous n'avez pas la permission de faire cela !"});
-				return;
-			}
-			const verif = verifTicket(interaction.channel, interaction.guild.id);
-			if (!verif) {
-				await interaction.editReply({content: "Ce salon n'est pas un ticket !"});
-				return;
-			}
-			const ticket = interaction.channel as GuildTextBasedChannel;
-			await ticketContent(ticket, interaction);
-			await interaction.editReply({content: "Le ticket a été fermé !"});
-			//delete ticket
-			await ticket.delete();
+			await closeTicket(interaction);
 		} else if (subcommand === "transcript") {
-			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
-			await interaction.deferReply({ephemeral: true});
-			if (!hasRole) {
-				await interaction.editReply({content: "Vous n'avez pas la permission de faire cela !"});
-				return;
-			}
-			const verif = verifTicket(interaction.channel, interaction.guild.id);
-			if (!verif) {
-				await interaction.editReply({content: "Ce salon n'est pas un ticket !"});
-				return;
-			}
-			const ticket = interaction.channel as GuildTextBasedChannel;
-			await ticketContent(ticket, interaction);
-			const channelTranscript = getConfig(interaction.guild.id, "transcript") as string;
-			await interaction.editReply({content: `Le transcript a été envoyé dans ${channelMention(channelTranscript)}`});
+			await transcriptTicket(interaction);
 		} else if (group === "members" && subcommand === "add") {
-			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
-			if (!hasRole) {
-				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
-				return;
-			}
-			const verif = verifTicket(interaction.channel, interaction.guild.id);
-			if (!verif) {
-				await interaction.reply({content: "Ce salon n'est pas un ticket !", ephemeral: true});
-				return;
-			}
-			const ticket = interaction.channel as TextChannel;
-			const user = options.getUser("membre", true);
-			await ticket.permissionOverwrites.create(user, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
-			await interaction.reply({content: `${userMention(user.id)} a bien été ajouté au ticket`, ephemeral: true});
+			await addMember(interaction, options);
 		} else if (group === "members" && subcommand === "remove") {
-			const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild.id);
-			if (!hasRole) {
-				await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
-				return;
-			}
-			const verif = verifTicket(interaction.channel, interaction.guild.id);
-			if (!verif) {
-				await interaction.reply({content: "Ce salon n'est pas un ticket !", ephemeral: true});
-				return;
-			}
-			const ticket = interaction.channel as TextChannel;
-			const user = options.getUser("membre", true);
-			const member = interaction.guild.members.cache.get(user.id) as GuildMember;
-			/** not remove staff or bot */
-			if (hasStaffRole(member, interaction.guild.id) || user.id === interaction.client.user.id) {
-				await interaction.reply({
-					content: "Vous ne pouvez pas supprimer un membre du staff ou le bot !",
-					ephemeral: true
-				});
-				return;
-			}
-			await ticket.permissionOverwrites.delete(user);
-			await interaction.reply({content: `${userMention(user.id)} a bien été supprimé du ticket`, ephemeral: true});
+			await removeMember(interaction, options);
 		}
 	}
 };
@@ -345,13 +217,7 @@ function formatDate(date: Date): string {
 	return `${day}/${month}/${year} - ${hours}:${minutes}`;
 }
 
-interface FetchAllMessagesResult {
-	messages: {
-		message: Message;
-		embeds: Embed[];
-	}[];
-	messageFiles: Attachment[];
-}
+
 
 async function fetchAllMessages(channel: TextBasedChannel): Promise<FetchAllMessagesResult> {
 	const messages: Array<{ message: Message; embeds: Embed[] }> = [];
@@ -404,4 +270,142 @@ function formatEmbed(embed: Embed) {
 
 function unixEpochInSecond() {
 	return Math.floor(new Date().getTime() / 1000);
+}
+
+async function canUpdateTicket(interaction: CommandInteraction) {
+	const hasRole = hasStaffRole(interaction.member as GuildMember, interaction.guild!.id);
+	if (!hasRole) {
+		await interaction.reply({content: "Vous n'avez pas la permission de faire cela !", ephemeral: true});
+		return false;
+	}
+	const verif = verifTicket(interaction.channel, interaction.guild!.id);
+	if (!verif) {
+		await interaction.reply({content: "Ce salon n'est pas un ticket !", ephemeral: true});
+		return false;
+	}
+	return true;
+}
+
+async function openTicket(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+	let raison: string | null = options.getString("raison") ?? "";
+	const user = interaction.member as GuildMember;
+	const guild = interaction.guild;
+	const startEmoji = "📩";
+	const ticketCategory = getConfig(interaction.guild!.id, "ticket");
+	if (!ticketCategory) {
+		await interaction.reply("Aucune catégorie de ticket n'a été définie, vous ne pouvez pas utiliser cette commande !");
+		return;
+	}
+	const channelFindByID = guild!.channels.cache.find((channel) => channel.id === ticketCategory) as CategoryChannel;
+	if (!channelFindByID) {
+		await interaction.reply("La catégorie de ticket n'a pas été trouvée, veuillez contacter un administrateur !");
+		return;
+	}
+	const staff = getConfig(interaction.guild!.id, "staff");
+	const staffRole = guild!.roles.cache.find((role) => role.id === staff);
+	const nickName = user.nickname ?? user.user.globalName ?? user.displayName;
+	logInDev(`Ticket de ${nickName} créé`);
+	const newTicket = await channelFindByID?.children.create({
+		name: `${startEmoji}╏⌈${nickName}⌋${raison}`,
+		permissionOverwrites: [
+			{
+				id: user,
+				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
+				type: OverwriteType.Member
+			},
+			{
+				id: interaction.client.user,
+				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
+				type: OverwriteType.Member
+			},
+			{
+				id: guild!.roles.everyone,
+				deny: [PermissionFlagsBits.ViewChannel],
+			}
+		]
+	});
+			
+	if (!newTicket) {
+		await interaction.reply("Le ticket n'a pas pu être créé, veuillez contacter un administrateur !");
+		return;
+	}
+	if (staffRole) {
+		await newTicket.permissionOverwrites.create(staffRole, {
+			ViewChannel: true,
+			SendMessages: true,
+			ReadMessageHistory: true
+		});
+	}
+	await interaction.reply({
+		content: `Votre ticket a été créé dans ${channelMention(newTicket.id)}`,
+		ephemeral: true
+	});
+	raison = raison.length > 0 ? "Raison : " + raison : null;
+	const reply = new EmbedBuilder()
+		.setTitle(`Ticket de ${nickName}`)
+		.setDescription(raison)
+		.setColor("#276083");
+	await newTicket.send({embeds: [reply]});
+}
+
+/**
+ * Allow moderator to update ticket status (on the name)
+ * @param interaction {CommandInteraction} 
+ * @param options {CommandInteractionOptionResolver}
+ */
+async function updateStatut(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+	const verif = await canUpdateTicket(interaction);
+	if (!verif) return;
+	const ticket = interaction.channel as GuildTextBasedChannel;
+	const etat = options.getString("etat", true);
+	await ticket.setName(ticket.name.replace(/[📩📝⌛✅]/u, etat));
+	await interaction.reply({content: "Le ticket a été mis à jour !", ephemeral: true});
+}
+
+async function closeTicket(interaction: CommandInteraction) {
+	const verif = canUpdateTicket(interaction);
+	if (!verif) return;
+	await interaction.deferReply({ephemeral: true});
+	const ticket = interaction.channel as GuildTextBasedChannel;
+	await ticketContent(ticket, interaction);
+	await interaction.editReply({content: "Le ticket a été fermé !"});
+	//delete ticket
+	await ticket.delete();
+}
+
+async function transcriptTicket(interaction: CommandInteraction) {
+	const verif = canUpdateTicket(interaction);
+	if (!verif) return;
+	await interaction.deferReply({ephemeral: true});
+	const ticket = interaction.channel as GuildTextBasedChannel;
+	await ticketContent(ticket, interaction);
+	const channelTranscript = getConfig(interaction.guild!.id, "transcript") as string;
+	await interaction.editReply({content: `Le transcript a été envoyé dans ${channelMention(channelTranscript)}`});
+}
+
+async function addMember(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+	const verif = canUpdateTicket(interaction);
+	if (!verif) return;
+	const ticket = interaction.channel as TextChannel;
+	const user = options.getUser("membre", true);
+	await ticket.permissionOverwrites.create(user, {ViewChannel: true, SendMessages: true, ReadMessageHistory: true});
+	await interaction.reply({content: `${userMention(user.id)} a bien été ajouté au ticket`, ephemeral: true});
+}
+
+async function removeMember(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+	const verif = canUpdateTicket(interaction);
+	if (!verif) return;
+	const ticket = interaction.channel as TextChannel;
+	const user = options.getUser("membre", true);
+	const member = interaction.guild!.members.cache.get(user.id) as GuildMember;
+	/** not remove staff or bot */
+	if (hasStaffRole(member, interaction.guild!.id) || user.id === interaction.client.user.id) {
+		await interaction.reply({
+			content: "Vous ne pouvez pas supprimer un membre du staff ou le bot !",
+			ephemeral: true
+		});
+		return;
+	}
+	await ticket.permissionOverwrites.delete(user);
+	await interaction.reply({content: `${userMention(user.id)} a bien été supprimé du ticket`, ephemeral: true});
 }
