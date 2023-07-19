@@ -363,7 +363,7 @@ async function updateStatut(interaction: CommandInteraction, options: CommandInt
 }
 
 async function closeTicket(interaction: CommandInteraction) {
-	const verif = canUpdateTicket(interaction);
+	const verif = await canUpdateTicket(interaction);
 	if (!verif) return;
 	await interaction.deferReply({ephemeral: true});
 	const ticket = interaction.channel as GuildTextBasedChannel;
@@ -374,7 +374,7 @@ async function closeTicket(interaction: CommandInteraction) {
 }
 
 async function transcriptTicket(interaction: CommandInteraction) {
-	const verif = canUpdateTicket(interaction);
+	const verif = await canUpdateTicket(interaction);
 	if (!verif) return;
 	await interaction.deferReply({ephemeral: true});
 	const ticket = interaction.channel as GuildTextBasedChannel;
@@ -384,7 +384,7 @@ async function transcriptTicket(interaction: CommandInteraction) {
 }
 
 async function addMember(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
-	const verif = canUpdateTicket(interaction);
+	const verif = await canUpdateTicket(interaction);
 	if (!verif) return;
 	const ticket = interaction.channel as TextChannel;
 	const user = options.getUser("membre", true);
@@ -393,7 +393,7 @@ async function addMember(interaction: CommandInteraction, options: CommandIntera
 }
 
 async function removeMember(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
-	const verif = canUpdateTicket(interaction);
+	const verif = await canUpdateTicket(interaction);
 	if (!verif) return;
 	const ticket = interaction.channel as TextChannel;
 	const user = options.getUser("membre", true);
