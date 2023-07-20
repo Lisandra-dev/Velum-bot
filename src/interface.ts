@@ -20,6 +20,7 @@ export type Meteo = {
 	channel: string,
 	ville: string
 	auto: boolean
+	frequence: string
 };
 
 export const DEFAULT_STATISTIQUE: Statistiques = {

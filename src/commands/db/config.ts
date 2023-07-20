@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import {check, getConfig, push, remove, setConfig} from "../../maps";
 import dedent from "ts-dedent";
+import * as cron from "cron-validator";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -63,6 +64,11 @@ export default {
 			.addStringOption((option) => option
 				.setName("ville")
 				.setDescription("Ville à surveiller")
+				.setRequired(false)
+			)
+			.addStringOption((option) => option
+				.setName("frequence")
+				.setDescription("Fréquence des messages de la météo. Merci d'utiliser un format CRON.")
 				.setRequired(false)
 			)
 		)
@@ -150,10 +156,16 @@ export default {
 				await interaction.reply("La météo automatique est maintenant désactivée");
 				return;
 			}
+			let freq = options.getString("frequence", false) || "0 0,6,12,18 * * *";
+			if (freq && !cron.isValidCron(freq)) {
+				await interaction.reply("La fréquence n'est pas au bon format. Merci d'utiliser un format CRON.");
+				freq = "0 0,6,12,18 * * *";
+			}
 			setConfig(interaction.guild.id, "meteo", {
 				auto: true,
 				channel: channel!.id,
-				ville: ville
+				ville: ville,
+				frequence: freq
 			});
 			await interaction.reply(`La météo est maintenant activée dans ${channelMention(channel!.id)} pour la ville de ${ville}`);
 			return;
