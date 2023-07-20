@@ -16,6 +16,12 @@ export interface Statistiques {
 	};
 }
 
+export type Meteo = {
+	channel: string,
+	ville: string
+	auto: boolean
+};
+
 export const DEFAULT_STATISTIQUE: Statistiques = {
 	stats: {
 		force: 10,

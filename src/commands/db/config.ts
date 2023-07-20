@@ -52,6 +52,22 @@ export default {
 			)
 		)
 		.addSubcommand((subcommand) => subcommand
+			.setName("meteo")
+			.setDescription("Permet de définir les divers paramètres de la météo automatique. Supprimer le channel désactive cette fonction.")
+			.addChannelOption((option) => option
+				.setName("channel")
+				.setDescription("Channel des messages de la météo")
+				.setRequired(false)
+				.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+			)
+			.addStringOption((option) => option
+				.setName("ville")
+				.setDescription("Ville à surveiller")
+				.setRequired(false)
+			)
+		)
+		
+		.addSubcommand((subcommand) => subcommand
 			.setName("staff")
 			.setDescription("Permet de définir le rôle staff pour donner le droit de faire des jets de dés pour les autres")
 			.addRoleOption((option) => option
@@ -126,6 +142,21 @@ export default {
 			const role = options.getRole("role", true);
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
+		} else if (subcommand === "meteo") {
+			const channel = options.getChannel("channel", false);
+			const ville = options.getString("ville", false) || "Villefranche-sur-mer";
+			if (!channel) {
+				setConfig(interaction.guild.id, "meteo.auto", false);
+				await interaction.reply("La météo automatique est maintenant désactivée");
+				return;
+			}
+			setConfig(interaction.guild.id, "meteo", {
+				auto: true,
+				channel: channel!.id,
+				ville: ville
+			});
+			await interaction.reply(`La météo est maintenant activée dans ${channelMention(channel!.id)} pour la ville de ${ville}`);
+			return;
 		} else if (subGroup === "ticket") {
 			if (subcommand === "category") {
 				const category = options.getChannel("category", true);

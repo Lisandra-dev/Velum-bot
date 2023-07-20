@@ -1,6 +1,6 @@
 import Enmap from "enmap";
 import {latinise, logInDev} from "./utils";
-import {Statistiques} from "./interface";
+import {Statistiques, Meteo} from "./interface";
 
 /**
  * Create a new Enmap "Characters"
@@ -64,7 +64,7 @@ export function set(
 	}
 }
 
-export function getConfig(guildID: string, key: string): string | string[] {
+export function getConfig(guildID: string, key: string): string | string[] | Meteo {
 	switch (key) {
 	case "prefix":
 		return configuration.ensure(guildID, "!", "prefix") as string;
@@ -84,12 +84,18 @@ export function getConfig(guildID: string, key: string): string | string[] {
 		return configuration.ensure(guildID, "", "ticket") as string;
 	case "transcript" :
 		return configuration.ensure(guildID, "", "transcript") as string;
+	case "meteo":
+		return configuration.ensure(guildID, {
+			auto: false,
+			channel: "",
+			ville: ""
+		}, "meteo") as Meteo;
 	default:
 		return configuration.ensure(guildID, "", key);
 	}
 }
 
-export function setConfig(guildID: string, key: string, value: string) {
+export function setConfig(guildID: string, key: string, value: string | boolean | Meteo) {
 	configuration.set(guildID, value, key);
 	logInDev(`Set ${key} to ${value} for ${guildID}`);
 }
