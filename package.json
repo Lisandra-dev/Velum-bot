@@ -22,7 +22,7 @@
         "@typescript-eslint/eslint-plugin": "^6.1.0",
         "ansi-colors": "^4.1.3",
         "dedent": "^0.7.0",
-        "discord.js": "14.11.1-dev.1689639260-afa9879.0",
+        "discord.js": "14.11.1-dev.1689854654-d26e022.0",
         "dotenv": "^16.3.1",
         "enmap": "^5.9.8",
         "eslint": "^8.45.0",
@@ -34,6 +34,7 @@
         "ts-dedent": "^2.2.0"
     },
     "devDependencies": {
+        "@cicciosgamino/openweather-apis": "^5.2.0",
         "@discordjs/rest": "^1.7.1",
         "cross-env": "^7.0.3",
         "node-gyp": "^9.4.0",
