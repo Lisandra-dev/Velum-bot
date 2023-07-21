@@ -36,7 +36,6 @@ export async function channelNameGenerator(city: string = "Villefranche-sur-mer"
 	
 	const raw = data.weather.icon.raw.replace(/[dn]/, "") as keyof typeof meteoEmoji;
 	const moonEmoji = Moon.lunarPhaseEmoji(undefined, {hemisphere: Hemisphere.NORTHERN}) as NorthernHemisphereLunarEmoji;
-	console.log(`${moonEmoji}·${meteoEmoji[raw]}╏Météo`);
 	return `${moonEmoji}·${meteoEmoji[raw]}╏Météo`;
 }
 
@@ -45,14 +44,14 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 	const time = data.weather.icon.raw.replace(/\d{2}/, "") as "d" | "n";
 	const icon = meteoImage[raw][time];
 	const moon = {
-		"Waxing Crescent" : `${IMAGE_LINK}/meteo/moon/waxing-crescent.png`, //🌒
-		"First Quarter" : `${IMAGE_LINK}/meteo/moon/first-quarter.png`, //🌓
-		"New" : `${IMAGE_LINK}/meteo/moon/new-moon.png`, //🌑
-		"Waxing Gibbous" : `${IMAGE_LINK}/meteo/moon/waxing-gibbous.png`, //🌔
-		"Full" : `${IMAGE_LINK}/meteo/moon/full-moon.png`, //🌕
-		"Waning Gibbous" : `${IMAGE_LINK}/meteo/moon/waning-gibbous.png`, //🌖
-		"Last Quarter" : `${IMAGE_LINK}/meteo/moon/third-quarter.png`, //🌗
-		"Waning Crescent" : `${IMAGE_LINK}/meteo/moon/waning-crescent.png`, //🌘
+		"Waxing Crescent" : `${IMAGE_LINK}/meteo/lunar-phase/waxing-crescent.png`, //🌒
+		"First Quarter" : `${IMAGE_LINK}/meteo/lunar-phase/first-quarter.png`, //🌓
+		"New" : `${IMAGE_LINK}/meteo/lunar-phase/new-moon.png`, //🌑
+		"Waxing Gibbous" : `${IMAGE_LINK}/meteo/lunar-phase/waxing-gibbous.png`, //🌔
+		"Full" : `${IMAGE_LINK}/meteo/lunar-phase/full-moon.png`, //🌕
+		"Waning Gibbous" : `${IMAGE_LINK}/meteo/lunar-phase/waning-gibbous.png`, //🌖
+		"Last Quarter" : `${IMAGE_LINK}/meteo/lunar-phase/third-quarter.png`, //🌗
+		"Waning Crescent" : `${IMAGE_LINK}/meteo/lunar-phase/waning-crescent.png`, //🌘
 	};
 	const wind = convertDegToArrow(data.weather.wind.deg);
 	const main = translationMain[data.weather.main as keyof typeof translationMain];
@@ -64,11 +63,11 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 		.setDescription(capitalize(data.weather.description))
 		.setAuthor({
 			name: `${city} · ${main}`,
-			iconURL: `${moon[Moon.lunarPhase()]}` as string,
+			iconURL: moon[Moon.lunarPhase(undefined, {hemisphere: Hemisphere.NORTHERN}) as keyof typeof moon],
 		})
 		.setTimestamp()
 		.setFooter({
-			text: `Météo de la ${timeMessage}`,
+			text: `Météo de ${timeMessage}`,
 		})
 		.addFields({
 			name: "Température",
