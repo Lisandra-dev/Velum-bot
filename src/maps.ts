@@ -88,7 +88,9 @@ export function getConfig(guildID: string, key: string): string | string[] | Met
 		return configuration.ensure(guildID, {
 			auto: false,
 			channel: "",
-			ville: ""
+			ville: "",
+			freq: "0 0,6,12,18 * * *",
+			name: ""
 		}, "meteo") as Meteo;
 	default:
 		return configuration.ensure(guildID, "", key);
@@ -97,7 +99,7 @@ export function getConfig(guildID: string, key: string): string | string[] | Met
 
 export function setConfig(guildID: string, key: string, value: string | boolean | Meteo) {
 	configuration.set(guildID, value, key);
-	logInDev(`Set ${key} to ${value} for ${guildID}`);
+	logInDev(`Set: ${key} (for ${guildID}`, value);
 }
 
 export function push(guildID: string, key: string, value: string) {
@@ -110,7 +112,7 @@ export function push(guildID: string, key: string, value: string) {
 		configuration.ensure(guildID, [], key);
 		configuration.push(guildID, value, key, false);
 	}
-	logInDev(`Pushed ${value} to ${key} for ${guildID}`);
+	logInDev("Pushed", value, `to ${key} for ${guildID}`);
 }
 
 export function remove(guildID: string, key: string, value: string) {
@@ -208,7 +210,15 @@ export function loadGuild(guildID: string) {
 		"staff": "",
 		"ticket": "",
 		"role.add": [],
-		"role.remove": []
+		"role.remove": [],
+		"transcript": "",
+		"meteo": {
+			"auto": false,
+			"channel": "",
+			"ville": "",
+			"freq": "0 0,6,12,18 * * *",
+			"name": ""
+		}
 	});
 }
 
