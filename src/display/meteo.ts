@@ -3,7 +3,7 @@ import {WEATHER} from "../index";
 import {EmbedBuilder} from "discord.js";
 import {capitalize, roundUp} from "../utils";
 import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
-import {meteoImage, translationMain, IMAGE_LINK} from "../interface";
+import {meteoImage, translationMain, IMAGE_LINK, timedMessage} from "../interface";
 
 function weatherData(city: string) {
 	const weather = new OpenWeatherAPI({
@@ -56,6 +56,9 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 	};
 	const wind = convertDegToArrow(data.weather.wind.deg);
 	const main = translationMain[data.weather.main as keyof typeof translationMain];
+	//Get hour day
+	const hour = new Date().getHours();
+	const timeMessage = timedMessage[hour as keyof typeof timedMessage];
 	let embed = new EmbedBuilder()
 		.setThumbnail(icon)
 		.setDescription(capitalize(data.weather.description))
@@ -64,6 +67,9 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 			iconURL: `${moon[Moon.lunarPhase()]}` as string,
 		})
 		.setTimestamp()
+		.setFooter({
+			text: `Météo de la ${timeMessage}`,
+		})
 		.addFields({
 			name: "Température",
 			value: `${roundUp(data.weather.temp.cur)}°C`,

@@ -186,3 +186,10 @@ export const translationMain = {
 	"Clear" : "Clair",
 	"Clouds" : "Nuageux",
 };
+
+export const timedMessage = {
+	6 : "Matinée",
+	12 : "Après-Midi",
+	18 : "Soirée",
+	0 : "Nuit",
+};
