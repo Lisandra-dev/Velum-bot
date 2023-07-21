@@ -6,6 +6,7 @@ import {commands} from "../commands";
 import {logInDev} from "../utils";
 import {DESTROY, VERSION} from "../index";
 import {destroyDB, loadGuild} from "../maps";
+import {autoWeather} from "./cronWeather";
 
 if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});
 else dotenv.config({path: ".env"});
@@ -37,6 +38,7 @@ export default (client: Client): void => {
 			logInDev(`Load in ${guild.name} done`);
 			if (DESTROY) destroyDB();
 			loadGuild(guild.id);
+			await autoWeather(guild);
 		}
 	});
 };
