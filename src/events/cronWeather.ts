@@ -1,4 +1,4 @@
-import {CronJob} from 'cron';
+import {CronJob} from "cron";
 import {getConfig} from "../maps";
 import {Meteo} from "../interface";
 import {Guild, TextChannel} from "discord.js";
