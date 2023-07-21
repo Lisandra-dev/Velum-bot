@@ -188,8 +188,8 @@ export const translationMain = {
 };
 
 export const timedMessage = {
-	6 : "Matinée",
-	12 : "Après-Midi",
-	18 : "Soirée",
-	0 : "Nuit",
+	6 : "la matinée",
+	12 : "l'après-midi",
+	18 : "la soirée",
+	0 : "la nuit",
 };
