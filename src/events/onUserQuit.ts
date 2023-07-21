@@ -7,6 +7,6 @@ export default (client: Client): void => {
 		const memberID = member.user.id;
 		const guildID = member.guild.id;
 		logInDev(`Member ${memberID} left guild ${guildID}`);
-		removeUser(guildID, memberID);
+		removeUser(memberID, guildID);
 	});
 };
