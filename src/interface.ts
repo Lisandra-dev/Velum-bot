@@ -1,4 +1,7 @@
 import {User} from "discord.js";
+import * as pkg from "../package.json";
+export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
+export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
 
 export interface Characters {
 	stats: Statistiques[];
@@ -114,4 +117,72 @@ export type Formula = {
 	modifStat: string,
 	first: number,
 	second: signe,
+};
+
+const jour = `${IMAGE_LINK}/meteo/jour`;
+const nuit = `${IMAGE_LINK}/meteo/nuit`;
+
+
+export 	const meteoImage = {
+	"01" :
+			{
+				d: `${jour}/soleil.png`,
+				n: `${nuit}/lune.png`
+			},
+	"02" :
+			{
+				d: `${jour}/few.png`,
+				n: `${nuit}/few.png`
+			},
+	"03" :
+			{
+				d: `${jour}/cloud.png`,
+				n: `${jour}/cloud.png`
+			},
+	"04" :
+			{
+				d: `${jour}/clouds.png`,
+				n: `${jour}/clouds.png`
+			},
+	"09" :
+			{
+				d: `${jour}/shower.png`,
+				n: `${jour}/shower.png`
+			},
+	"10" :
+			{
+				d: `${jour}/rain.png`,
+				n: `${nuit}/rain.png`
+			},
+	"11" :
+			{
+				d: `${jour}/thunder.png`,
+				n: `${jour}/thunder.png`
+			},
+	"13" : {
+		d: `${jour}/snow.png`,
+		n: `${jour}/snow.png`
+	},
+	"50" : {
+		d: `${jour}/mist.png`,
+		n: `${jour}/mist.png`
+	}
+};
+
+export const translationMain = {
+	"Thunderstorm" : "Orage",
+	"Drizzle" : "Bruine",
+	"Rain" : "Pluie",
+	"Snow" : "Neige",
+	"Mist" : "Brume",
+	"Smoke" : "Fumée",
+	"Haze" : "Brume",
+	"Dust" : "Poussière",
+	"Fog" : "Brouillard",
+	"Sand" : "Sable",
+	"Ash" : "Cendre",
+	"Squall" : "Rafale",
+	"Tornado" : "Tornade",
+	"Clear" : "Clair",
+	"Clouds" : "Nuageux",
 };

@@ -7,7 +7,8 @@ import {
 	ResultRolls,
 	Seuil,
 	SEUIL_KEYS,
-	STATISTIQUES
+	STATISTIQUES,
+	IMAGE_LINK
 } from "../interface";
 import {
 	capitalize,
@@ -17,7 +18,6 @@ import {
 	removeFromArgumentsWithString,
 } from "../utils";
 import {getCharacters} from "../maps";
-import {IMAGE_LINK} from "../index";
 import {hasStaffRole} from "../utils/data_check";
 import {getSeuil, getStatistique} from "../utils/get";
 
