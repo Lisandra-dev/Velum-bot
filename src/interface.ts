@@ -187,9 +187,26 @@ export const translationMain = {
 	"Clouds" : "Nuageux",
 };
 
-export const timedMessage = {
-	6 : "la matinée",
-	12 : "l'après-midi",
-	18 : "la soirée",
-	0 : "la nuit",
-};
+interface MomentOfDay {
+  hour: number[];
+  description: string;
+}
+
+export const timedMessage: MomentOfDay[] = [
+	{
+		hour: [6, 7, 8, 9, 10, 11],
+		description: "la matinée",
+	},
+	{
+		hour: [12, 13, 14, 15, 16, 17],
+		description: "l'après-midi",
+	},
+	{
+		hour: [18, 19, 20, 21, 22, 23],
+		description: "la soirée",
+	},
+	{
+		hour: [0, 1, 2, 3, 4, 5],
+		description: "la nuit",
+	}
+];

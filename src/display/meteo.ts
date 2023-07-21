@@ -57,7 +57,7 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 	const main = translationMain[data.weather.main as keyof typeof translationMain];
 	//Get hour day
 	const hour = new Date().getHours();
-	const timeMessage = timedMessage[hour as keyof typeof timedMessage];
+	const timeMessage = getTimeOfDay(new Date().getHours());
 	let embed = new EmbedBuilder()
 		.setThumbnail(icon)
 		.setDescription(capitalize(data.weather.description))
@@ -123,3 +123,10 @@ function convertDegToArrow(deg: number) {
 	};
 }
 
+function getTimeOfDay(hour: number) {
+	for (const moment of timedMessage) {
+		if (moment.hour.includes(hour)) {
+			return moment.description;
+		}
+	}
+}
