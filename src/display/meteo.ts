@@ -45,14 +45,14 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 	const time = data.weather.icon.raw.replace(/\d{2}/, "") as "d" | "n";
 	const icon = meteoImage[raw][time];
 	const moon = {
-		"Waxing Crescent" : `${IMAGE_LINK}/meteo/moon/waxing-crescent.png`,
-		"First Quarter" : `${IMAGE_LINK}/meteo/moon/first-quarter.png`,
-		"New" : `${IMAGE_LINK}/meteo/moon/new-moon.png`,
-		"Waxing Gibbous" : `${IMAGE_LINK}/meteo/moon/waning-gibbous.png`,
-		"Full" : `${IMAGE_LINK}/meteo/moon/full-moon.png`,
-		"Waning Gibbous" : `${IMAGE_LINK}/meteo/moon/waning-gibbous.png`,
-		"Last Quarter" : `${IMAGE_LINK}/meteo/moon/third-quarter.png`,
-		"Waning Crescent" : `${IMAGE_LINK}/meteo/moon/waning-crescent.png`,
+		"Waxing Crescent" : `${IMAGE_LINK}/meteo/moon/waxing-crescent.png`, //🌒
+		"First Quarter" : `${IMAGE_LINK}/meteo/moon/first-quarter.png`, //🌓
+		"New" : `${IMAGE_LINK}/meteo/moon/new-moon.png`, //🌑
+		"Waxing Gibbous" : `${IMAGE_LINK}/meteo/moon/waxing-gibbous.png`, //🌔
+		"Full" : `${IMAGE_LINK}/meteo/moon/full-moon.png`, //🌕
+		"Waning Gibbous" : `${IMAGE_LINK}/meteo/moon/waning-gibbous.png`, //🌖
+		"Last Quarter" : `${IMAGE_LINK}/meteo/moon/third-quarter.png`, //🌗
+		"Waning Crescent" : `${IMAGE_LINK}/meteo/moon/waning-crescent.png`, //🌘
 	};
 	const wind = convertDegToArrow(data.weather.wind.deg);
 	const main = translationMain[data.weather.main as keyof typeof translationMain];
