@@ -1,8 +1,9 @@
 import OpenWeatherAPI, {CurrentWeather} from "openweather-api-node";
-import {IMAGE_LINK, WEATHER} from "../index";
+import {WEATHER} from "../index";
 import {EmbedBuilder} from "discord.js";
 import {capitalize, roundUp} from "../utils";
 import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
+import {meteoImage, translationMain, IMAGE_LINK} from "../interface";
 
 function weatherData(city: string) {
 	const weather = new OpenWeatherAPI({
@@ -40,54 +41,6 @@ export async function channelNameGenerator(city: string = "Villefranche-sur-mer"
 }
 
 export function generateEmbed(data: CurrentWeather, city: string) {
-	const jour = `${IMAGE_LINK}/meteo/jour`;
-	const nuit = `${IMAGE_LINK}/meteo/nuit`;
-	const meteoImage = {
-		"01" :
-			{
-				d: `${jour}/soleil.png`,
-				n: `${nuit}/lune.png`
-			},
-		"02" :
-			{
-				d: `${jour}/few.png`,
-				n: `${nuit}/few.png`
-			},
-		"03" :
-			{
-				d: `${jour}/cloud.png`,
-				n: `${jour}/cloud.png`
-			},
-		"04" :
-			{
-				d: `${jour}/clouds.png`,
-				n: `${jour}/clouds.png`
-			},
-		"09" :
-			{
-				d: `${jour}/shower.png`,
-				n: `${jour}/shower.png`
-			},
-		"10" :
-			{
-				d: `${jour}/rain.png`,
-				n: `${nuit}/rain.png`
-			},
-		"11" :
-			{
-				d: `${jour}/thunder.png`,
-				n: `${jour}/thunder.png`
-			},
-		"13" : {
-			d: `${jour}/snow.png`,
-			n: `${jour}/snow.png`
-		},
-		"50" : {
-			d: `${jour}/mist.png`,
-			n: `${jour}/mist.png`
-		}
-	};
-	
 	const raw = data.weather.icon.raw.replace(/[dn]/, "") as keyof typeof meteoImage;
 	const time = data.weather.icon.raw.replace(/\d{2}/, "") as "d" | "n";
 	const icon = meteoImage[raw][time];
@@ -102,11 +55,12 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 		"Waning Crescent" : `${IMAGE_LINK}/meteo/moon/waning-crescent.png`,
 	};
 	const wind = convertDegToArrow(data.weather.wind.deg);
+	const main = translationMain[data.weather.main as keyof typeof translationMain];
 	let embed = new EmbedBuilder()
 		.setThumbnail(icon)
 		.setDescription(capitalize(data.weather.description))
 		.setAuthor({
-			name: `Météo pour ${city}`,
+			name: `${city} · ${main}`,
 			iconURL: `${moon[Moon.lunarPhase()]}` as string,
 		})
 		.setTimestamp()
