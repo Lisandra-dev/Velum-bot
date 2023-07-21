@@ -22,13 +22,13 @@ export default {
 		),
 	async execute(interaction: CommandInteraction) {
 		const options = interaction.options as CommandInteractionOptionResolver;
-		console.log(getConfig(interaction.guild!.id, "meteo"));
-		const lieu = options.getString("lieu") as string ?? getConfig(interaction.guild!.id, "meteo.ville") ?? "Villefranche-sur-mer";
-		const name = options.getString("lieu") as string ?? getConfig(interaction.guild!.id, "meteo.name") ?? "Villefranche-sur-mer";
+		const config = getConfig(interaction.guild!.id, "meteo") as Meteo;
+
+		const lieu = options.getString("lieu") as string ?? (config.ville && config.ville.length > 0) ? config.ville : "Villefranche-sur-mer";
+		const name = options.getString("lieu") as string ?? (config.name && config.name.length > 0) ? config.name : config.ville;
 		const embed = await getWeather(lieu, name);
 		await interaction.reply({embeds: [embed]});
 		if (hasStaffRole(interaction.member as GuildMember, interaction.guild!.id) && options.getBoolean("force-update")) {
-			const config = getConfig(interaction.guild!.id, "meteo") as Meteo;
 			if (!config.auto || !isValidCron(config.frequence) || config.channel.length === 0 || config.ville.length === 0) {
 				await interaction.followUp("La configuration de la météo n'est pas valide.");
 				return;
