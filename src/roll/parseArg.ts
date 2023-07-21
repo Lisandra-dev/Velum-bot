@@ -317,7 +317,7 @@ export function parseResult(
 	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
 	const finalResultMessage: Result = {
 		author: author,
-		image: `${IMAGE_LINK}/${imageStatistiques}.png`,
+		image: `${IMAGE_LINK}/statistiques/${imageStatistiques}.png`,
 		calcul: createFormula(param, result),
 		total: total,
 		ccMsg: ccMsg,
