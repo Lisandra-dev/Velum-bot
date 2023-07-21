@@ -56,7 +56,6 @@ export function generateEmbed(data: CurrentWeather, city: string) {
 	const wind = convertDegToArrow(data.weather.wind.deg);
 	const main = translationMain[data.weather.main as keyof typeof translationMain];
 	//Get hour day
-	const hour = new Date().getHours();
 	const timeMessage = getTimeOfDay(new Date().getHours());
 	let embed = new EmbedBuilder()
 		.setThumbnail(icon)
