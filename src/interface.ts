@@ -21,6 +21,7 @@ export type Meteo = {
 	ville: string
 	auto: boolean
 	frequence: string
+	name: string
 };
 
 export const DEFAULT_STATISTIQUE: Statistiques = {
