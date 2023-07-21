@@ -1,5 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder, CommandInteractionOptionResolver } from "discord.js";
-import { getConfig } from "src/maps";
+import { getConfig } from "../../maps";
+import {getWeather} from "../../display/meteo";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -13,9 +14,13 @@ export default {
 		),
 	async execute(interaction: CommandInteraction) {
 		const options = interaction.options as CommandInteractionOptionResolver;
-		const lieu = options.getString("lieu") ?? getConfig(interaction.guild!.id, "meteo.ville") ?? "Villefranche-sur-mer";
-		
-
+		console.log(getConfig(interaction.guild!.id, "meteo"));
+		const lieu = options.getString("lieu") as string ?? getConfig(interaction.guild!.id, "meteo.ville") ?? "Villefranche-sur-mer";
+		const name = options.getString("lieu") as string ?? getConfig(interaction.guild!.id, "meteo.name") ?? "Villefranche-sur-mer";
+		const embed = await getWeather(lieu, name);
+		await interaction.reply({embeds: [embed]});
 	}
-		
 };
+
+
+

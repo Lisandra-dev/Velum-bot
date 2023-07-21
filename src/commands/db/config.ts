@@ -13,6 +13,7 @@ import {
 import {check, getConfig, push, remove, setConfig} from "../../maps";
 import dedent from "ts-dedent";
 import * as cron from "cron-validator";
+import {Meteo} from "../../interface";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -54,7 +55,7 @@ export default {
 		)
 		.addSubcommand((subcommand) => subcommand
 			.setName("meteo")
-			.setDescription("Permet de définir les divers paramètres de la météo automatique. Supprimer le channel désactive cette fonction.")
+			.setDescription("Permet de définir les paramètres de la météo")
 			.addChannelOption((option) => option
 				.setName("channel")
 				.setDescription("Channel des messages de la météo")
@@ -69,6 +70,11 @@ export default {
 			.addStringOption((option) => option
 				.setName("frequence")
 				.setDescription("Fréquence des messages de la météo. Merci d'utiliser un format CRON.")
+				.setRequired(false)
+			)
+			.addStringOption((option) => option
+				.setName("nom")
+				.setDescription("Permet de changer le nom de la ville.")
 				.setRequired(false)
 			)
 		)
@@ -149,82 +155,97 @@ export default {
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
 		} else if (subcommand === "meteo") {
-			const channel = options.getChannel("channel", false);
-			const ville = options.getString("ville", false) || "Villefranche-sur-mer";
-			if (!channel) {
-				setConfig(interaction.guild.id, "meteo.auto", false);
-				await interaction.reply("La météo automatique est maintenant désactivée");
-				return;
-			}
-			let freq = options.getString("frequence", false) || "0 0,6,12,18 * * *";
-			if (freq && !cron.isValidCron(freq)) {
-				await interaction.reply("La fréquence n'est pas au bon format. Merci d'utiliser un format CRON.");
-				freq = "0 0,6,12,18 * * *";
-			}
-			setConfig(interaction.guild.id, "meteo", {
-				auto: true,
-				channel: channel!.id,
-				ville: ville,
-				frequence: freq
-			});
-			await interaction.reply(`La météo est maintenant activée dans ${channelMention(channel!.id)} pour la ville de ${ville}`);
+			await setMeteo(interaction, options);
 			return;
 		} else if (subGroup === "ticket") {
-			if (subcommand === "category") {
-				const category = options.getChannel("category", true);
-				setConfig(interaction.guild.id, "ticket", category.id);
-				await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
-			}
-			if (subcommand === "transcript") {
-				const channel = options.getChannel("channel", true);
-				setConfig(interaction.guild.id, "transcript", channel.id);
-				await interaction.reply(`Le channel des transcriptions est maintenant ${channelMention(channel.id)}`);
-			}
+			await ticket(interaction, options, subcommand);
+			return;
 		} else if (subGroup === "autorole") {
-			if (subcommand === "set") {
-				const choices = options.getString("dans", true);
-				if (choices === "add") {
-					await interaction.deferReply();
-					const role = options.getRole("role", true);
-					const isRemoved = check(interaction.guild.id, "role.remove", role.id);
-					if (isRemoved) {
-						await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à retirer. Suppression`);
-						remove(interaction.guild.id, "role.remove", role.id);
-					}
-					push(interaction.guild.id, "role.add", role.id);
-					await interaction.editReply(`Le rôle ${role.name} sera maintenant ajouté lors de l'utilisation de la commande create`);
-				} else if (choices === "remove") {
-					await interaction.deferReply();
-					const role = options.getRole("role", true);
-					const isAdded = check(interaction.guild.id, "role.add", role.id);
-					if (isAdded) {
-						await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à ajouter. Suppression`);
-						remove(interaction.guild.id, "role.add", role.id);
-					}
-					push(interaction.guild.id, "role.remove", role.id);
-					await interaction.editReply(`Le rôle ${role.name} sera maintenant retiré lors de l'utilisation de la commande create`);
-				}
-			} else if (subcommand === "delete") {
-				const role = options.getRole("role", true);
-				const choices = options.getString("dans", true);
-				if (choices === "add") {
-					remove(interaction.guild.id, "role.add", role.id);
-					await interaction.reply(`Le rôle ${role.name} ne sera plus ajouté lors de l'utilisation de la commande create`);
-				} else if (choices === "remove") {
-					remove(interaction.guild.id, "role.remove", role.id);
-					await interaction.reply(`Le rôle ${role.name} ne sera plus retiré lors de l'utilisation de la commande create`);
-				}
-			} else if (subcommand === "liste") {
-				const roleToAdd = getConfig(interaction.guild.id, "role.add") as string[];
-				const roleToRemove = getConfig(interaction.guild.id, "role.remove") as string[];
-				const message = dedent(`
+			await autorole(interaction, options, subcommand);
+			return;
+		}
+	},
+};
+
+async function setMeteo(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+	const channel = options.getChannel("channel", false);
+	const ville = options.getString("ville", false) || "Villefranche-sur-mer";
+	if (!channel) {
+		setConfig(interaction.guild!.id, "meteo.auto", false);
+		await interaction.reply("La météo automatique est maintenant désactivée");
+		return;
+	}
+	let freq = options.getString("frequence", false) || "0 0,6,12,18 * * *";
+	if (freq && !cron.isValidCron(freq)) {
+		await interaction.reply("La fréquence n'est pas au bon format. Merci d'utiliser un format CRON.");
+		freq = "0 0,6,12,18 * * *";
+	}
+	setConfig(interaction.guild!.id, "meteo", {
+		auto: true,
+		channel: channel!.id,
+		ville: ville,
+		frequence: freq,
+		name: options.getString("nom", false) || ville
+	} as Meteo);
+	await interaction.reply(`La météo est maintenant activée dans ${channelMention(channel!.id)} pour la ville de ${ville}, pour un CRON de ${freq}.`);
+}
+
+async function ticket(interaction: CommandInteraction, options: CommandInteractionOptionResolver, subcommand: string) {
+	if (subcommand === "category") {
+		const category = options.getChannel("category", true);
+		setConfig(interaction.guild!.id, "ticket", category.id);
+		await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
+	}
+	if (subcommand === "transcript") {
+		const channel = options.getChannel("channel", true);
+		setConfig(interaction.guild!.id, "transcript", channel.id);
+		await interaction.reply(`Le channel des transcriptions est maintenant ${channelMention(channel.id)}`);
+	}
+}
+
+async function autorole(interaction: CommandInteraction, options: CommandInteractionOptionResolver, subcommand: string) {
+	if (subcommand === "set") {
+		const choices = options.getString("dans", true);
+		if (choices === "add") {
+			await interaction.deferReply();
+			const role = options.getRole("role", true);
+			const isRemoved = check(interaction.guild!.id, "role.remove", role.id);
+			if (isRemoved) {
+				await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à retirer. Suppression`);
+				remove(interaction.guild!.id, "role.remove", role.id);
+			}
+			push(interaction.guild!.id, "role.add", role.id);
+			await interaction.editReply(`Le rôle ${role.name} sera maintenant ajouté lors de l'utilisation de la commande create`);
+		} else if (choices === "remove") {
+			await interaction.deferReply();
+			const role = options.getRole("role", true);
+			const isAdded = check(interaction.guild!.id, "role.add", role.id);
+			if (isAdded) {
+				await interaction.editReply(`Le rôle ${role.name} est déjà dans la liste des rôles à ajouter. Suppression`);
+				remove(interaction.guild!.id, "role.add", role.id);
+			}
+			push(interaction.guild!.id, "role.remove", role.id);
+			await interaction.editReply(`Le rôle ${role.name} sera maintenant retiré lors de l'utilisation de la commande create`);
+		}
+	} else if (subcommand === "delete") {
+		const role = options.getRole("role", true);
+		const choices = options.getString("dans", true);
+		if (choices === "add") {
+			remove(interaction.guild!.id, "role.add", role.id);
+			await interaction.reply(`Le rôle ${role.name} ne sera plus ajouté lors de l'utilisation de la commande create`);
+		} else if (choices === "remove") {
+			remove(interaction.guild!.id, "role.remove", role.id);
+			await interaction.reply(`Le rôle ${role.name} ne sera plus retiré lors de l'utilisation de la commande create`);
+		}
+	} else if (subcommand === "liste") {
+		const roleToAdd = getConfig(interaction.guild!.id, "role.add") as string[];
+		const roleToRemove = getConfig(interaction.guild!.id, "role.remove") as string[];
+		const message = dedent(`
 					**Rôles à ajouter**
 					- ${roleToAdd.map((id: string) => `<@&${id}>`).join("\n- ")}
 					**Rôles à retirer**
 					- ${roleToRemove.map((id: string) => `<@&${id}>`).join("\n- ")}
 					`);
-				await interaction.reply({ content: message, ephemeral: true }); //prevent the bot from pinging everyone
-			}
-		}
-	},
-};
+		await interaction.reply({ content: message, ephemeral: true }); //prevent the bot from pinging everyone
+	}
+}

@@ -30,6 +30,7 @@ export const VERSION = pkg.version ?? "0.0.0";
 export const DESTROY = process.env.DESTROY === "true";
 export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
 export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
+export const WEATHER = process.env.WEATHER ?? "";
 
 try {
 	ready(client);
