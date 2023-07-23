@@ -1,5 +1,6 @@
 name: Publish on VPS
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
