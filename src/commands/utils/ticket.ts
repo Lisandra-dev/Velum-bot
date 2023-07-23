@@ -203,6 +203,7 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 	const targetChannel = getConfig(interaction.guild!.id, "transcript") as string;
 	const channel = interaction.guild!.channels.cache.get(targetChannel) as TextChannel;
 	const transcript = await createTranscript(ticket, {
+		limit: -1,
 		filename: `${ticket.name}.html`,
 		saveImages: true,
 		poweredBy: false,
