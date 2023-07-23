@@ -1,11 +1,9 @@
 import {
 	Attachment,
 	CategoryChannel,
-	Channel,
 	channelMention,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	DMChannel,
 	Embed,
 	EmbedBuilder,
 	GuildMember,
@@ -22,16 +20,8 @@ import {
 import {getConfig} from "../../maps";
 import {logInDev} from "../../utils";
 import {hasStaffRole} from "../../utils/data_check";
-import * as fs from "fs";
+import {createTranscript} from "discord-html-transcripts";
 
-
-interface FetchAllMessagesResult {
-	messages: {
-		message: Message;
-		embeds: Embed[];
-	}[];
-	messageFiles: Attachment[];
-}
 
 export default {
 	data: new SlashCommandBuilder()
@@ -145,6 +135,10 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 	if (!ticket || ticket.isDMBased()) {
 		return null;
 	}
+	/**
+	 *  Old version - Return markdown + attachments
+	 *  @Deprecated
+	 
 	const messages = await fetchAllMessages(ticket);
 	let firstAuthor = messages.messages[0].message.author.id;
 	const formattedContent = messages.messages
@@ -189,7 +183,7 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 		})
 		.join("\n");
 	
-	/** create a txt file with the content of the ticket using fs */
+	/** create a txt file with the content of the ticket using fs
 	fs.writeFileSync(`${ticket.name}.md`, formattedContent, "utf-8");
 	const targetChannel = getConfig(interaction.guild!.id, "transcript") as string;
 	const channel = interaction.guild!.channels.cache.get(targetChannel) as TextChannel;
@@ -205,21 +199,24 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 	});
 	fs.unlinkSync(`${ticket.name}.md`);
 	return formattedContent;
+	 */
+	const targetChannel = getConfig(interaction.guild!.id, "transcript") as string;
+	const channel = interaction.guild!.channels.cache.get(targetChannel) as TextChannel;
+	const transcript = await createTranscript(ticket, {
+		filename: `${ticket.name}.html`,
+		saveImages: true,
+		poweredBy: false,
+	});
+	//download files not image (image are already in the transcript)
+	const files = await fetchFiles(ticket);
+	await channel.send({
+		content: `Transcript du ticket \`#${ticket.name}\` créé le <t:${unixEpochInSecond()}:d> par ${userMention(interaction.user.id)}`,
+		files: [transcript, ...files]
+	});
 }
 
-function formatDate(date: Date): string {
-	const day = date.getDate().toString().padStart(2, "0");
-	const month = (date.getMonth() + 1).toString().padStart(2, "0");
-	const year = date.getFullYear().toString();
-	const hours = date.getHours().toString().padStart(2, "0");
-	const minutes = date.getMinutes().toString().padStart(2, "0");
-	
-	return `${day}/${month}/${year} - ${hours}:${minutes}`;
-}
 
-
-
-async function fetchAllMessages(channel: TextBasedChannel): Promise<FetchAllMessagesResult> {
+async function fetchFiles(channel: TextBasedChannel): Promise<Attachment[]> {
 	const messages: Array<{ message: Message; embeds: Embed[] }> = [];
 	let lastMessageID: Snowflake | undefined;
 	let continueFetching = true;
@@ -238,34 +235,19 @@ async function fetchAllMessages(channel: TextBasedChannel): Promise<FetchAllMess
 		}
 	}
 	/** get all files */
-	const messageFiles = messages
-		.filter((message) => message.message.attachments.size > 0)
-		.map((message) => message.message.attachments.map((attachment) => attachment))
-		.reduce((acc, val) => acc.concat(val), []);
-	/**
-	 * Replace mention role by role name, mention channel by channel name and mention user by user name
-	 */
-	messages.forEach((message) => {
-		message.message.mentions.roles.forEach((role) => {
-			message.message.content = message.message.content.replace(`<@&${role.id}>`, `@${role.name}`);
-		});
-		message.message.mentions.channels.forEach((channel: Channel) => {
-			if (!channel.partial && (!(channel instanceof DMChannel))) {
-				message.message.content = message.message.content.replace(`<#${channel.id}>`, `#${channel.name}`);
-			}
-		});
-		message.message.mentions.users.forEach((user) => {
-			message.message.content = message.message.content.replace(`<@${user.id}>`, `@${user.globalName ?? user.username}`);
-		});
-	});
-	return {messages, messageFiles};
-}
-
-/**
- * Convert the embed format from JSON to Markdown
- */
-function formatEmbed(embed: Embed) {
-	return `${embed.author ? `  > *${embed.author.name}*\n` : ""}${embed.title ? `  > **${embed.title}**\n` : ""}${embed.description ? `  > ${embed.description}\n` : ""}${embed.fields ? embed.fields.map((field) => `  >> **${field.name}**\n>> ${field.value}`).join("\n  >") : ""}${embed.image ? `  > ${embed.image.url}\n` : ""}${embed.footer ? `  > *${embed.footer.text}*\n` : ""}${embed.timestamp ? `  > ${embed.timestamp}\n` : ""}${embed.url ? `  > ${embed.url}\n` : ""}${embed.thumbnail ? `  > ${embed.thumbnail.url}\n` : ""}`;
+	return messages
+		.filter((message) =>
+			message.message.attachments.size > 0
+		)
+		.map((message) =>
+			message.message.attachments.map((attachment) => attachment)
+		)
+		.reduce((acc, val) =>
+			acc.concat(val), []
+		)
+		.filter((attachment) =>
+			!attachment.name.match(/(png|gifv?|jpe?g|web[pm])$/gi)
+		);
 }
 
 function unixEpochInSecond() {
