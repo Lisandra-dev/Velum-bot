@@ -142,8 +142,9 @@ async function ticketContent(ticket: TextBasedChannel | null, interaction: Comma
 	if (!channel && close) {
 		return await confirmCloseWithoutTranscript(interaction);
 	} else if (!channel) {
-		await interaction.editReply({content: "Vous n'avez pas configuré de channel pour les transcripts !"});
-		return false;
+		await interaction.editReply({content: "Vous n'avez pas configuré de channel pour les transcripts !\n Le transcript sera envoyé dans ce channel."});
+		const channel = interaction.channel as TextChannel;
+		return await createTranscriptAttachment(ticket as TextChannel, channel, interaction);
 	}
 	channel = channel as TextChannel;
 	return await createTranscriptAttachment(ticket as TextChannel, channel, interaction, close);
@@ -334,7 +335,8 @@ async function transcriptTicket(interaction: CommandInteraction) {
 		return;
 	}
 	const channelTranscript = getConfig(interaction.guild!.id, "transcript") as string;
-	await interaction.editReply({content: `Le transcript a été envoyé dans ${channelMention(channelTranscript)}`});
+	const mention = channelTranscript.length > 0 ? channelMention(channelTranscript) : channelMention(interaction.channel!.id);
+	await interaction.editReply({content: `Le transcript a été envoyé dans ${mention}`});
 }
 
 async function addMember(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
@@ -442,6 +444,7 @@ async function createTranscriptAttachment(ticket: TextChannel, channel: GuildTex
 		}
 		catch (e) {
 			await interaction.editReply({content: `Le transcript n'a pas pu être envoyé. Il est conseillé d'utiliser Discord Chat Exporter (https://github.com/Tyrrrz/DiscordChatExporter) pour ce ticket.${close? "\n**Le ticket n'a pas été supprimé !**" : ""}`});
+			logInDev(e);
 			return false;
 		}
 	}
