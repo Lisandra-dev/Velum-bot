@@ -48,7 +48,7 @@ export default {
 				.addChannelOption((option) => option
 					.setName("channel")
 					.setDescription("Channel des transcriptions")
-					.setRequired(true)
+					.setRequired(false)
 					.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
 				)
 			)
@@ -197,7 +197,13 @@ async function ticket(interaction: CommandInteraction, options: CommandInteracti
 		await interaction.reply(`La catégorie des tickets est maintenant ${channelMention(category.id)}`);
 	}
 	if (subcommand === "transcript") {
-		const channel = options.getChannel("channel", true);
+		const channel = options.getChannel("channel", false);
+		if (!channel) {
+			//disable transcript
+			setConfig(interaction.guild!.id, "transcript", "");
+			await interaction.reply("Les transcriptions sont maintenant désactivées");
+			return;
+		}
 		setConfig(interaction.guild!.id, "transcript", channel.id);
 		await interaction.reply(`Le channel des transcriptions est maintenant ${channelMention(channel.id)}`);
 	}
