@@ -1,5 +1,6 @@
 import {
-	Attachment,
+	ActionRowBuilder,
+	Attachment, ButtonBuilder, ButtonStyle,
 	CategoryChannel,
 	channelMention,
 	CommandInteraction,
@@ -21,7 +22,7 @@ import {getConfig} from "../../maps";
 import {logInDev} from "../../utils";
 import {hasStaffRole} from "../../utils/data_check";
 import {createTranscript} from "discord-html-transcripts";
-
+import AdmZip from "adm-zip";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -129,95 +130,58 @@ function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
  * When the ticket is closed, the content of the ticket is saved in a txt file and send in a channel (configurable)
  * @param ticket: the ticket to save
  * @param interaction: the interaction to reply
+ * @param close
  * @returns the content of the ticket
  */
-async function ticketContent(ticket: TextBasedChannel | null, interaction: CommandInteraction) {
+async function ticketContent(ticket: TextBasedChannel | null, interaction: CommandInteraction, close?: boolean) {
 	if (!ticket || ticket.isDMBased()) {
-		return null;
+		return false;
 	}
-	/**
-	 *  Old version - Return markdown + attachments
-	 *  @Deprecated
-	 
-	const messages = await fetchAllMessages(ticket);
-	let firstAuthor = messages.messages[0].message.author.id;
-	const formattedContent = messages.messages
-		.sort((a, b) => a.message.createdAt.getTime() - b.message.createdAt.getTime())
-		.map((message) => {
-			
-			if (message.message.attachments.size > 0) {
-				if (firstAuthor !== message.message.author.id) {
-					firstAuthor = message.message.author.id;
-					return `\n---\n\`[${formatDate(message.message.createdAt)}] ${message.message.author.displayName}:\`\n- ${message.message.attachments.map((attachment) => {
-						return attachment.url.split("/").pop();
-					}).join("\n- ")}\n`;
-				} else {
-					return `- ${message.message.attachments.map((attachment) => {
-						return attachment.url.split("/").pop();
-					}).join("\n- ")}`;
-				}
-			} else if (message.message.content.trim().length > 0) {
-				const author = message.message.author.displayName;
-				const content = message.message.content.replace(/\n/g, "\n  ").replace(/[\u200B-\u200D\uFEFF]/g, "");
-				const date = formatDate(message.message.createdAt);
-				if (message.message.author.id !== firstAuthor) {
-					firstAuthor = message.message.author.id;
-					return `\n---\n\`[${date}] ${author}:\`\n  ${content}`;
-				} else {
-					return `  ${content}`;
-				}
-			} else if (message.embeds) {
-				const author = message.message.author.displayName;
-				const date = formatDate(message.message.createdAt);
-				const embed = message.embeds.map((embed) => {
-					return formatEmbed(embed);
-				});
-				if (message.message.author.id !== firstAuthor) {
-					firstAuthor = message.message.author.id;
-					return `\n---\n\`[${date}] ${author}:\`\n${embed.join("\n")}`;
-				} else {
-					return `  ${embed.join("\n")}`;
-				}
-			}
-			return "";
-		})
-		.join("\n");
-	
-	/** create a txt file with the content of the ticket using fs
-	fs.writeFileSync(`${ticket.name}.md`, formattedContent, "utf-8");
 	const targetChannel = getConfig(interaction.guild!.id, "transcript") as string;
-	const channel = interaction.guild!.channels.cache.get(targetChannel) as TextChannel;
-	const files = messages.messageFiles;
-	await channel.send({
-		content: `Transcript du ticket \`#${ticket.name}\` créé le <t:${unixEpochInSecond()}:d> par ${userMention(interaction.user.id)}`,
-		files: [
-			{
-				attachment: `${ticket.name}.md`, contentType: "text/plain", name: `${ticket.name}.md`,
-			},
-			...files
-		]
-	});
-	fs.unlinkSync(`${ticket.name}.md`);
-	return formattedContent;
-	 */
-	const targetChannel = getConfig(interaction.guild!.id, "transcript") as string;
-	const channel = interaction.guild!.channels.cache.get(targetChannel) as TextChannel;
-	const transcript = await createTranscript(ticket, {
-		limit: -1,
-		filename: `${ticket.name}.html`,
-		saveImages: true,
-		poweredBy: false,
-	});
-	//download files not image (image are already in the transcript)
-	const files = await fetchFiles(ticket);
-	await channel.send({
-		content: `Transcript du ticket \`#${ticket.name}\` créé le <t:${unixEpochInSecond()}:d> par ${userMention(interaction.user.id)}`,
-		files: [transcript, ...files]
-	});
+	let channel = interaction.guild!.channels.cache.get(targetChannel);
+	if (!channel && close) {
+		return await confirmCloseWithoutTranscript(interaction);
+	} else if (!channel) {
+		await interaction.editReply({content: "Vous n'avez pas configuré de channel pour les transcripts !"});
+		return false;
+	}
+	channel = channel as TextChannel;
+	return await createTranscriptAttachment(ticket as TextChannel, channel, interaction, close);
 }
 
+async function generateZip(ticket: TextBasedChannel) {
+	const transcript = await createTranscript(ticket, {
+		limit: -1,
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
+		filename: `${ticket.name}.html`,
+		saveImages: false,
+		poweredBy: false,
+	});
+		/** get all attachments **/
+	const files = await fetchFiles(ticket, true);
+	/** create html file + zip it */
+	const buffer = Buffer.from(transcript.attachment as Buffer);
+	// zip file
+	const zip = new AdmZip();
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	//@ts-ignore
+	zip.addFile(`${ticket.name}.html`, buffer);
+	/** also add other attachments **/
+	for (const file of files) {
+		/** download file */
+		const contents = await fetch(file.url);
+		if (!contents.ok) {
+			break;
+		}
+		const buffer = await contents.arrayBuffer();
+		/** create file */
+		zip.addFile(file.name, Buffer.from(buffer));
+	}
+	return zip;
+}
 
-async function fetchFiles(channel: TextBasedChannel): Promise<Attachment[]> {
+async function fetchFiles(channel: TextBasedChannel, image?: boolean ): Promise<Attachment[]> {
 	const messages: Array<{ message: Message; embeds: Embed[] }> = [];
 	let lastMessageID: Snowflake | undefined;
 	let continueFetching = true;
@@ -236,7 +200,7 @@ async function fetchFiles(channel: TextBasedChannel): Promise<Attachment[]> {
 		}
 	}
 	/** get all files */
-	return messages
+	const files =  messages
 		.filter((message) =>
 			message.message.attachments.size > 0
 		)
@@ -245,10 +209,13 @@ async function fetchFiles(channel: TextBasedChannel): Promise<Attachment[]> {
 		)
 		.reduce((acc, val) =>
 			acc.concat(val), []
-		)
-		.filter((attachment) =>
+		);
+	if (!image) {
+		return files.filter((attachment) =>
 			!attachment.name.match(/(png|gifv?|jpe?g|web[pm])$/gi)
 		);
+	}
+	return files;
 }
 
 function unixEpochInSecond() {
@@ -350,7 +317,8 @@ async function closeTicket(interaction: CommandInteraction) {
 	if (!verif) return;
 	await interaction.deferReply({ephemeral: true});
 	const ticket = interaction.channel as GuildTextBasedChannel;
-	await ticketContent(ticket, interaction);
+	const success = await ticketContent(ticket, interaction, true);
+	if (!success) return;
 	await interaction.editReply({content: "Le ticket a été fermé !"});
 	//delete ticket
 	await ticket.delete();
@@ -361,7 +329,10 @@ async function transcriptTicket(interaction: CommandInteraction) {
 	if (!verif) return;
 	await interaction.deferReply({ephemeral: true});
 	const ticket = interaction.channel as GuildTextBasedChannel;
-	await ticketContent(ticket, interaction);
+	const send = await ticketContent(ticket, interaction);
+	if (!send) {
+		return;
+	}
 	const channelTranscript = getConfig(interaction.guild!.id, "transcript") as string;
 	await interaction.editReply({content: `Le transcript a été envoyé dans ${channelMention(channelTranscript)}`});
 }
@@ -391,4 +362,87 @@ async function removeMember(interaction: CommandInteraction, options: CommandInt
 	}
 	await ticket.permissionOverwrites.delete(user);
 	await interaction.reply({content: `${userMention(user.id)} a bien été supprimé du ticket`, ephemeral: true});
+}
+
+async function confirmCloseWithoutTranscript(interaction: CommandInteraction) {
+	//create button to prevent the user to close the ticket
+	await interaction.editReply({content: "Vous n'avez pas configuré de channel pour les transcripts !"});
+	const confirmButton = new ButtonBuilder()
+		.setCustomId("confirm")
+		.setLabel("Confirmer")
+		.setStyle(ButtonStyle.Danger);
+	const cancelButton = new ButtonBuilder()
+		.setCustomId("cancel")
+		.setLabel("Annuler")
+		.setStyle(ButtonStyle.Secondary);
+	const download = new ButtonBuilder()
+		.setCustomId("download")
+		.setLabel("Télécharger le transcript")
+		.setStyle(ButtonStyle.Primary);
+	const row = new ActionRowBuilder<ButtonBuilder>()
+		.addComponents(confirmButton, cancelButton, download);
+	await interaction.followUp(
+		{content: "Voulez-vous quand même fermer le ticket ?",
+			components: [row],
+			ephemeral: true
+		});
+	// eslint-disable-next-line
+		const collectorFilter = (i: any) => i.user.id === interaction.user.id;
+	try {
+		let confirm = await interaction.channel!.awaitMessageComponent({filter: collectorFilter, time: 60000});
+		if (confirm.customId === "download") {
+			await createTranscriptAttachment(interaction.channel as TextChannel, interaction.channel as TextChannel, interaction);
+			await confirm.update({content: "Le transcript a été téléchargé !", components: []});
+			const row = new ActionRowBuilder<ButtonBuilder>()
+				.addComponents(confirmButton, cancelButton);
+			await interaction.followUp({content: "Le transcript a été envoyé dans ce salon !\n Voulez vous continuer la fermeture du ticket ?\n**⚠️ Le channel sera supprimé !**", components: [row]});
+			confirm = await interaction.channel!.awaitMessageComponent({filter: collectorFilter, time: 60000});
+		}
+		if (confirm.customId === "confirm") {
+			await confirm.update({content: "Le ticket a été fermé !", components: []});
+			return true;
+		} else {
+			await confirm.update({content: "Le ticket n'a pas été fermé !", components: []});
+			return false;
+		}
+	} catch (e) {
+		await interaction.editReply({content: "Le ticket n'a pas été fermé !", components: []
+		});
+		return false;
+	}
+}
+
+async function createTranscriptAttachment(ticket: TextChannel, channel: GuildTextBasedChannel, interaction: CommandInteraction, close?: boolean) {
+	
+	const transcript = await createTranscript(ticket, {
+		limit: -1,
+		filename: `${ticket.name}.html`,
+		saveImages: true,
+		poweredBy: false,
+	});
+	//download files not image (image are already in the transcript)
+	const files = await fetchFiles(ticket);
+	try {
+		await channel.send({
+			content: `Transcript du ticket \`#${ticket.name}\` créé le <t:${unixEpochInSecond()}:d> par ${userMention(interaction.user.id)}`,
+			files: [transcript, ...files]
+		});
+		return true;
+	} catch (e) {
+		try {
+			const zip = await generateZip(ticket);
+			await channel.send({
+				content: `Transcript du ticket \`#${ticket.name}\` créé le <t:${unixEpochInSecond()}:d> par ${userMention(interaction.user.id)}`,
+				files: [{
+					attachment: zip.toBuffer(),
+					name: `${ticket.name}.zip`
+				}]
+			});
+			return true;
+		}
+		catch (e) {
+			await interaction.editReply({content: `Le transcript n'a pas pu être envoyé. Il est conseillé d'utiliser Discord Chat Exporter (https://github.com/Tyrrrz/DiscordChatExporter) pour ce ticket.${close? "\n**Le ticket n'a pas été supprimé !**" : ""}`});
+			return false;
+		}
+	}
 }
