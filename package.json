@@ -44,8 +44,10 @@
     "devDependencies": {
         "@discordjs/rest": "^1.7.1",
         "@types/cron": "^2.0.1",
+        "@types/html-minifier": "^4.0.2",
         "cron": "^2.3.1",
         "cross-env": "^7.0.3",
+        "html-minifier": "^4.0.0",
         "lunarphase-js": "^2.0.1",
         "node-gyp": "^9.4.0",
         "nodemon": "^2.0.22",
