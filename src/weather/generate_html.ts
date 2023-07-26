@@ -4,7 +4,7 @@ import {CSS, IMAGE_LINK, meteoImage} from "../interface";
 import nodeHtmlToImage from "node-html-to-image";
 import { capitalize, roundUp } from "../utils";
 import { convertDegToArrow, getTimeOfDay } from "./utils";
-import * as fs from "fs";
+//import * as fs from "fs";
 import { minify } from "html-minifier";
 
 const TodayValue : CSS = {
