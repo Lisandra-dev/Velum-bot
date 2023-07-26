@@ -20,13 +20,14 @@ export default {
 			.setDescription("Permet d'afficher la météo prévu pour la journée ou la semaine.")
 			.addChoices(
 				{
-					name: "Météo de la journée",
+					name: "Journée",
 					value: "today"
 				},
 				{
-					name: "Météo de la semaine",
+					name: "Semaine",
 					value: "week"
 				})
+			
 			.setRequired(false)
 		)
 		.addBooleanOption((option) => option
