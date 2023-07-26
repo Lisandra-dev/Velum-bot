@@ -128,10 +128,10 @@ function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
 
 /**
  * When the ticket is closed, the content of the ticket is saved in a txt file and send in a channel (configurable)
- * @param ticket: the ticket to save
- * @param interaction: the interaction to reply
- * @param close
- * @returns the content of the ticket
+ * @param ticket {TextBasedChannel} : The ticket to transcript
+ * @param interaction {CommandInteraction} The interaction to reply
+ * @param close {boolean} If the ticket must be deleted
+ * @returns {<Promise>Boolean} If the transcript was created
  */
 async function ticketContent(ticket: TextBasedChannel | null, interaction: CommandInteraction, close?: boolean) {
 	if (!ticket || ticket.isDMBased()) {
