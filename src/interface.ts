@@ -196,19 +196,19 @@ interface MomentOfDay {
 export const timedMessage: MomentOfDay[] = [
 	{
 		hour: [6, 7, 8, 9, 10, 11],
-		description: "Ce matin",
+		description: "Matin",
 	},
 	{
 		hour: [12, 13, 14, 15, 16, 17],
-		description: "Cet après-midi",
+		description: "Après-midi",
 	},
 	{
 		hour: [18, 19, 20, 21, 22, 23],
-		description: "Ce soir",
+		description: "Soir",
 	},
 	{
 		hour: [0, 1, 2, 3, 4, 5],
-		description: "Cette nuit",
+		description: "Nuit",
 	}
 ];
 
@@ -220,4 +220,20 @@ export interface ResultTodayWeather {
 export interface ResultWeather {
 	allEmbeds: EmbedBuilder[],
 	alert: string[]
+}
+
+export interface CSS {
+	wind: string,
+	weatherInfoWind: string,
+	dayCard: string,
+	day: string,
+	weatherInfoTable: string,
+	weatherInfoItem: {
+		fontSize: string,
+		marginRight: string
+	},
+	weatherName: string,
+	number: string,
+	weatherInfo: string,
+	icon: string,
 }
