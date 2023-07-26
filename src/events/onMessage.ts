@@ -4,7 +4,7 @@ import {rollCombat, rollNeutre} from "../roll";
 import {getParameters} from "../roll/parseArg";
 import {displayATQ, displayNEUTRE, ephemeralInfo} from "../roll/results";
 import {exportMaps, getConfig} from "../maps";
-import {helpCombat} from "../display/help";
+import {helpCombat} from "../roll/help";
 
 export default (client: Client): void => {
 	client.on("messageCreate", async (message) => {

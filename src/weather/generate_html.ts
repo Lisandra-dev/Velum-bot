@@ -3,8 +3,7 @@ import {DailyWeather, ForecastWeather} from "openweather-api-node";
 import {IMAGE_LINK, meteoImage} from "../interface";
 import nodeHtmlToImage from "node-html-to-image";
 import {capitalize, roundUp} from "../utils";
-import * as fs from "fs";
-import {convertDegToArrow, getTimeOfDay} from "./meteo";
+import {convertDegToArrow, getTimeOfDay} from "./utils";
 
 
 /**
@@ -122,7 +121,7 @@ async function head(today?: boolean) {
 `);
 }
 
-export async function body(data: DailyWeather[] | ForecastWeather[], num: number, title: "today" | "week") {
+export async function body(data: DailyWeather[] | ForecastWeather[], title: "today" | "week") {
 	let body = dedent(`
     <body>
     <div class="weather-grid">`);
@@ -184,11 +183,7 @@ export async function body(data: DailyWeather[] | ForecastWeather[], num: number
     </body>
     </html>
   `);
-	//write HTML
 	const isToday = title === "today";
-	console.log(isToday);
-	fs.writeFileSync(`test-${num}.html`, await head(isToday) + body);
-
 	const images = await nodeHtmlToImage({
 		html: await head(isToday) + body,
 		transparent: true,

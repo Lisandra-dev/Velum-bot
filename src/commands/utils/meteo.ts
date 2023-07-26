@@ -1,6 +1,6 @@
 import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, SlashCommandBuilder} from "discord.js";
 import {getConfig} from "../../maps";
-import {channelNameGenerator, getWeather, todayWeather, weeklyWeather} from "../../display/meteo";
+import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../../weather/display";
 import {hasStaffRole} from "../../utils/data_check";
 import {Meteo} from "../../interface";
 import {isValidCron} from "cron-validator";
@@ -59,25 +59,25 @@ export default {
 			switch (moment) {
 			case "today":
 				// eslint-disable-next-line no-case-declarations
-				const embeds = await todayWeather(lieu);
+				const embeds = await generateTodayImage(lieu);
 				await interaction.editReply({files: [embeds.images[0]], content: `# Météo d'aujourd'hui\n ${embeds.alert.join("\n")}`});
 				await interaction.followUp({files: [embeds.images[1]]});
 				break;
 			case "week":
 				//eslint-disable-next-line no-case-declarations
-				const weekBuffer = await weeklyWeather(lieu);
+				const weekBuffer = await generateWeeklyImage(lieu);
 				for (const embed of weekBuffer) {
 					await interaction.followUp({files: [embed]});
 				}
 				break;
 			default:
 				// eslint-disable-next-line no-case-declarations
-				const embed = await getWeather(lieu, name);
+				const embed = await createWeatherAsEmbed(lieu, name);
 				await interaction.editReply({embeds: embed.allEmbeds, content: embed.alert.join("\n")});
 				break;
 			}
 		} else {
-			const embed = await getWeather(lieu, name);
+			const embed = await createWeatherAsEmbed(lieu, name);
 			await interaction.reply({embeds: embed.allEmbeds, content: embed.alert.join("\n")});
 		}
 	}

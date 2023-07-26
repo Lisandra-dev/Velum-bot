@@ -1,82 +1,13 @@
-import OpenWeatherAPI, {Alert, DailyConditions, ForecastWeather} from "openweather-api-node";
-import {DEEPL, WEATHER} from "../index";
+import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
+import {CurrentConditions} from "openweather-api-node/dist/types/weather/current";
+import {Alert, DailyConditions, ForecastWeather} from "openweather-api-node";
+import {IMAGE_LINK, meteoImage, ResultWeather, translationMain} from "../interface";
 import {EmbedBuilder} from "discord.js";
 import {capitalize, roundUp} from "../utils";
-import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
-import {IMAGE_LINK, meteoImage, ResultTodayWeather, ResultWeather, timedMessage, translationMain} from "../interface";
-import {CurrentConditions} from "openweather-api-node/dist/types/weather/current";
+import {convertDegToArrow, getTimeOfDay, weatherAPI, weatherCurrent, weatherToday} from "./utils";
 import * as deepl from "deepl-node";
-import {body} from "./meteo-html";
-
-
-function weatherAPI(city: string) {
-	const weather = new OpenWeatherAPI({
-		key: WEATHER,
-		units: "metric",
-		locationName: city,
-	});
-	weather.setLanguage("fr");
-	return weather;
-}
-
-function weatherCurrent(city: string) {
-	const weather = weatherAPI(city);
-	return weather.getCurrent();
-}
-
-async function weatherToday(city: string) {
-	const weather = weatherAPI(city);
-	/** the getForecast() give the weather for the next 5 days, so we need to filter the data to get only the weather for today */
-	const data = await weather.getForecast(8);
-	const today = new Date().getDate();
-	const todayData = data.filter((value) => new Date(value.dt).getDate() === today);
-	/** we need also the history of the day for this night, aka everything of the same date and before the first dt of todayData */
-	let first = todayData[0].dt;
-	const timesToFetchToComplete:Date[] = [];
-	while (first.getDate() === today) {
-		/** remove three hours to the first hour */
-		const newDate = new Date(first);
-		newDate.setHours(newDate.getHours() - 3);
-		if (newDate.getDate() === today) {
-			timesToFetchToComplete.push(newDate);
-		}
-		first = newDate;
-	}
-	const history = await Promise.all(timesToFetchToComplete.map((value) => weather.getHistory(value)));
-	const forecast = todayData.concat(...history as unknown as ForecastWeather[])
-		.sort((a, b) => a.dt.getTime() - b.dt.getTime())
-		.filter((value) => {
-			return value.dt.getUTCHours() % 6 === 0;
-		});
-	// ajouter les history à todayData
-	return {
-		today: forecast,
-		alerts : await weather.getAlerts(),
-	} as ResultTodayWeather;
-}
-
-export async function embedAlerts(alert: Alert[]) {
-	const contentAlert: string[] = [];
-	for (const value of alert) {
-		const translator = new deepl.Translator(DEEPL);
-		const translated = await translator.translateText(value.event, "en", "fr");
-		contentAlert.push(`⚠️ **${translated.text}**\n*Du <t:${value.start}:d> au <t:${value.end}:d>*`);
-	}
-	return contentAlert;
-}
-
-export async function getWeather(city: string, name?: string) {
-	const data = await weatherCurrent(city);
-	const alerts = (await weatherAPI(city).getAlerts()).filter((value, index, self) => {
-		return self.findIndex((v) => v.event === value.event) === index;
-	});
-	const alert = await embedAlerts(alerts);
-	const embed = generateEmbed(data.weather, name ?? city, new Date());
-	return {
-		allEmbeds: [embed],
-		alert: alert
-	} as ResultWeather;
-}
+import {DEEPL} from "../index";
+import {body} from "./generate_html";
 
 export async function channelNameGenerator(city: string = "Villefranche-sur-mer") {
 	const data = await weatherCurrent(city);
@@ -95,6 +26,19 @@ export async function channelNameGenerator(city: string = "Villefranche-sur-mer"
 	const raw = data.weather.icon.raw.replace(/[dn]/, "") as keyof typeof meteoEmoji;
 	const moonEmoji = Moon.lunarPhaseEmoji(undefined, {hemisphere: Hemisphere.NORTHERN}) as NorthernHemisphereLunarEmoji;
 	return `${moonEmoji}·${meteoEmoji[raw]}╏Météo`;
+}
+
+export async function createWeatherAsEmbed(city: string, name?: string) {
+	const data = await weatherCurrent(city);
+	const alerts = (await weatherAPI(city).getAlerts()).filter((value, index, self) => {
+		return self.findIndex((v) => v.event === value.event) === index;
+	});
+	const alert = await createAlertText(alerts);
+	const embed = generateEmbed(data.weather, name ?? city, new Date());
+	return {
+		allEmbeds: [embed],
+		alert: alert
+	} as ResultWeather;
 }
 
 export function generateEmbed(data: CurrentConditions | DailyConditions, city: string, momentOfDay?: Date, setDayName?: string) {
@@ -180,35 +124,29 @@ export function generateEmbed(data: CurrentConditions | DailyConditions, city: s
 	}
 	return embed;
 }
-export function convertDegToArrow(deg: number) {
-	const directions = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
-	const arrow = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"];
-	return {
-		dir : directions[Math.round(deg / 45) % 8],
-		arrow: arrow[Math.round(deg / 45) % 8]
-	};
+
+export async function createAlertText(alert: Alert[]) {
+	const contentAlert: string[] = [];
+	for (const value of alert) {
+		const translator = new deepl.Translator(DEEPL);
+		const translated = await translator.translateText(value.event, "en", "fr");
+		contentAlert.push(`⚠️ **${translated.text}**\n*Du <t:${value.start}:d> au <t:${value.end}:d>*`);
+	}
+	return contentAlert;
 }
 
-export function getTimeOfDay(hour: number) {
-	for (const moment of timedMessage) {
-		if (moment.hour.includes(hour)) {
-			return moment.description;
-		}
-	} return "";
-}
-
-export async function weeklyWeather(city: string) {
+export async function generateWeeklyImage(city: string) {
 	const weather = weatherAPI(city);
 	const data = await weather.getDailyForecast(8, true);
 	//convert dailyWeather[] to DailyConditions[]
 	return [
-		await body(data.slice(0, 3), 1, "week"),
-		await body(data.slice(3, 6), 2, "week"),
-		await body(data.slice(6, 8), 3, "week"),
+		await body(data.slice(0, 3), "week"),
+		await body(data.slice(3, 6), "week"),
+		await body(data.slice(6, 8), "week"),
 	];
 }
 
-export async function todayWeather(city: string) {
+export async function generateTodayImage(city: string) {
 	const data = await weatherToday(city);
 	const allEmbeds: ForecastWeather[] = [];
 	//prevent duplicate data.alerts.event
@@ -224,9 +162,9 @@ export async function todayWeather(city: string) {
 			allEmbeds.push(hour);
 		}
 	}
-	const alert = await embedAlerts(alerts);
+	const alert = await createAlertText(alerts);
 	const allImages = [
-		await body(allEmbeds.slice(0, 2), 12, "today"),
-		await body(allEmbeds.slice(2), 18, "today"),];
+		await body(allEmbeds.slice(0, 2), "today"),
+		await body(allEmbeds.slice(2), "today"),];
 	return {images: allImages, alert: alert};
 }
