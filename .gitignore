@@ -134,3 +134,5 @@ package-lock.json
 data
 .env.prod
 .history/src/commands/db/config_20230720142712.ts
+
+*.html
