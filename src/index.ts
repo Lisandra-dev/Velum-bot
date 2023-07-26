@@ -29,7 +29,7 @@ export const client = new Client({
 export const VERSION = pkg.version ?? "0.0.0";
 export const DESTROY = process.env.DESTROY === "true";
 export const WEATHER = process.env.WEATHER ?? "";
-
+export const DEEPL = process.env.DEEPL ?? "";
 
 
 try {

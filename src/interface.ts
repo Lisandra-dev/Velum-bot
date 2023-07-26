@@ -1,5 +1,6 @@
-import {User} from "discord.js";
+import {EmbedBuilder, User} from "discord.js";
 import * as pkg from "../package.json";
+import {Alert, ForecastWeather} from "openweather-api-node";
 export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
 export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
 
@@ -195,18 +196,28 @@ interface MomentOfDay {
 export const timedMessage: MomentOfDay[] = [
 	{
 		hour: [6, 7, 8, 9, 10, 11],
-		description: "la matinée",
+		description: "Ce matin",
 	},
 	{
 		hour: [12, 13, 14, 15, 16, 17],
-		description: "l'après-midi",
+		description: "Cet après-midi",
 	},
 	{
 		hour: [18, 19, 20, 21, 22, 23],
-		description: "la soirée",
+		description: "Ce soir",
 	},
 	{
 		hour: [0, 1, 2, 3, 4, 5],
-		description: "la nuit",
+		description: "Cette nuit",
 	}
 ];
+
+export interface ResultTodayWeather {
+	today: ForecastWeather[],
+	alerts: Alert[]
+}
+
+export interface ResultWeather {
+	allEmbeds: EmbedBuilder[],
+	alert: string[]
+}
