@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+overrides:
+  semver@>=6.0.0 <6.3.1: '>=6.3.1'
+  semver@>=7.0.0 <7.5.2: '>=7.5.2'
+
 dependencies:
   '@discordjs/rest':
     specifier: ^1.7.1
@@ -410,7 +414,7 @@ packages:
       debug: 4.3.4
       eventemitter2: 6.4.9
       require-in-the-middle: 5.2.0
-      semver: 6.3.0
+      semver: 7.5.4
       shimmer: 1.2.1
       signal-exit: 3.0.7
       tslib: 1.9.3
@@ -3264,18 +3268,8 @@ packages:
     hasBin: true
     dev: false
 
-  /semver@6.3.0:
-    resolution: {integrity: sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==}
-    hasBin: true
-    dev: false
-
   /semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-    dev: false
-
-  /semver@7.0.0:
-    resolution: {integrity: sha512-+GB6zVA9LWh6zovYQLALHwv5rb2PHGlJi3lfiqIHxR0uuwCgefcOJc59v9fv1w8GbStwxuuqqAjI9NMAOOgq1A==}
     hasBin: true
     dev: false
 
@@ -3352,7 +3346,7 @@ packages:
     resolution: {integrity: sha512-VpsrsJSUcJEseSbMHkrsrAVSdvVS5I96Qo1QAQ4FxQ9wXFcB+pjj7FB7/us9+GcgfW4ziHtYMc1J0PLczb55mg==}
     engines: {node: '>=8.10.0'}
     dependencies:
-      semver: 7.0.0
+      semver: 7.5.4
     dev: false
 
   /slash@3.0.0:
