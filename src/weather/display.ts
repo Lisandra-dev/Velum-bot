@@ -66,7 +66,7 @@ export function generateEmbed(data: CurrentConditions | DailyConditions, city: s
 	} else {
 		temp = (data as DailyConditions).temp.day;
 	}
-	let momentAuthor : string | undefined = city;
+	let momentAuthor : string | undefined;
 	if (!setDayName) {
 		momentAuthor = getTimeOfDay(momentOfDay?.getHours() ?? new Date().getHours());
 	} else {
