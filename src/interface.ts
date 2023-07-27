@@ -25,8 +25,47 @@ export type Meteo = {
 	ville: string
 	auto: boolean
 	frequence: string
-	name: string
+	name: string,
+	forecast : {
+		weekly: string,
+		daily: string
+	}
 };
+
+interface GuildConfiguration {
+	prefix: string;
+	staff: string,
+	ticket: string,
+	transcript: string,
+	role: {
+		add: string[],
+		remove: string[]
+	},
+	meteo: Meteo
+}
+
+export const DEFAULT_CONFIG: GuildConfiguration = {
+	prefix: "$",
+	staff: "",
+	ticket: "",
+	transcript: "",
+	role: {
+		add: [],
+		remove: []
+	},
+	meteo: {
+		auto: false,
+		channel: "",
+		ville: "",
+		frequence: "0 0,6,12,18 * * *",
+		name: "",
+		forecast: {
+			weekly: "",
+			daily: ""
+		}
+	}
+};
+
 
 export const DEFAULT_STATISTIQUE: Statistiques = {
 	stats: {

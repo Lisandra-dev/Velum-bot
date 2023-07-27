@@ -1,6 +1,6 @@
 import Enmap from "enmap";
 import {latinise, logInDev} from "./utils";
-import {Statistiques, Meteo} from "./interface";
+import {Statistiques, Meteo, DEFAULT_CONFIG} from "./interface";
 
 /**
  * Create a new Enmap "Characters"
@@ -90,7 +90,11 @@ export function getConfig(guildID: string, key: string): string | string[] | Met
 			channel: "",
 			ville: "",
 			freq: "0 0,6,12,18 * * *",
-			name: ""
+			name: "",
+			forecast: {
+				weekly: "",
+				daily: ""
+			}
 		}, "meteo") as Meteo;
 	default:
 		return configuration.ensure(guildID, "", key);
@@ -205,21 +209,7 @@ export function exportMaps() {
 
 export function loadGuild(guildID: string) {
 	characters.ensure(guildID, {});
-	configuration.ensure(guildID, {
-		"prefix": "$",
-		"staff": "",
-		"ticket": "",
-		"role.add": [],
-		"role.remove": [],
-		"transcript": "",
-		"meteo": {
-			"auto": false,
-			"channel": "",
-			"ville": "",
-			"freq": "0 0,6,12,18 * * *",
-			"name": ""
-		}
-	});
+	configuration.ensure(guildID, DEFAULT_CONFIG);
 }
 
 export function destroyDB() {
