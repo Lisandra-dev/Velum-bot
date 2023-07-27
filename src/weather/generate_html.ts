@@ -2,19 +2,19 @@ import dedent from "ts-dedent";
 import { DailyWeather, ForecastWeather } from "openweather-api-node";
 import {CSS, IMAGE_LINK, meteoImage} from "../interface";
 import nodeHtmlToImage from "node-html-to-image";
-import { capitalize, roundUp } from "../utils";
+import {capitalize, logInDev, roundUp} from "../utils";
 import { convertDegToArrow, getTimeOfDay } from "./utils";
-//import * as fs from "fs";
 import { minify } from "html-minifier";
+import * as fs from "fs";
 
 const TodayValue : CSS = {
 	wind : "width: max-content",
-	weatherInfoWind: dedent(`
-		.weather-info > .weather-info-item.wind {
-				position: relative;
-				top: -15px;
-			}
-			`),
+	weatherInfoWind: `
+		\t\t.weather-info > .weather-info-item.wind {
+				\t\tposition: relative;
+				\t\ttop: -15px;
+			\t\t}
+		`,
 	weatherInfo: "padding: 0 50px;",
 	dayCard: "350px",
 	day: "30px",
@@ -25,7 +25,7 @@ const TodayValue : CSS = {
 	},
 	weatherName: "30px",
 	number: "30px",
-	icon: "",
+	icon: "padding-right: 15px;"
 };
 
 const WeekValue:CSS = {
@@ -91,8 +91,8 @@ async function head(today?: boolean) {
 				}
 				
 				@font-face {
-					font-family: 'Ubuntu Mono';
-					src: url('${await googleFontToBase64("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap")}') format('woff2'););
+					font-family: 'Karla';
+					src: url('${await googleFontToBase64("https://fonts.googleapis.com/css2?family=Karla&display=swap")}') format('woff2'););
 				}
 				
 				body {
@@ -110,7 +110,7 @@ async function head(today?: boolean) {
 					border-left-color: rgba(94, 176, 206, 0.51);
 					text-align: center;
 					width: ${CSS.dayCard};
-					background-color: rgba(0, 0, 0, 0.25);
+					background-color: rgba(0, 0, 0, 0.65);
 				}
 		
 				.day {
@@ -196,8 +196,10 @@ async function head(today?: boolean) {
 				}
 				
 				.number {
-					font-family: 'Ubuntu Mono', monospace;
+					font-family: 'Karla', sans-serif;
 					font-size: ${CSS.number};
+					position: relative;
+					top: -3px;
 				}
 				
 			.table-container {
@@ -268,7 +270,6 @@ export async function body(
 			const momentOfDay = day.dt.getHours() ?? new Date().getHours();
 			dayName = getTimeOfDay(momentOfDay);
 		}
-		//dayNameHTML += dayName + "-";
 		body += dedent(`
 			<div class="day-card ${dayName}">
 				<div class="day ${dayName.replaceAll(" ", "-")}">${dayName}</div>
@@ -292,10 +293,9 @@ export async function body(
 		</body>
 		</html>
 	`);
-	//generate random number
 	const isToday = title === "today";
-	//fs.writeFileSync(`html/${title}/${dayNameHTML}.html`, (await head(isToday)) + body);
 	const html = minify((await head(isToday)) + body);
+	writeHTMLForDev(title, data, html);
 	const images = await nodeHtmlToImage({
 		html: html,
 		transparent: true,
@@ -303,4 +303,21 @@ export async function body(
 		type: "png",
 	});
 	return images as Buffer;
+}
+
+function writeHTMLForDev(title: "today" | "week", data: DailyWeather[] | ForecastWeather[], html: string) {
+	if (process.env.NODE_ENV === "development") {
+		const dayName = data.map((day) => {
+			if (title === "week") {
+				return capitalize(
+					day.dt.toLocaleDateString("fr-FR", {weekday: "long"})
+				);
+			} else {
+				const momentOfDay = day.dt.getHours() ?? new Date().getHours();
+				return getTimeOfDay(momentOfDay);
+			}
+		});
+		logInDev(`Writing html for ${title}/${dayName.join("-")}.html`);
+		fs.writeFileSync(`html/${title}/${dayName.join("-")}.html`, html);
+	}
 }
