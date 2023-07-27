@@ -1,4 +1,5 @@
 import OpenWeatherAPI, {ForecastWeather} from "openweather-api-node";
+
 import {WEATHER} from "../index";
 import {ResultTodayWeather, timedMessage} from "../interface";
 

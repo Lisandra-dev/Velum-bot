@@ -1,4 +1,5 @@
 import {Client} from "discord.js";
+
 import {removeGuild} from "../maps";
 import {logInDev} from "../utils";
 

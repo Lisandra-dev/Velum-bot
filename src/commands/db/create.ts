@@ -6,6 +6,7 @@ import {
 	User,
 	userMention
 } from "discord.js";
+
 import {getConfig, set} from "../../maps";
 
 export default {

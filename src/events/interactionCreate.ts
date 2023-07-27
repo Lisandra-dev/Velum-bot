@@ -1,4 +1,5 @@
 import {AutocompleteInteraction, BaseInteraction, Client} from "discord.js";
+
 import {autoCompleteCmd, commands} from "../commands";
 
 export default (client: Client): void => {

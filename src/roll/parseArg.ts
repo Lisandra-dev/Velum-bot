@@ -1,15 +1,16 @@
 import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, Message, User} from "discord.js";
+
 import {
 	DEFAULT_STATISTIQUE,
+	IMAGE_LINK,
 	Parameters,
 	PARAMS,
 	Result,
 	ResultRolls,
 	Seuil,
 	SEUIL_KEYS,
-	STATISTIQUES,
-	IMAGE_LINK
-} from "../interface";
+	STATISTIQUES} from "../interface";
+import {getCharacters} from "../maps";
 import {
 	capitalize,
 	latinise,
@@ -17,7 +18,6 @@ import {
 	removeFromArguments,
 	removeFromArgumentsWithString,
 } from "../utils";
-import {getCharacters} from "../maps";
 import {hasStaffRole} from "../utils/data_check";
 import {getSeuil, getStatistique} from "../utils/get";
 

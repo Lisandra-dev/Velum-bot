@@ -1,13 +1,14 @@
-import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
-import {CurrentConditions} from "openweather-api-node/dist/types/weather/current";
-import {Alert, DailyConditions, ForecastWeather} from "openweather-api-node";
-import {IMAGE_LINK, meteoImage, ResultWeather, translationMain} from "../interface";
-import {EmbedBuilder} from "discord.js";
-import {capitalize, roundUp} from "../utils";
-import {convertDegToArrow, getTimeOfDay, weatherAPI, weatherCurrent, weatherToday} from "./utils";
 import * as deepl from "deepl-node";
+import {EmbedBuilder} from "discord.js";
+import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
+import {Alert, DailyConditions, ForecastWeather} from "openweather-api-node";
+import {CurrentConditions} from "openweather-api-node/dist/types/weather/current";
+
 import {DEEPL} from "../index";
+import {IMAGE_LINK, meteoImage, ResultWeather, translationMain} from "../interface";
+import {capitalize, roundUp} from "../utils";
 import {body} from "./generate_html";
+import {convertDegToArrow, getTimeOfDay, weatherAPI, weatherCurrent, weatherToday} from "./utils";
 
 export async function channelNameGenerator(city: string = "Villefranche-sur-mer") {
 	const data = await weatherCurrent(city);

@@ -5,12 +5,13 @@ import {
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
-import {Seuil, Statistiques, STATISTIQUES} from "../../interface";
+
+import {Seuil, STATISTIQUES, Statistiques} from "../../interface";
+import {get} from "../../maps";
 import {rollNeutre} from "../../roll";
+import {getInteractionArgs} from "../../roll/parseArg";
 import {displayNEUTRE} from "../../roll/results";
 import {capitalize, latinise} from "../../utils";
-import {getInteractionArgs} from "../../roll/parseArg";
-import {get} from "../../maps";
 
 export default {
 	data: new SlashCommandBuilder()

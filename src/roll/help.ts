@@ -1,5 +1,6 @@
 import {EmbedBuilder, Message} from "discord.js";
 import {dedent} from "ts-dedent";
+
 import {getConfig} from "../maps";
 
 export function helpCombat(message: Message, type: "combat" | "neutre") {

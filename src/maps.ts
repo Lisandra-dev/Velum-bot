@@ -1,6 +1,7 @@
 import Enmap from "enmap";
+
+import {DEFAULT_CONFIG, Meteo, Statistiques} from "./interface";
 import {latinise, logInDev} from "./utils";
-import {Statistiques, Meteo, DEFAULT_CONFIG} from "./interface";
 
 /**
  * Create a new Enmap "Characters"

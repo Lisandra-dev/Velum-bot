@@ -1,16 +1,16 @@
+import {isValidCron} from "cron-validator";
 import {
 	channelMention,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
 	GuildMember,
 	SlashCommandBuilder,
-	TextChannel
-} from "discord.js";
-import {getConfig} from "../../maps";
-import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../../weather/display";
-import {hasStaffRole} from "../../utils/data_check";
+	TextChannel} from "discord.js";
+
 import {Meteo} from "../../interface";
-import {isValidCron} from "cron-validator";
+import {getConfig} from "../../maps";
+import {hasStaffRole} from "../../utils/data_check";
+import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../../weather/display";
 
 export default {
 	data: new SlashCommandBuilder()

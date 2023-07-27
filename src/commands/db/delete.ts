@@ -9,8 +9,9 @@ import {
 	SlashCommandBuilder,
 	userMention
 } from "discord.js";
-import {get, getCharacters, removeCharacter, removeUser} from "../../maps";
+
 import {Statistiques} from "../../interface";
+import {get, getCharacters, removeCharacter, removeUser} from "../../maps";
 import {capitalize, latinise} from "../../utils";
 
 export default {

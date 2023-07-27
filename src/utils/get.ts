@@ -1,5 +1,5 @@
-import {getCharacters} from "../maps";
 import {DEFAULT_STATISTIQUE, Seuil} from "../interface";
+import {getCharacters} from "../maps";
 
 export function getStatistique(userId: string, guildId: string, stat: string, charName?: string) {
 	let characters = getCharacters(userId, guildId, charName);

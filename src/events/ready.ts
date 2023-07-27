@@ -2,10 +2,11 @@ import {REST} from "@discordjs/rest";
 import {Client, Routes} from "discord.js";
 import dotenv from "dotenv";
 import process from "process";
+
 import {commands} from "../commands";
-import {logInDev} from "../utils";
 import {DESTROY, VERSION} from "../index";
 import {destroyDB, loadGuild} from "../maps";
+import {logInDev} from "../utils";
 import {autoWeather} from "./cronWeather";
 
 if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});

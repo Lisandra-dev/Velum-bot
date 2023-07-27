@@ -3,17 +3,17 @@
  * Like prefix
  */
 
+import * as cron from "cron-validator";
 import {
 	channelMention,
 	ChannelType,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	SlashCommandBuilder
-} from "discord.js";
-import {check, getConfig, push, remove, setConfig} from "../../maps";
+	SlashCommandBuilder} from "discord.js";
 import dedent from "ts-dedent";
-import * as cron from "cron-validator";
+
 import {Meteo} from "../../interface";
+import {check, getConfig, push, remove, setConfig} from "../../maps";
 
 export default {
 	data: new SlashCommandBuilder()

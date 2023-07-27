@@ -1,6 +1,8 @@
 import {EmbedBuilder, User} from "discord.js";
-import * as pkg from "../package.json";
 import {Alert, ForecastWeather} from "openweather-api-node";
+
+import * as pkg from "../package.json";
+
 export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
 export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
 

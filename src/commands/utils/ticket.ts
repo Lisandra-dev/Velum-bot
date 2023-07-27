@@ -1,3 +1,4 @@
+import AdmZip from "adm-zip";
 import {
 	ActionRowBuilder,
 	Attachment, ButtonBuilder, ButtonStyle,
@@ -18,11 +19,11 @@ import {
 	TextChannel,
 	userMention
 } from "discord.js";
+import {createTranscript} from "discord-html-transcripts";
+
 import {getConfig} from "../../maps";
 import {logInDev} from "../../utils";
 import {hasStaffRole} from "../../utils/data_check";
-import {createTranscript} from "discord-html-transcripts";
-import AdmZip from "adm-zip";
 
 export default {
 	data: new SlashCommandBuilder()

@@ -1,6 +1,3 @@
-import {Statistiques} from "src/interface";
-import {get, getCharacters} from "../../maps";
-import {dedent} from "ts-dedent";
 import {
 	AutocompleteInteraction,
 	CommandInteraction,
@@ -9,6 +6,10 @@ import {
 	User,
 	userMention
 } from "discord.js";
+import {Statistiques} from "src/interface";
+import {dedent} from "ts-dedent";
+
+import {get, getCharacters} from "../../maps";
 import {capitalize, latinise} from "../../utils";
 
 export default {

@@ -1,10 +1,11 @@
 import {ChannelType, Client, GuildMember} from "discord.js";
-import {logInDev,} from "../utils";
+
+import {exportMaps, getConfig} from "../maps";
 import {rollCombat, rollNeutre} from "../roll";
+import {helpCombat} from "../roll/help";
 import {getParameters} from "../roll/parseArg";
 import {displayATQ, displayNEUTRE, ephemeralInfo} from "../roll/results";
-import {exportMaps, getConfig} from "../maps";
-import {helpCombat} from "../roll/help";
+import {logInDev,} from "../utils";
 
 export default (client: Client): void => {
 	client.on("messageCreate", async (message) => {

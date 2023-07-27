@@ -1,9 +1,10 @@
 import {CronJob} from "cron";
-import {getConfig} from "../maps";
-import {Meteo} from "../interface";
-import {EmbedBuilder, Guild, TextChannel} from "discord.js";
-import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../weather/display";
 import {isValidCron} from "cron-validator";
+import {EmbedBuilder, Guild, TextChannel} from "discord.js";
+
+import {Meteo} from "../interface";
+import {getConfig} from "../maps";
+import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../weather/display";
 
 export async function autoWeather(guild: Guild) {
 	const config = getConfig(guild.id, "meteo") as Meteo;

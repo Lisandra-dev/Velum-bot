@@ -1,5 +1,6 @@
-import {getConfig} from "../maps";
 import {GuildMember, PermissionFlagsBits} from "discord.js";
+
+import {getConfig} from "../maps";
 
 /**
  * Check if the member has the staff role

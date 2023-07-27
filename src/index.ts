@@ -1,13 +1,14 @@
 import {Client, GatewayIntentBits, Partials} from "discord.js";
 import dotenv from "dotenv";
 import * as process from "process";
+
 import * as pkg from "../package.json";
-import ready from "./events/ready";
 import interactionCreate from "./events/interactionCreate";
 import onBotEnter from "./events/onBotEnter";
+import onBotRemoved from "./events/onBotRemoved";
 import onMessage from "./events/onMessage";
 import onUserQuit from "./events/onUserQuit";
-import onBotRemoved from "./events/onBotRemoved";
+import ready from "./events/ready";
 
 if (process.env.ENV === "production") dotenv.config({path: ".env.prod"});
 else dotenv.config({path: ".env"});

@@ -1,11 +1,13 @@
-import dedent from "ts-dedent";
-import { DailyWeather, ForecastWeather } from "openweather-api-node";
-import { CSS, IMAGE_LINK, meteoImage } from "../interface";
-import nodeHtmlToImage from "node-html-to-image";
-import { capitalize, logInDev, roundUp } from "../utils";
-import { convertDegToArrow, getTimeOfDay } from "./utils";
-import { minify } from "html-minifier";
 import * as fs from "fs";
+import {minify} from "html-minifier";
+import nodeHtmlToImage from "node-html-to-image";
+import {DailyWeather, ForecastWeather} from "openweather-api-node";
+import dedent from "ts-dedent";
+
+import {CSS, IMAGE_LINK, meteoImage} from "../interface";
+import {capitalize, logInDev, roundUp} from "../utils";
+import {convertDegToArrow, getTimeOfDay} from "./utils";
+
 
 const TodayValue: CSS = {
 	wind: "width: max-content",

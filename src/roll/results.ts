@@ -1,7 +1,8 @@
-import {Parameters, Result, ResultRolls, Seuil} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
-import {parseResult} from "./parseArg";
+
+import {Parameters, Result, ResultRolls} from "../interface";
 import {capitalize} from "../utils";
+import {parseResult} from "./parseArg";
 
 
 export function ephemeralInfo(param: Parameters): string | undefined {
