@@ -1,14 +1,14 @@
 import dedent from "ts-dedent";
 import { DailyWeather, ForecastWeather } from "openweather-api-node";
-import {CSS, IMAGE_LINK, meteoImage} from "../interface";
+import { CSS, IMAGE_LINK, meteoImage } from "../interface";
 import nodeHtmlToImage from "node-html-to-image";
-import {capitalize, logInDev, roundUp} from "../utils";
+import { capitalize, logInDev, roundUp } from "../utils";
 import { convertDegToArrow, getTimeOfDay } from "./utils";
 import { minify } from "html-minifier";
 import * as fs from "fs";
 
-const TodayValue : CSS = {
-	wind : "width: max-content",
+const TodayValue: CSS = {
+	wind: "width: max-content",
 	weatherInfoWind: `
 		\t\t.weather-info > .weather-info-item.wind {
 				\t\tposition: relative;
@@ -19,7 +19,7 @@ const TodayValue : CSS = {
 	dayCard: "350px",
 	day: "30px",
 	weatherInfoTable: "width: 100%;",
-	weatherInfoItem : {
+	weatherInfoItem: {
 		fontSize: "25px",
 		marginRight: "",
 	},
@@ -28,15 +28,15 @@ const TodayValue : CSS = {
 		fontSize: "30px",
 		top: "-3px",
 	},
-	icon: "padding-right: 15px;"
+	icon: "padding-right: 15px;",
 };
 
-const WeekValue:CSS = {
-	wind : "margin-top: -10px",
+const WeekValue: CSS = {
+	wind: "margin-top: -10px",
 	dayCard: "250px",
 	day: "20px",
 	weatherInfoTable: "\t\t\t",
-	weatherInfoItem : {
+	weatherInfoItem: {
 		fontSize: "20px",
 		marginRight: "\nmargin-right: 10px;",
 	},
@@ -81,6 +81,12 @@ async function head(today?: boolean) {
 			<meta charset="UTF-8">
 			<title></title>
 			<style>
+				:root {
+					--soir: 199, 21, 74;
+					--nuit: 6,83,147;
+					--matin: 244,164,96;
+				}
+			
 				@font-face {
 					font-family: 'Fauna One';
 					src: url('${await googleFontToBase64("https://fonts.googleapis.com/css2?family=Fauna+One&display=swap")}') format('woff2'););
@@ -116,16 +122,21 @@ async function head(today?: boolean) {
 					border-left-color: rgba(94, 176, 206, 0.51);
 					text-align: center;
 					width: ${CSS.dayCard};
-					background-color: rgba(0, 0, 0, 0.65);
+					background-color: rgba(43, 45, 49);
+					border-radius: 10px;
+					box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 				}
 		
 				.day {
 					font-size: ${CSS.day};
 					color: #ffffff;
 					font-family: 'Fauna One', serif;
-					background-color: rgba(94, 176, 206, 0.51);
+					background-color: rgba(94, 176, 206, 0.35);
 					padding-top: 10px;
 					padding-bottom: 10px;
+					border-top-right-radius: 10px;
+					border-top-left-radius: 10px;
+					
 				}
 				
 				.info-icon {
@@ -174,31 +185,32 @@ async function head(today?: boolean) {
 				}
 				
 				.day.Soir {
-					background-color: #c7154a;
+					background-color: rgba(var(--soir),0.50);
 				}
 				
 				.day-card.Soir {
-					border-left-color: #c7154a;
+					border-left-color: rgb(var(--soir));
 				}
 				
 				.day.Nuit {
-					background-color: #065393;
+					background-color: rgba(var(--nuit),0.50);
 				}
 				
 				.day-card.Nuit {
-					border-left-color: #065393;
-				}
-				
-				.weather-info-table.today.not-uvi {
-					column-gap: 15%;
+					border-left-color: rgb(var(--nuit));
 				}
 				
 				.day.Matin {
-					background-color: #f4a460;
+					background-color: rgba(var(--matin),0.50);
 				}
 				
 				.day-card.Matin {
-					border-left-color: #f4a460;
+					border-left-color: rgb(var(--matin));
+				}
+				
+				
+				.weather-info-table.today.not-uvi {
+					column-gap: 15%;
 				}
 				
 				.number {
@@ -259,7 +271,6 @@ export async function body(
 					</div>`);
 		} else {
 			uvi = dedent(`
-
 					<div class="weather-info-item"><img src="${IMAGE_LINK}/meteo/icon/temps-nuageux.png" alt="couverture nuageuse" class="info-icon"> <span class="number">${day.weather.clouds}</span>%</div>
 					<div class="weather-info-item wind">${convertDegToArrow(day.weather.wind.deg).arrow} <span class="number">${roundUp(day.weather.wind.speed * 3.6)}</span>km/h ${convertDegToArrow(day.weather.wind.deg).dir}</div>
 				</div>
@@ -311,12 +322,16 @@ export async function body(
 	return images as Buffer;
 }
 
-function writeHTMLForDev(title: "today" | "week", data: DailyWeather[] | ForecastWeather[], html: string) {
+function writeHTMLForDev(
+	title: "today" | "week",
+	data: DailyWeather[] | ForecastWeather[],
+	html: string
+) {
 	if (process.env.NODE_ENV === "development") {
 		const dayName = data.map((day) => {
 			if (title === "week") {
 				return capitalize(
-					day.dt.toLocaleDateString("fr-FR", {weekday: "long"})
+					day.dt.toLocaleDateString("fr-FR", { weekday: "long" })
 				);
 			} else {
 				const momentOfDay = day.dt.getHours() ?? new Date().getHours();
@@ -325,5 +340,10 @@ function writeHTMLForDev(title: "today" | "week", data: DailyWeather[] | Forecas
 		});
 		logInDev(`Writing html for ${title}/${dayName.join("-")}.html`);
 		fs.writeFileSync(`html/${title}/${dayName.join("-")}.html`, html);
+		//run prettier on html file
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const { exec } = require("child_process");
+		exec(`prettier --write html/${title}/${dayName.join("-")}.html`);
 	}
+	return;
 }
