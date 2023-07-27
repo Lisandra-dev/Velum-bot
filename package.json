@@ -57,5 +57,8 @@
             "semver@>=6.0.0 <6.3.1": ">=6.3.1",
             "semver@>=7.0.0 <7.5.2": ">=7.5.2"
         }
+    },
+    "devDependencies": {
+        "eslint-plugin-html": "^7.1.0"
     }
 }

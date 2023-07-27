@@ -1,0 +1,21 @@
+{
+  "overrides": [
+    {
+      "files": "**/*.{js,json,ts,tsx}",
+      "options": {
+        "tabWidth": 2,
+        "useTabs": true,
+        "singleQuote": false,
+        "semi": true
+      }
+    },
+    {
+      "files": "**/*.html",
+      "options": {
+        "tabWidth": 2,
+        "useTabs": true,
+        "htmlWhitespaceSensitivity": "strict"
+      }
+    }
+  ]
+}

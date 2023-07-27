@@ -8,7 +8,6 @@ module.exports = {
 		"eslint:recommended",
 		"plugin:jsonc/recommended-with-jsonc",
 		"plugin:jsonc/recommended-with-json",
-
 	],
 	"overrides": [
 		{
@@ -24,14 +23,15 @@ module.exports = {
 		{
 			"files": ["*.json"],
 			"parser": "jsonc-eslint-parser"
-		},
+		}
 	],
 	"parserOptions": {
 		"ecmaVersion": "latest",
 		"sourceType": "module"
 	},
 	"plugins": [
-		"@typescript-eslint"
+		"@typescript-eslint",
+		"html"
 	],
 	"rules": {
 		"indent": [
