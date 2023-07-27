@@ -1,4 +1,4 @@
-import {Parameters, ResultRolls, Seuil} from "../interface";
+import {Parameters, Result, ResultRolls, Seuil} from "../interface";
 import {EmbedBuilder, GuildMember, userMention} from "discord.js";
 import {parseResult} from "./parseArg";
 import {capitalize} from "../utils";
@@ -34,18 +34,42 @@ export function displayNEUTRE(
 	member: GuildMember) {
 	const result = parseResult(param, resultRoll, "neutre", member);
 	const commentaire = result.commentaire ? `*${capitalize(result.commentaire)}*` : null;
-	const seuil = param.seuil ? param.seuil.value : Seuil.moyen;
-	const signeTotal = result.total > seuil ? "⩾" : "⩽";
+	const seuil = param.seuil ? param.seuil.value : 0;
 	return new EmbedBuilder()
 		.setAuthor({
-			name: `${result.author} • ${param.seuil?.name}`,
+			name: `${result.author} ${param?.seuil && param.seuil.name.length > 0 ? `• ${capitalize(param.seuil?.name)}` : ""}`,
 			iconURL: result.image,
 		})
 		.setFooter({
 			text: `[ ${result.calcul} ]`,
 			iconURL: "https://imgur.com/1xGY5S1.png"
 		})
-		.setTitle(`${result.total} ${signeTotal} ${seuil} ${result.ccMsg.message}`)
+		.setTitle(titleSigne(seuil, resultRoll, result))
 		.setDescription(commentaire)
-		.setColor(result.total > seuil ? "#33b666" : "#5e5e5e");
+		.setColor(colorBySuccessAction(result, seuil, resultRoll));
 }
+
+function titleSigne(seuil: number, roll: ResultRolls, result: Result) {
+	if (seuil === 0) {
+		if (roll.roll === 1) {
+			return `${result.total} ${result.ccMsg.message}`;
+		} else if (roll.roll === 20) {
+			return `${result.total} ${result.ccMsg.message}`;
+		}
+		return `${result.total}`;
+	}
+	const signeTotal = result.total > seuil ? "⩾" : "⩽";
+	return `${result.total} ${signeTotal} ${seuil} ${result.ccMsg.message}`;
+}
+
+function colorBySuccessAction(result: Result, seuil: number, roll: ResultRolls) {
+	if (seuil === 0 && roll.roll > 1) {
+		return "#4256b7";
+	} else if (roll.roll === 1) {
+		return "#c72727";
+	} else if (roll.roll === 20) {
+		return "#3ed1e5";
+	}
+	return result.total > seuil ? "#33b666" : "#524d4d";
+}
+

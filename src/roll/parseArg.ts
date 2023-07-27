@@ -36,8 +36,8 @@ export function getParameters(message: Message, rollType: "neutre" | "combat") {
 	
 	if (rollType === "neutre") {
 		args.seuil = {
-			value: Seuil.moyen,
-			name: "Moyen"
+			value: 0,
+			name: ""
 		};
 	} else {
 		args.cc = false;
@@ -148,8 +148,8 @@ function getCommentaire(params: string[]) {
 
 function getSeuilInParameters(params: string[]) {
 	const seuilFind = params.find((value) => value.match(PARAMS.seuil));
-	let seuil = Seuil.moyen;
-	let seuilName: string | undefined = "Moyen";
+	let seuil = 0;
+	let seuilName: string | undefined = "";
 	if (seuilFind) {
 		seuilName = SEUIL_KEYS.find((value) => value.includes(latinise(seuilFind.replace(PARAMS.seuil, "").toLowerCase())));
 		if (!seuilName && !isNaN(parseInt(seuilFind.replace(PARAMS.seuil, "")))) {
@@ -164,7 +164,7 @@ function getSeuilInParameters(params: string[]) {
 	const seuilValue =
 		{
 			value: seuil,
-			name: seuilName ?? "Moyen"
+			name: seuilName
 		};
 	return {params, seuilValue};
 }
@@ -228,14 +228,22 @@ export function getInteractionArgs(interaction: CommandInteraction, type: "comba
 	if (type === "combat") {
 		args.cc = options.getBoolean("critique") || false;
 	} else {
-		const seuil = (options.getString("seuil"))?.toLowerCase() || "moyen";
+		const seuil = (options.getString("seuil"))?.toLowerCase() || "0";
 		const seuilValue = Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
 		args.seuil = {
 			value: seuilValue,
-			name: isNaN(parseInt(seuil)) ? capitalize(seuil) : `Seuil : ${seuil}`
+			name: seuilName(seuil)
 		};
 	}
 	return args;
+}
+
+function seuilName(seuil: string) {
+	const seuilValue = Seuil[seuil as keyof typeof Seuil] ?? parseInt(seuil);
+	if (seuilValue === 0) {
+		return "";
+	}
+	return isNaN(parseInt(seuil)) ? capitalize(seuil) : `Seuil : ${seuil}`;
 }
 
 function removeAllPARAMSregex(params: string[]) {
