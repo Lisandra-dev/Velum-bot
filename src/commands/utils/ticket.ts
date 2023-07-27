@@ -60,6 +60,10 @@ export default {
 						value: "⌛",
 					},
 					{
+						name: "Stale",
+						value: "💤",
+					},
+					{
 						name: "Validée",
 						value: "✅",
 					})
@@ -309,7 +313,7 @@ async function updateStatut(interaction: CommandInteraction, options: CommandInt
 	if (!verif) return;
 	const ticket = interaction.channel as GuildTextBasedChannel;
 	const etat = options.getString("etat", true);
-	await ticket.setName(ticket.name.replace(/[📩📝⌛✅]/u, etat));
+	await ticket.setName(ticket.name.replace(/[📩📝⌛✅💤]/u, etat));
 	await interaction.reply({content: "Le ticket a été mis à jour !", ephemeral: true});
 }
 
