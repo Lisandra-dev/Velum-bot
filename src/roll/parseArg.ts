@@ -315,9 +315,10 @@ export function parseResult(
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
 	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
+	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	const finalResultMessage: Result = {
 		author: author,
-		image: `${IMAGE_LINK}/statistiques/${imageStatistiques}.png`,
+		image: `${IMAGE_LINK}/statistiques/${imageStatistiques ? latinise(imageStatistiques) : "neutre"}.png`,
 		calcul: createFormula(param, result),
 		total: total,
 		ccMsg: ccMsg,
