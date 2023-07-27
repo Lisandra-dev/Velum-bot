@@ -18,22 +18,33 @@ export async function autoWeather(guild: Guild) {
 }
 
 async function sendWeather(config: Meteo, guild: Guild) {
-	const channel = guild.channels.cache.get(config.channel) as TextChannel;
+	let channel = guild.channels.cache.get(config.channel);
+	let weekChannel = guild.channels.cache.get(config.forecast.weekly);
+	let dayChannel = guild.channels.cache.get(config.forecast.daily);
+	
 	if (!channel) return;
+	channel = channel as TextChannel;
+	weekChannel = weekChannel as TextChannel ?? channel;
+	dayChannel = dayChannel as TextChannel ?? channel;
+	
 	let embed: EmbedBuilder[];
 	if (new Date().getUTCDay() === 1 && new Date().getUTCHours() === 0) {
 		const week = await generateWeeklyImage(config.ville);
 		const today = await generateTodayImage(config.ville);
-		await channel.send("# Météo de la semaine");
+		await weekChannel.send("# Météo de la semaine");
 		for (const embed of week) {
-			await channel.send({files: [embed]});
+			await weekChannel.send({files: [embed]});
 		}
-		await channel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
-		await channel.send({files: [today.images[1]]});
+		await dayChannel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
+		await dayChannel.send({files: [today.images[1]]});
+		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
+		await channel.send({embeds: embed});
 	} else if (new Date().getUTCHours() === 0) {
 		const today = await generateTodayImage(config.ville);
-		await channel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
-		await channel.send({files: [today.images[1]]});
+		await dayChannel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
+		await dayChannel.send({files: [today.images[1]]});
+		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
+		await channel.send({embeds: embed});
 	} else {
 		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
 		await channel.send({embeds: embed});

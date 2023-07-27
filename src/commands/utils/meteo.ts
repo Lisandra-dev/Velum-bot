@@ -1,4 +1,11 @@
-import {CommandInteraction, CommandInteractionOptionResolver, GuildMember, SlashCommandBuilder} from "discord.js";
+import {
+	channelMention,
+	CommandInteraction,
+	CommandInteractionOptionResolver,
+	GuildMember,
+	SlashCommandBuilder,
+	TextChannel
+} from "discord.js";
 import {getConfig} from "../../maps";
 import {channelNameGenerator, createWeatherAsEmbed, generateTodayImage, generateWeeklyImage} from "../../weather/display";
 import {hasStaffRole} from "../../utils/data_check";
@@ -42,18 +49,20 @@ export default {
 		const lieu = options.getString("lieu") as string ?? (config.ville && config.ville.length > 0) ? config.ville : "Villefranche-sur-mer";
 		const name = options.getString("lieu") as string ?? (config.name && config.name.length > 0) ? config.name : config.ville;
 		
-		if (hasStaffRole(interaction.member as GuildMember, interaction.guild!.id) && options.getBoolean("force-update")) {
+		if (hasStaffRole(interaction.member as GuildMember, interaction.guild!.id) && options.getBoolean("force-update") && !options.getString("forecast")) {
 			if (!config.auto || !isValidCron(config.frequence) || config.channel.length === 0 || config.ville.length === 0) {
 				await interaction.followUp("La configuration de la météo n'est pas valide.");
 				return;
 			}
 			const channel = interaction.guild!.channels.cache.get(config.channel);
+			
 			if (!channel) {
 				await interaction.followUp("Le channel de la météo n'existe pas.");
 				return;
 			}
 			const name = await channelNameGenerator(config.ville);
 			await channel.setName(name);
+			
 		} else if (options.getString("forecast")) {
 			await interaction.deferReply();
 			const moment = options.getString("forecast", true);
@@ -61,14 +70,32 @@ export default {
 			case "today":
 				// eslint-disable-next-line no-case-declarations
 				const embeds = await generateTodayImage(lieu);
-				await interaction.editReply({files: [embeds.images[0]], content: `# Météo d'aujourd'hui\n ${embeds.alert.join("\n")}`});
-				await interaction.followUp({files: [embeds.images[1]]});
+				if (!options.getBoolean("force-update")) {
+					await interaction.editReply({files: [embeds.images[0]], content: `# Météo d'aujourd'hui\n ${embeds.alert.join("\n")}`});
+					await interaction.followUp({files: [embeds.images[1]]});
+				} else {
+					const channel = interaction.guild!.channels.cache.get(config.channel)  as TextChannel ?? interaction.channel as TextChannel;
+					const dayChannel = interaction.guild!.channels.cache.get(config.forecast.daily) as TextChannel ?? channel;
+					await dayChannel.send({files: [embeds.images[0]], content: `# Météo d'aujourd'hui\n ${embeds.alert.join("\n")}`});
+					await dayChannel.send({files: [embeds.images[1]]});
+					await interaction.followUp(`Météo d'aujourd'hui envoyée dans ${channelMention(dayChannel.id)}.`);
+				}
 				break;
 			case "week":
 				//eslint-disable-next-line no-case-declarations
 				const weekBuffer = await generateWeeklyImage(lieu);
-				for (const embed of weekBuffer) {
-					await interaction.followUp({files: [embed]});
+				if (!options.getBoolean("force-update")) {
+					for (const embed of weekBuffer) {
+						await interaction.followUp({files: [embed]});
+					}
+				} else {
+					const channel = interaction.guild!.channels.cache.get(config.channel)  as TextChannel ?? interaction.channel as TextChannel;
+					const weekChannel = interaction.guild!.channels.cache.get(config.forecast.weekly) as TextChannel ?? channel;
+					await weekChannel.send("# Météo de la semaine");
+					for (const embed of weekBuffer) {
+						await weekChannel.send({files: [embed]});
+					}
+					await interaction.followUp(`Météo de la semaine envoyée dans ${channelMention(weekChannel.id)}.`);
 				}
 				break;
 			default:

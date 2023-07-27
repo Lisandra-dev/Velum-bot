@@ -180,13 +180,13 @@ export default {
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
 		} else if (subGroup === "meteo") {
 			if (subcommand === "main") {
-				await setMeteo(interaction, options);
+				await setWeather(interaction, options);
 				return;
 			} else if (subcommand === "semaine") {
-				//@TODO
+				await setWeatherWeekly(options, interaction);
 				return;
 			} else if (subcommand === "jour") {
-				//@TODO
+				await setWeatherDaily(options, interaction);
 				return;
 			}
 		} else if (subGroup === "ticket") {
@@ -199,7 +199,7 @@ export default {
 	},
 };
 
-async function setMeteo(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
+async function setWeather(interaction: CommandInteraction, options: CommandInteractionOptionResolver) {
 	const channel = options.getChannel("channel", false);
 	const ville = options.getString("ville", false) || "Villefranche-sur-mer";
 	if (!channel) {
@@ -217,7 +217,11 @@ async function setMeteo(interaction: CommandInteraction, options: CommandInterac
 		channel: channel!.id,
 		ville: ville,
 		frequence: freq,
-		name: options.getString("nom", false) || ville
+		name: options.getString("nom", false) || ville,
+		forecast: {
+			weekly: channel!.id,
+			daily: channel!.id
+		}
 	} as Meteo);
 	await interaction.reply(`La météo est maintenant activée dans ${channelMention(channel!.id)} pour la ville de ${ville}, pour un CRON de ${freq}.`);
 }
@@ -287,3 +291,28 @@ async function autorole(interaction: CommandInteraction, options: CommandInterac
 		await interaction.reply({ content: message, ephemeral: true }); //prevent the bot from pinging everyone
 	}
 }
+
+async function setWeatherWeekly(options: CommandInteractionOptionResolver, interaction: CommandInteraction) {
+	const channel = options.getChannel("channel", false);
+	if (!channel) {
+		//disable weekly forecast
+		setConfig(interaction.guild!.id, "meteo.forecast.weekly", "");
+		await interaction.reply("Les prévisions de la semaine sont maintenant désactivées");
+		return;
+	}
+	setConfig(interaction.guild!.id, "meteo.forecast.weekly", channel.id);
+	await interaction.reply(`Les prévisions de la semaine sont maintenant activées dans ${channelMention(channel.id)}. Les prévisions de la semaine sont envoyés tous les lundis !`);
+}
+
+async function setWeatherDaily(options: CommandInteractionOptionResolver, interaction: CommandInteraction) {
+	const channel = options.getChannel("channel", false);
+	if (!channel) {
+		//disable daily forecast
+		setConfig(interaction.guild!.id, "meteo.forecast.daily", "");
+		await interaction.reply("Les prévisions du jour sont maintenant désactivées");
+		return;
+	}
+	setConfig(interaction.guild!.id, "meteo.forecast.daily", channel.id);
+	await interaction.reply(`Les prévisions du jour sont maintenant activées dans ${channelMention(channel.id)}. Les prévisions du jour sont envoyés tous les jours à minuit !`);
+}
+
