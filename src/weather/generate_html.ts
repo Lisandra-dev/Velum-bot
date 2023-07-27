@@ -24,7 +24,10 @@ const TodayValue : CSS = {
 		marginRight: "",
 	},
 	weatherName: "30px",
-	number: "30px",
+	number: {
+		fontSize: "30px",
+		top: "-3px",
+	},
 	icon: "padding-right: 15px;"
 };
 
@@ -39,7 +42,10 @@ const WeekValue:CSS = {
 	},
 	weatherInfoWind: "",
 	weatherName: "20px",
-	number: "20px",
+	number: {
+		fontSize: "20px",
+		top: "0",
+	},
 	weatherInfo: "",
 	icon: "padding-left: 15px;",
 };
@@ -197,9 +203,9 @@ async function head(today?: boolean) {
 				
 				.number {
 					font-family: 'Karla', sans-serif;
-					font-size: ${CSS.number};
+					font-size: ${CSS.number.fontSize};
 					position: relative;
-					top: -3px;
+					top: ${CSS.number.top};
 				}
 				
 			.table-container {

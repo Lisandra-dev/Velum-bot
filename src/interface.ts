@@ -272,7 +272,10 @@ export interface CSS {
 		marginRight: string
 	},
 	weatherName: string,
-	number: string,
+	number: {
+		fontSize: string,
+		top: string,
+	},
 	weatherInfo: string,
 	icon: string,
 }
