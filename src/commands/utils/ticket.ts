@@ -135,9 +135,9 @@ function verifTicket(ticket: TextBasedChannel | null, guildID: string) {
  * @param ticket {TextBasedChannel} : The ticket to transcript
  * @param interaction {CommandInteraction} The interaction to reply
  * @param close {boolean} If the ticket must be deleted
- * @returns {<Promise>Boolean} If the transcript was created
+ * @returns {Promise<boolean>} If the transcript was created
  */
-async function ticketContent(ticket: TextBasedChannel | null, interaction: CommandInteraction, close?: boolean) {
+async function ticketContent(ticket: TextBasedChannel | null, interaction: CommandInteraction, close?: boolean): Promise<boolean> {
 	if (!ticket || ticket.isDMBased()) {
 		return false;
 	}
