@@ -53,29 +53,53 @@ export default {
 				)
 			)
 		)
-		.addSubcommand((subcommand) => subcommand
+		.addSubcommandGroup((group) => group
 			.setName("meteo")
 			.setDescription("Permet de définir les paramètres de la météo")
-			.addChannelOption((option) => option
-				.setName("channel")
-				.setDescription("Channel des messages de la météo")
-				.setRequired(false)
-				.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+			.addSubcommand((subcommand) => subcommand
+				.setName("main")
+				.setDescription("Permet de définir le channel principal où les messages de la météo seront envoyés")
+				.addChannelOption((option) => option
+					.setName("channel")
+					.setDescription("Channel des messages de la météo")
+					.setRequired(false)
+					.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+				)
+				.addStringOption((option) => option
+					.setName("ville")
+					.setDescription("Ville à surveiller")
+					.setRequired(false)
+				)
+				.addStringOption((option) => option
+					.setName("frequence")
+					.setDescription("Fréquence des messages de la météo. Merci d'utiliser un format CRON.")
+					.setRequired(false)
+				)
+				.addStringOption((option) => option
+					.setName("nom")
+					.setDescription("Permet de changer le nom de la ville.")
+					.setRequired(false)
+				)
 			)
-			.addStringOption((option) => option
-				.setName("ville")
-				.setDescription("Ville à surveiller")
-				.setRequired(false)
+			.addSubcommand((subcommand) => subcommand
+				.setName("semaine")
+				.setDescription("Permet de définir le channel où les messages de la météo de la semaine seront envoyés")
+				.addChannelOption((option) => option
+					.setName("channel")
+					.setDescription("Channel des messages de la météo de la semaine")
+					.setRequired(false)
+					.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+				)
 			)
-			.addStringOption((option) => option
-				.setName("frequence")
-				.setDescription("Fréquence des messages de la météo. Merci d'utiliser un format CRON.")
-				.setRequired(false)
-			)
-			.addStringOption((option) => option
-				.setName("nom")
-				.setDescription("Permet de changer le nom de la ville.")
-				.setRequired(false)
+			.addSubcommand((subcommand) => subcommand
+				.setName("jour")
+				.setDescription("Permet de définir le channel où les messages de la météo du jour seront envoyés")
+				.addChannelOption((option) => option
+					.setName("channel")
+					.setDescription("Channel des messages de la météo du jour")
+					.setRequired(false)
+					.addChannelTypes(ChannelType.GuildText, ChannelType.PublicThread, ChannelType.PrivateThread)
+				)
 			)
 		)
 		
@@ -154,9 +178,17 @@ export default {
 			const role = options.getRole("role", true);
 			setConfig(interaction.guild.id, "staff", role.id);
 			await interaction.reply(`Le rôle staff est maintenant ${role.name}`);
-		} else if (subcommand === "meteo") {
-			await setMeteo(interaction, options);
-			return;
+		} else if (subGroup === "meteo") {
+			if (subcommand === "main") {
+				await setMeteo(interaction, options);
+				return;
+			} else if (subcommand === "semaine") {
+				//@TODO
+				return;
+			} else if (subcommand === "jour") {
+				//@TODO
+				return;
+			}
 		} else if (subGroup === "ticket") {
 			await ticket(interaction, options, subcommand);
 			return;
