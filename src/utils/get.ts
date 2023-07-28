@@ -4,15 +4,18 @@ import {getCharacters} from "../maps";
 export function getStatistique(userId: string, guildId: string, stat: string, charName?: string) {
 	let characters = getCharacters(userId, guildId, charName);
 	let fiche = true;
+	let name = charName;
 	if (!characters) {
 		characters = DEFAULT_STATISTIQUE;
 		fiche = false;
 	}
 	const charModif = characters.stats;
 	const modif = charModif[stat as keyof typeof charModif] ?? 10;
+	name = characters.characterName;
 	return {
 		modif,
-		fiche
+		fiche,
+		name
 	};
 }
 

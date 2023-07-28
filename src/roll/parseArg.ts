@@ -110,6 +110,7 @@ function getPersonnage(params: string[]) {
 function getParamStats(messageContent: string[], guildID: string, args: Parameters) {
 	const stats = getStatistique(args.user.id, guildID, "Neutre", args.personnage ?? "main");
 	args.fiche = stats.fiche;
+	args.personnage = stats.name;
 	if (messageContent.length >= 1) {
 		const stat = messageContent[0];
 		if (isNaN(parseInt(stat))) {
@@ -118,6 +119,7 @@ function getParamStats(messageContent: string[], guildID: string, args: Paramete
 			const stats = getStatistique(args.user.id, guildID, statistiquesArgs ?? "Neutre", args.personnage ?? "main");
 			args.statistiques = stats.modif;
 			args.fiche = stats.fiche;
+			args.personnage = stats.name;
 			messageContent = removeFromArgumentsWithString(messageContent, stat);
 		} else if (noMatchInParam(messageContent[0])) {
 			logInDev("no match in args", noMatchInParam(messageContent[0]));

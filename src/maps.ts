@@ -154,7 +154,7 @@ export function getCharacters(user: string, guildID: string, characterName?: str
 			return userCharacters.find((s: Statistiques) => {
 				if (!characterName) return;
 				const name = s.characterName ?? "main";
-				return latinise(name).toLowerCase().trim() === latinise(characterName).toLowerCase().trim();
+				return latinise(name).toLowerCase().trim().includes(latinise(characterName).toLowerCase().trim());
 			});
 		}
 	} catch (error) {
