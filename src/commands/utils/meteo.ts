@@ -46,9 +46,7 @@ export default {
 		const options = interaction.options as CommandInteractionOptionResolver;
 		const config = getConfig(interaction.guild!.id, "meteo") as Meteo;
 
-		const lieu = options.getString("lieu") as string ?? (config.ville && config.ville.length > 0) ? config.ville : "Villefranche-sur-mer";
-		const name = options.getString("lieu") as string ?? (config.name && config.name.length > 0) ? config.name : config.ville;
-		
+		const {name, lieu} = getLieuName(options, config);
 		if (hasStaffRole(interaction.member as GuildMember, interaction.guild!.id) && options.getBoolean("force-update") && !options.getString("forecast")) {
 			if (!config.auto || !isValidCron(config.frequence) || config.channel.length === 0 || config.ville.length === 0) {
 				await interaction.followUp("La configuration de la météo n'est pas valide.");
@@ -100,16 +98,39 @@ export default {
 				break;
 			default:
 				// eslint-disable-next-line no-case-declarations
-				const embed = await createWeatherAsEmbed(lieu, name);
-				await interaction.editReply({embeds: embed.allEmbeds, content: embed.alert.join("\n")});
+				const embed = await createWeatherAsEmbed(lieu);
+				// eslint-disable-next-line no-case-declarations
+				const content = `## Météo de ${name}\n${embed.alert.join("\n")}`;
+				await interaction.editReply({embeds: embed.allEmbeds, content: content});
 				break;
 			}
 		} else {
-			const embed = await createWeatherAsEmbed(lieu, name);
-			await interaction.reply({embeds: embed.allEmbeds, content: embed.alert.join("\n")});
+			const embed = await createWeatherAsEmbed(lieu);
+			const content = `## Météo de ${name}\n${embed.alert.join("\n")}`;
+			await interaction.reply({embeds: embed.allEmbeds, content: content});
 		}
 	}
 };
 
 
 
+function getLieuName(options: CommandInteractionOptionResolver, config: Meteo) {
+	if (options.getString("lieu")) {
+		return {
+			name: options.getString("lieu", true),
+			lieu: options.getString("lieu", true)
+		};
+	}
+	let lieu = "Villefranche-Sur-Mer";
+	let name = "villefranche-Sur-Mer";
+	if (config.ville.length > 0) {
+		lieu = config.ville;
+	}
+	if (config.name.length>0) {
+		name = config.name;
+	}
+	return {
+		name: name,
+		lieu: lieu
+	};
+}
