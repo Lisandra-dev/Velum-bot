@@ -156,7 +156,7 @@ function getSeuilInParameters(params: string[]) {
 			seuil = parseInt(seuilFind.replace(PARAMS.seuil, ""));
 			seuilName = `Seuil : ${seuil}`;
 		} else {
-			seuil = getSeuil(seuilName ?? "Moyen");
+			seuil = getSeuil((seuilName ?? "moyen").toLowerCase());
 			seuilName = seuilName ?? "Moyen";
 		}
 		params = removeFromArguments(params, PARAMS.seuil);
@@ -323,7 +323,6 @@ export function parseResult(
 	let commentaire: string | null = param.commentaire ? param.commentaire : "";
 	commentaire = commentaire.length > 0 ? commentaire : null;
 	const imageStatistiques = STATISTIQUES.find(stats => latinise(param.statistiqueName.toLowerCase()) === latinise(stats.toLowerCase()));
-	logInDev(`imageStatistiques : ${imageStatistiques}`);
 	const finalResultMessage: Result = {
 		author: author,
 		image: `${IMAGE_LINK}/statistiques/${imageStatistiques ? latinise(imageStatistiques) : "neutre"}.png`,
