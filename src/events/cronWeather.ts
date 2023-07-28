@@ -38,16 +38,16 @@ async function sendWeather(config: Meteo, guild: Guild) {
 		}
 		await dayChannel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
 		await dayChannel.send({files: [today.images[1]]});
-		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
+		embed = (await createWeatherAsEmbed(config.ville)).allEmbeds;
 		await channel.send({embeds: embed});
 	} else if (new Date().getUTCHours() === 0) {
 		const today = await generateTodayImage(config.ville);
 		await dayChannel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
 		await dayChannel.send({files: [today.images[1]]});
-		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
+		embed = (await createWeatherAsEmbed(config.ville)).allEmbeds;
 		await channel.send({embeds: embed});
 	} else {
-		embed = (await createWeatherAsEmbed(config.ville, config.name)).allEmbeds;
+		embed = (await createWeatherAsEmbed(config.ville)).allEmbeds;
 		await channel.send({embeds: embed});
 	}
 	const channelName = await channelNameGenerator(config.ville);
