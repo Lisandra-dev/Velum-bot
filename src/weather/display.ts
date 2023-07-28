@@ -1,14 +1,26 @@
 import * as deepl from "deepl-node";
 import {EmbedBuilder} from "discord.js";
 import {Hemisphere, Moon, NorthernHemisphereLunarEmoji} from "lunarphase-js";
-import {Alert, DailyConditions, ForecastWeather} from "openweather-api-node";
+import {
+	Alert,
+	CurrentWeather,
+	DailyConditions, DailyWeather,
+	ForecastWeather
+} from "openweather-api-node";
 import {CurrentConditions} from "openweather-api-node/dist/types/weather/current";
 
 import {DEEPL} from "../index";
 import {IMAGE_LINK, meteoImage, ResultWeather, translationMain} from "../interface";
 import {capitalize, roundUp} from "../utils";
 import {body} from "./generate_html";
-import {convertDegToArrow, getTimeOfDay, weatherAPI, weatherCurrent, weatherToday} from "./utils";
+import {
+	convertDegToArrow,
+	getIconTimeBasedOnSunrise,
+	getTimeOfDay,
+	weatherAPI,
+	weatherCurrent,
+	weatherToday
+} from "./utils";
 
 export async function channelNameGenerator(city: string = "Villefranche-sur-mer") {
 	const data = await weatherCurrent(city);
@@ -29,22 +41,23 @@ export async function channelNameGenerator(city: string = "Villefranche-sur-mer"
 	return `${moonEmoji}·${meteoEmoji[raw]}╏Météo`;
 }
 
-export async function createWeatherAsEmbed(city: string, name?: string) {
+export async function createWeatherAsEmbed(city: string) {
 	const data = await weatherCurrent(city);
 	const alerts = (await weatherAPI(city).getAlerts()).filter((value, index, self) => {
 		return self.findIndex((v) => v.event === value.event) === index;
 	});
 	const alert = await createAlertText(alerts);
-	const embed = generateEmbed(data.weather, name ?? city, new Date());
+	const embed = generateEmbed(data, new Date());
 	return {
 		allEmbeds: [embed],
 		alert: alert
 	} as ResultWeather;
 }
 
-export function generateEmbed(data: CurrentConditions | DailyConditions, city: string, momentOfDay?: Date, setDayName?: string) {
+export function generateEmbed(weather: CurrentWeather | DailyWeather, momentOfDay?: Date, setDayName?: string) {
+	const data = weather.weather;
 	const raw = data.icon.raw.replace(/[dn]/, "") as keyof typeof meteoImage;
-	const time = data.icon.raw.replace(/\d{2}/, "") as "d" | "n";
+	const time = getIconTimeBasedOnSunrise(weather.astronomical);
 	const icon = meteoImage[raw][time];
 	const moon = {
 		"Waxing Crescent" : `${IMAGE_LINK}/meteo/lunar-phase/waxing-crescent.png`, //🌒
@@ -169,3 +182,4 @@ export async function generateTodayImage(city: string) {
 		await body(allEmbeds.slice(2), "today"),];
 	return {images: allImages, alert: alert};
 }
+

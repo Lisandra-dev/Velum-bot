@@ -1,4 +1,4 @@
-import OpenWeatherAPI, {ForecastWeather} from "openweather-api-node";
+import OpenWeatherAPI, {CurrentAstronomical, DailyAstronomical, ForecastWeather} from "openweather-api-node";
 
 import {WEATHER} from "../index";
 import {ResultTodayWeather, timedMessage} from "../interface";
@@ -70,3 +70,12 @@ export function getTimeOfDay(hour: number) {
 }
 
 
+export function getIconTimeBasedOnSunrise(data: CurrentAstronomical | DailyAstronomical) {
+	const now = new Date();
+	const sunrise = data.sunrise;
+	const sunset = data.sunset;
+	if (now > sunrise && now < sunset) {
+		return "d";
+	}
+	return "n";
+}
