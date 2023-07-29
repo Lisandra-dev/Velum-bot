@@ -19,6 +19,19 @@
         "lint:fix": "eslint --ext .ts src/ --fix"
     },
     "dependencies": {
+    },
+    "pnpm": {
+        "overrides": {
+            "semver@>=6.0.0 <6.3.1": ">=6.3.1",
+            "semver@>=7.0.0 <7.5.2": ">=7.5.2",
+            "puppeteer" : ">=19.4.0",
+            "uuid" : ">=9.0.0"
+        }
+    },
+    "devDependencies": {
+        "eslint-plugin-html": "^7.1.0",
+        "eslint-plugin-simple-import-sort": "^10.0.0",
+        "eslint-plugin-unused-imports": "^3.0.0",
         "@discordjs/rest": "^1.7.1",
         "@types/adm-zip": "^0.5.0",
         "@types/cron": "^2.0.1",
@@ -42,7 +55,7 @@
         "i18next": "^22.5.1",
         "lunarphase-js": "^2.0.1",
         "node-gyp": "^9.4.0",
-        "node-html-to-image": "^3.3.0",
+        "@lisandra-dev/node-html-to-image": "^3.3.2",
         "nodemon": "^2.0.22",
         "openweather-api-node": "^3.1.1",
         "pm2": "^5.3.0",
@@ -52,16 +65,5 @@
         "ts-node-dev": "^2.0.0",
         "tslib": "^2.6.1",
         "typescript": "^5.1.6"
-    },
-    "pnpm": {
-        "overrides": {
-            "semver@>=6.0.0 <6.3.1": ">=6.3.1",
-            "semver@>=7.0.0 <7.5.2": ">=7.5.2"
-        }
-    },
-    "devDependencies": {
-        "eslint-plugin-html": "^7.1.0",
-        "eslint-plugin-simple-import-sort": "^10.0.0",
-        "eslint-plugin-unused-imports": "^3.0.0"
     }
 }

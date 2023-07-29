@@ -1,6 +1,6 @@
+import nodeHtmlToImage from "@lisandra-dev/node-html-to-image";
 import * as fs from "fs";
 import {minify} from "html-minifier";
-import nodeHtmlToImage from "node-html-to-image";
 import {DailyWeather, ForecastWeather} from "openweather-api-node";
 import dedent from "ts-dedent";
 
