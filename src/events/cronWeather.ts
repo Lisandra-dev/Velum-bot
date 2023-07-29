@@ -29,7 +29,7 @@ async function sendWeather(config: Meteo, guild: Guild) {
 	dayChannel = dayChannel as TextChannel ?? channel;
 	
 	let embed: EmbedBuilder[];
-	if (new Date().getUTCDay() === 1 && new Date().getUTCHours() === 0) {
+	if (new Date().getDay() === 1 && new Date().getHours() === 0) {
 		const week = await generateWeeklyImage(config.ville);
 		const today = await generateTodayImage(config.ville);
 		await weekChannel.send("# Météo de la semaine");
@@ -40,7 +40,7 @@ async function sendWeather(config: Meteo, guild: Guild) {
 		await dayChannel.send({files: [today.images[1]]});
 		embed = (await createWeatherAsEmbed(config.ville)).allEmbeds;
 		await channel.send({embeds: embed});
-	} else if (new Date().getUTCHours() === 0) {
+	} else if (new Date().getHours() === 0) {
 		const today = await generateTodayImage(config.ville);
 		await dayChannel.send({files: [today.images[0]], content: `## Météo d'aujourd'hui\n${today.alert.join("\n")}`});
 		await dayChannel.send({files: [today.images[1]]});
