@@ -9,7 +9,7 @@ import {
 	ChannelType,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	SlashCommandBuilder} from "discord.js";
+	SlashCommandBuilder, PermissionFlagsBits} from "discord.js";
 import dedent from "ts-dedent";
 
 import {Meteo} from "../../interface";
@@ -18,6 +18,7 @@ import {check, getConfig, push, remove, setConfig} from "../../maps";
 export default {
 	data: new SlashCommandBuilder()
 		.setName("config")
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.setDMPermission(false)
 		.setDescription("Configure le bot")
 		.addSubcommand((subcommand) => subcommand
