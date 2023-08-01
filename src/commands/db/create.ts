@@ -106,5 +106,6 @@ export default {
 			});
 		}
 		await interaction.reply(`Personnage ${name === "main" ? "principal" : name} créé pour ${userMention(user.id)}`);
+		console.log();
 	}
 };
