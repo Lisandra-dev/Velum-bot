@@ -25,14 +25,6 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 		}]
 	};
 	const steps = 4;
-	const gridColor : string[] = [];
-	for (let i = 0; i < steps+1; i++) {
-		if (i === steps) {
-			gridColor.push("darkgrey");
-		} else {
-			gridColor.push("transparent");
-		}
-	}
 	const options = {
 		elements: {
 			line: {
@@ -105,9 +97,7 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 		aspectRatio: 1,
 	};
 	
-	const renderer = new ChartJSNodeCanvas({ width: 800, height: 800, plugins: {
-		modern: ["chartjs-plugin-datalabels"],
-	}});
+	const renderer = new ChartJSNodeCanvas({ width: 800, height: 800});
 	const fontPath = path.resolve(__dirname, "../../assets/fonts/Jost-Regular.ttf");
 	renderer.registerFont(fontPath, {family: "Jost"});
 
