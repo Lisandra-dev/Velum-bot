@@ -98,7 +98,9 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 	};
 	
 	const renderer = new ChartJSNodeCanvas({ width: 800, height: 800});
-	const fontPath = path.resolve(__dirname, "../../assets/fonts/Jost-Regular.ttf");
+	let fontPath = path.resolve(__dirname, "../../assets/fonts/Jost-Regular.ttf");
+	//remove dist/ in fontPath if any
+	fontPath= fontPath.replace("dist/", "");
 	renderer.registerFont(fontPath, {family: "Jost"});
 
 	return await renderer.renderToBuffer({
