@@ -58,7 +58,7 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 					color: "darkgrey",
 					showLabelBackdrop: false,
 					font: {
-						family: "Inter",
+						family: "Ubuntu",
 						size: 30,
 					},
 					z: 100,
@@ -78,18 +78,6 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 			},
 		},
 		plugins: {
-			datalabels: {
-				display: false,
-				color: "white",
-				font: {
-					size: 25,
-					family: "'Inter'",
-				},
-				backgroundColor: lineColor,
-				borderRadius: 50,
-				opacity: 0.8,
-				padding: 1,
-			},
 			legend: {
 				display: false,
 			},
