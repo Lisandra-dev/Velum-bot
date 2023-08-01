@@ -13,6 +13,9 @@ dependencies:
   canvas:
     specifier: ^2.11.2
     version: 2.11.2
+  chartjs-plugin-datalabels:
+    specifier: ^2.2.0
+    version: 2.2.0(chart.js@3.9.1)
   eslint:
     specifier: ^8.46.0
     version: 8.46.0
@@ -1394,7 +1397,6 @@ packages:
 
   /chart.js@3.9.1:
     resolution: {integrity: sha512-Ro2JbLmvg83gXF5F4sniaQ+lTbSv18E+TIf2cOeiH1Iqd2PGFOtem+DUufMZsCJwFE7ywPOpfXFBwRTGq7dh6w==}
-    dev: true
 
   /chartjs-node-canvas@4.1.6(chart.js@3.9.1):
     resolution: {integrity: sha512-UQJbPWrvqB/FoLclGA9BaLQmZbzSYlujF4w8NZd6Xzb+sqgACBb2owDX6m7ifCXLjUW5Nz0Qx0qqrTtQkkSoYw==}
@@ -1408,6 +1410,14 @@ packages:
       - encoding
       - supports-color
     dev: true
+
+  /chartjs-plugin-datalabels@2.2.0(chart.js@3.9.1):
+    resolution: {integrity: sha512-14ZU30lH7n89oq+A4bWaJPnAG8a7ZTk7dKf48YAzMvJjQtjrgg5Dpk9f+LbjCF6bpx3RAGTeL13IXpKQYyRvlw==}
+    peerDependencies:
+      chart.js: '>=3.0.0'
+    dependencies:
+      chart.js: 3.9.1
+    dev: false
 
   /chokidar@3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}

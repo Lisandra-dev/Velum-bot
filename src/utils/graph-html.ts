@@ -21,11 +21,12 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 			fill: true,
 			backgroundColor: fillColor,
 			borderColor: lineColor,
+			pointStyle: "cross",
 		}]
 	};
 	const steps = 4;
-	const gridColor: string[] = [];
-	for (let i = 0; i < steps + 1; i++) {
+	const gridColor : string[] = [];
+	for (let i = 0; i < steps+1; i++) {
 		if (i === steps) {
 			gridColor.push("darkgrey");
 		} else {
@@ -35,62 +36,80 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 	const options = {
 		elements: {
 			line: {
-				borderWidth: 1,
-				tension: 0,
+				borderWidth: 0,
 			},
-				
+			points: {
+				pointStyle: "cross",
+				pointBorderWidth: 12,
+			}
 		},
 		scales: {
 			r: {
 				angleLines: {
 					color: "darkgrey",
 					display: true,
+					lineWidth: 2,
 					borderDash: [5, 5],
-					borderDashOffset: 0.1,
 				},
 				grid: {
-					color: gridColor,
+					color: "darkgrey",
 					circular: true,
-					tickBorderDash: [5, 5],
 				},
 				ticks: {
 					stepSize: steps,
 					display: true,
-					color: "darkgrey",
-					backdropColor: "transparent",
-					showLabelBackdrop: true,
-					font: {
-						size: 16,
-						weight: "700",
+					callback: (value: any) => {
+						let space = "   ";
+						if (value === 12) space += "  ";
+						if (value === 20) space = "     ";
+						if (value === 16) space = "     ";
+						return `${space}• ${value}`;
 					},
+					color: "darkgrey",
+					showLabelBackdrop: false,
+					font: {
+						family: "Inter",
+						size: 30,
+					},
+					z: 100,
 				},
 				pointLabels: {
 					color: "darkgrey",
 					font: {
-						size: 20,
+						size: 30,
 						family: "'Jost'",
 						weight: "700",
 					},
+					display: true,
+					centerPointLabels: true,
 				},
 				suggestedMin: 0,
 				suggestedMax: 20
 			},
-				
 		},
 		plugins: {
+			datalabels: {
+				display: false,
+				color: "white",
+				font: {
+					size: 25,
+					family: "'Inter'",
+				},
+				backgroundColor: lineColor,
+				borderRadius: 50,
+				opacity: 0.8,
+				padding: 1,
+			},
 			legend: {
 				display: false,
 			},
-			labels: {
-				render: "value",
-				fontColor: "darkgrey",
-				precision: 0,
-				filter: (value: number) => value === 20,
-			}
 		},
+		aspectRatio: 1,
 	};
 	
-	const renderer = new ChartJSNodeCanvas({ width: 400, height: 400});
+	const renderer = new ChartJSNodeCanvas({ width: 800, height: 800, plugins: {
+		modern: ["chartjs-plugin-datalabels"],
+	}});
 	const fontPath = path.resolve(__dirname, "../../assets/fonts/Jost-Regular.ttf");
 	renderer.registerFont(fontPath, {family: "Jost"});
 

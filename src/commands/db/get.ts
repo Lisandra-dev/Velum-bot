@@ -30,8 +30,9 @@ export default {
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const opt = interaction.options as CommandInteractionOptionResolver;
 		const focused = opt.getFocused(true);
+		const user = opt.getUser("user") as User || interaction.user;
 		const choices: string[] = [];
-		const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+		const chara = get(user.id, interaction.guild?.id ?? "0");
 		/** list all characters */
 		if (chara) {
 			chara.forEach((value: Statistiques) => {
