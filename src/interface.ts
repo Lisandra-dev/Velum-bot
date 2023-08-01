@@ -4,7 +4,7 @@ import {Alert, ForecastWeather} from "openweather-api-node";
 import * as pkg from "../package.json";
 
 export const GITHUB = pkg.repository ? pkg.repository.replace("github:", "") : "";
-export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/images`;
+export const IMAGE_LINK = `https://raw.githubusercontent.com/${GITHUB}/master/assets/images/`;
 
 export interface Characters {
 	stats: Statistiques[];
