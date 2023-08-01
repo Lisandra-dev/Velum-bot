@@ -90,6 +90,10 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 	//remove dist/ in fontPath if any
 	fontPath= fontPath.replace("dist/", "");
 	renderer.registerFont(fontPath, {family: "Jost"});
+	let ubuntuPath = path.resolve(__dirname, "../../assets/fonts/Ubuntu-Regular.ttf");
+	//remove dist/ in fontPath if any
+	ubuntuPath= ubuntuPath.replace("dist/", "");
+	renderer.registerFont(path.resolve(ubuntuPath), {family: "Ubuntu"});
 
 	return await renderer.renderToBuffer({
 		type: "radar",
