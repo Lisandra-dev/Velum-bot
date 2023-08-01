@@ -48,8 +48,8 @@ export default {
 			.setDescription("Génère un graphique")
 			.addUserOption((option) => option
 				.setName("user")
-				.setDescription("Utilisateur à qui créer le personnage")
-				.setRequired(true)
+				.setDescription("Utilisateur à qui dessiner le graphique")
+				.setRequired(false)
 			)
 			.addStringOption((option) => option
 				.setName("alias")
@@ -72,7 +72,8 @@ export default {
 		const opt = interaction.options as CommandInteractionOptionResolver;
 		const focused = opt.getFocused(true);
 		const choices: string[] = [];
-		const chara = get(interaction.user.id, interaction.guild?.id ?? "0");
+		const user = opt.getUser("user", false) as User || interaction.user;
+		const chara = get(user.id, interaction.guild?.id ?? "0");
 		/** list all characters */
 		if (chara) {
 			chara.forEach((value: Statistiques) => {

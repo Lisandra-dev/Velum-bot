@@ -65,6 +65,7 @@
     "dependencies": {
         "@kurkle/color": "^0.3.2",
         "canvas": "^2.11.2",
+        "chartjs-plugin-datalabels": "^2.2.0",
         "eslint": "^8.46.0"
     }
 }
