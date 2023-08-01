@@ -36,12 +36,8 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 	const options = {
 		elements: {
 			line: {
-				borderWidth: 0,
+				borderWidth: 1,
 			},
-			points: {
-				pointStyle: "cross",
-				pointBorderWidth: 12,
-			}
 		},
 		scales: {
 			r: {
@@ -49,11 +45,12 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 					color: "darkgrey",
 					display: true,
 					lineWidth: 2,
-					borderDash: [5, 5],
 				},
 				grid: {
 					color: "darkgrey",
 					circular: true,
+					lineWidth: 1,
+					borderDash: [10, 10],
 				},
 				ticks: {
 					stepSize: steps,
