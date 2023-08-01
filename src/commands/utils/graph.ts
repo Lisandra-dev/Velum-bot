@@ -76,6 +76,7 @@ export default {
 		const graph = await imageChar(user.id, interaction.guild.id, name, line as string, background as string);
 		if (!graph) {
 			await interaction.reply("Aucune statistique trouvée");
+			return;
 		}
 		await interaction.reply({files: [graph as AttachmentBuilder]});
 	}

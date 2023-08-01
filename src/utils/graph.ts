@@ -50,9 +50,9 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 					//eslint-disable-next-line @typescript-eslint/no-explicit-any
 					callback: (value: any) => {
 						let space = "   ";
-						if (value === 12) space += "  ";
-						if (value === 20) space = "     ";
-						if (value === 16) space = "     ";
+						if (value === 12) space += "   ";
+						if (value === 20) space = "      ";
+						if (value === 16) space = "      ";
 						return `${space}• ${value}`;
 					},
 					color: "darkgrey",
