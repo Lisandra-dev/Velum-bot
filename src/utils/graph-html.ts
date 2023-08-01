@@ -58,6 +58,7 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 				ticks: {
 					stepSize: steps,
 					display: true,
+					//eslint-disable-next-line @typescript-eslint/no-explicit-any
 					callback: (value: any) => {
 						let space = "   ";
 						if (value === 12) space += "  ";

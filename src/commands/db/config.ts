@@ -9,7 +9,7 @@ import {
 	ChannelType,
 	CommandInteraction,
 	CommandInteractionOptionResolver,
-	SlashCommandBuilder, PermissionFlagsBits} from "discord.js";
+	PermissionFlagsBits,	SlashCommandBuilder} from "discord.js";
 import dedent from "ts-dedent";
 
 import {Meteo} from "../../interface";
