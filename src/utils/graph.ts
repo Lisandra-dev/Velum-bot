@@ -2,12 +2,11 @@ import {ChartJSNodeCanvas} from "chartjs-node-canvas";
 import {AttachmentBuilder} from "discord.js";
 import path from "path";
 
+import {Statistiques} from "../interface";
 import {getCharacters} from "../maps";
 import {capitalize} from "./index";
 
-export async function chart(user: string, guild: string, chara?: string, lineColor?: string, fillColor?: string) {
-	const stat = getCharacters(user, guild, chara);
-	if (!stat) return;
+export async function chart(stat: Statistiques, lineColor?: string, fillColor?: string) {
 	if (!lineColor) lineColor = "rgb(14,71,178)";
 	if (!fillColor) fillColor = "rgba(27,137,204,0.2)";
 	// for data, we need list of stats and number
@@ -71,7 +70,7 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 						weight: "700",
 					},
 					display: true,
-					centerPointLabels: true,
+					centerPointLabels: false,
 				},
 				suggestedMin: 0,
 				suggestedMax: 20
@@ -103,8 +102,15 @@ export async function chart(user: string, guild: string, chara?: string, lineCol
 }
 
 export async function imageChar(user: string, guild: string, chara?: string, lineColor?: string, fillColor?: string) {
-	const charGraph = await chart(user, guild, chara, lineColor, fillColor);
+	const stat = getCharacters(user, guild, chara);
+	if (!stat) return;
+	const charGraph = await chart(stat, lineColor, fillColor);
 	if (!charGraph) return;
 	return new AttachmentBuilder(charGraph);
 }
 
+export async function imagePersonalized(stat: Statistiques, lineColor?: string, fillColor?: string) {
+	const charGraph = await chart(stat, lineColor, fillColor);
+	if (!charGraph) return;
+	return new AttachmentBuilder(charGraph);
+}
