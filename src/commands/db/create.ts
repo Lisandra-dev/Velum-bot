@@ -81,6 +81,12 @@ export default {
 		const intelligence = options.getNumber("intelligence") ?? 10;
 		const psychologie = options.getNumber("psychologie") ?? 10;
 		const perception = options.getNumber("perception") ?? 10;
+		const total = force + constitution + agilite + intelligence + psychologie + perception;
+		const ptTotal = 70;
+		if (total !== ptTotal) {
+			await interaction.reply(`Le total des points (${total}) n'est pas égal à ${ptTotal}`);
+			return;
+		}
 		const stats = {
 			characterName: name,
 			stats: {
