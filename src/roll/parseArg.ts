@@ -360,37 +360,18 @@ function createNumber(param: Parameters, result: ResultRolls) {
  */
 
 function createFormula(param: Parameters, result: ResultRolls) {
-	/**
-	 * Old version
-	 const number = createNumber(param, result);
-  let formula: string;
-	if (number.first !== 0) {
-		formula = number.second.value !== 0 ? ` (${number.first} ${number.second.signe} ${number.second.value})` : `${number.first}`;
-	} else {
-		formula = number.second.value !== 0 ? `${number.second.signe} ${number.second.value}` : "";
-	}
-	
-	const rollCC = param.cc ? `(${result.roll} x 2)` : `${result.roll}`;
-	formula = number.modifStat.trim() === "-" && number.first < 0 ? `(${number.second.value} + ${number.first * -1})` : formula;
-	const formulaRegex = /\((\d+) - -(\d+)\)/gi;
-	formula = formula.replace(formulaRegex, "($1 + $2)");
-	const calculExplained = `${rollCC} ${number.modifStat}${formula}`;
-	
-	logInDev("calculExplained", calculExplained, "modif", number.modifStat);
-	return calculExplained;
-	*/
-	
 	/** New version
 	 * Use the [roll] + [total stats + modif] formula
 	 */
 	const rollCC = param.cc ? `(${result.roll} × 2)` : `${result.roll}`;
-	const bonusTotal = result.stats + param.modificateur;
-	const bonusSigne = bonusTotal > 0 ? " + " : " ";
+	let bonusTotal: number|string = result.stats + param.modificateur;
+	const bonusSigne = bonusTotal > 0 ? " + " : bonusTotal < 0 ? " " : "";
+	bonusTotal = bonusTotal === 0 ? "" : bonusTotal;
 	return `${rollCC}${bonusSigne}${bonusTotal.toString().replace("-", " - ")}`;
 }
 
 function authorName(member: GuildMember, param: Parameters) {
-	if (param.personnage) {
+	if (param.personnage && param.personnage !== "main") {
 		return param.personnage;
 	} else if (member.nickname === null) {
 		return param.user.displayName ?? param.user.globalName;
