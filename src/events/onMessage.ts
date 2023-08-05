@@ -1,4 +1,4 @@
-import {ChannelType, Client, GuildMember} from "discord.js";
+import {ChannelType, Client, GuildMember, MessageFlagsBitField, userMention} from "discord.js";
 
 import {exportMaps, getConfig} from "../maps";
 import {rollCombat, rollNeutre} from "../roll";
@@ -26,16 +26,20 @@ export default (client: Client): void => {
 				await message.reply({embeds: [helpCombat(message, "neutre")]});
 				return;
 			}
+			const messageSaved = `||${userMention(message.author.id)}: \`${message.content}\`||`;
 			/** Parse parameters **/
 			const param = getParameters(message, "neutre");
 			const result = rollNeutre(param);
 			if (!result?.success) return;
 			const member = message.guild?.members.cache.get(param.user.id) as GuildMember;
 			const embed = displayNEUTRE(param, result, member);
-			const info = ephemeralInfo(param);
-			await message.reply({
+			const info = ephemeralInfo(param) + messageSaved;
+			const channel = message.channel;
+			await message.delete();
+			await channel.send({
 				content: info,
-				embeds: [embed]
+				embeds: [embed],
+				flags: [MessageFlagsBitField.Flags.SuppressNotifications]
 			});
 			return;
 		} else if (message.content.toLowerCase().startsWith(`${prefix}atq`)) {
@@ -43,13 +47,16 @@ export default (client: Client): void => {
 				await message.reply({embeds: [helpCombat(message, "combat")]});
 				return;
 			}
+			const messageSaved = `||${userMention(message.author.id)}: \`${message.content}\`||`;
 			const param = getParameters(message, "combat");
 			const result = rollCombat(param);
 			if (!result) return;
 			const member = message.guild?.members.cache.get(param.user.id) as GuildMember;
 			const embed = displayATQ(param, result, member);
-			const info = ephemeralInfo(param);
-			await message.reply({
+			const info = ephemeralInfo(param) + messageSaved;
+			const channel = message.channel;
+			await message.delete();
+			await channel.send({
 				content: info,
 				embeds: [embed]
 			});

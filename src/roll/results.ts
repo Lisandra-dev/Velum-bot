@@ -5,12 +5,12 @@ import {capitalize} from "../utils";
 import {parseResult} from "./parseArg";
 
 
-export function ephemeralInfo(param: Parameters): string | undefined {
+export function ephemeralInfo(param: Parameters): string {
 	if (!param.fiche && param.statistiqueName === "Neutre" && param.statistiques === 10) {
 		const char = param.personnage !== "main" ? `${param.personnage} (${userMention(param.user.id)})` : userMention(param.user.id);
 		return `*${char} n'a pas de fiche de personnage ! ${capitalize(param.statistiqueName)} appliquée : [${param.statistiques}]* \n_ _`;
 	}
-	return undefined;
+	return "";
 }
 
 export function displayATQ(param: Parameters, resultRoll: ResultRolls, member: GuildMember) {
